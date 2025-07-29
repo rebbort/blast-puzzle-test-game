@@ -56,4 +56,26 @@ export class BoardSolver {
     EventBus.emit("GroupFound", result);
     return result;
   }
+
+  /**
+   * Determines whether any valid moves exist on the board.
+   * A move is considered available when two orthogonally
+   * adjacent tiles share the same color.
+   */
+  hasMoves(): boolean {
+    let found = false;
+    // Iterate over all tiles on the board
+    this.board.forEach((p, tile) => {
+      if (found) return; // early exit when at least one move is found
+      // Check 4-directional neighbours for a tile of the same color
+      for (const n of this.board.neighbors4(p)) {
+        const other = this.board.tileAt(n);
+        if (other && other.color === tile.color) {
+          found = true;
+          break;
+        }
+      }
+    });
+    return found;
+  }
 }
