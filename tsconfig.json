@@ -7,6 +7,6 @@
     // Enable strict type checking for better code quality
     "strict": true
   },
-  // Include all TypeScript files in the project
-  "include": ["**/*.ts"]
+  // Include all TypeScript source and type definition files in the project
+  "include": ["**/*.ts", "**/*.d.ts"]
 }
