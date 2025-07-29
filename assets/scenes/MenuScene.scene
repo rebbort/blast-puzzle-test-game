@@ -1,0 +1,18 @@
+{
+  "name": "MenuScene",
+  "canvas": {
+    "name": "Canvas",
+    "children": [
+      {
+        "name": "Background",
+        "type": "Sprite"
+      },
+      {
+        "name": "PlayButton",
+        "type": "Button",
+        "label": "Play",
+        "script": "MenuController"
+      }
+    ]
+  }
+}

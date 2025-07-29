@@ -1,0 +1,11 @@
+{
+  "name": "GameScene",
+  "canvas": {
+    "name": "Canvas",
+    "children": [
+      { "name": "TilesLayer" },
+      { "name": "FxLayer" },
+      { "name": "HudLayer" }
+    ]
+  }
+}
