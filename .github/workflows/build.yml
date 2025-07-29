@@ -1,0 +1,33 @@
+# GitHub Actions workflow for linting and type checking
+# Triggers on pushes and pull requests to the main branch
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint-and-typecheck:
+    name: lint / typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository with Git LFS enabled
+        uses: actions/checkout@v4
+        with:
+          lfs: true # Fetch Git LFS files for full repository contents
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18 # Use Node.js 18 which matches local environment
+
+      - name: Install dependencies
+        run: npm ci # Install exact versions from package-lock.json
+
+      - name: Run ESLint
+        run: npm run lint # Lint TypeScript sources
+
+      - name: Run TypeScript type check
+        run: npm run typecheck # Ensure types are correct

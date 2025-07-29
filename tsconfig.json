@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    // Target modern JavaScript output
+    "target": "ESNext",
+    // Use CommonJS modules so Node can run the code
+    "module": "commonjs",
+    // Enable strict type checking for better code quality
+    "strict": true
+  },
+  // Include all TypeScript files in the project
+  "include": ["**/*.ts"]
+}

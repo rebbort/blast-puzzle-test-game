@@ -1,0 +1,11 @@
+# --- Line ending normalization ---
+# Convert CRLF line endings to LF in all text files
+* text=auto eol=lf
+
+# --- Git LFS for binary assets ---
+# Store PNG textures using Git LFS
+*.png filter=lfs diff=lfs merge=lfs -text
+# Store Photoshop files using Git LFS
+*.psd filter=lfs diff=lfs merge=lfs -text
+# Store MP3 sound files using Git LFS
+*.mp3 filter=lfs diff=lfs merge=lfs -text

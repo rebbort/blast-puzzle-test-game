@@ -1,0 +1,8 @@
+{
+  // Use two spaces for indentation
+  "tabWidth": 2,
+  // Print semicolons at the ends of statements
+  "semi": true,
+  // Prefer single quotes instead of double quotes
+  "singleQuote": true
+}
