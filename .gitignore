@@ -1,0 +1,27 @@
+# --- Node.js dependencies and logs ---
+# Ignore modules installed via npm or yarn
+node_modules/
+# Ignore npm/yarn log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+# Environment configuration files shouldn't be committed
+.env
+
+# --- Cocos Creator generated files ---
+# Asset library cache produced by the editor
+library/
+# User specific local settings
+local/
+# Temporary build data
+temp/
+# Final build output
+build/
+# Editor log files
+logs/
+# Temporary meta files created by the editor
+*.meta.tmp
+
+# --- Operating system artifacts ---
+.DS_Store
+Thumbs.db

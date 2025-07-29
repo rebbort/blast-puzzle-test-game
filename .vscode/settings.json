@@ -1,0 +1,12 @@
+{
+  // Use LF line endings in the workspace
+  "files.eol": "\n",
+  // Automatically format files on save
+  "editor.formatOnSave": true,
+  // Use Prettier extension to format TypeScript files
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  // Enable Path Intellisense suggestions
+  "path-intellisense.autoSlashAfterDirectory": true
+}
