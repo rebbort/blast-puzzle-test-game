@@ -4,3 +4,13 @@
 [![Tests](https://github.com/rebbort/blast-puzzle-test-game/actions/workflows/build.yml/badge.svg?label=Tests)](https://github.com/rebbort/blast-puzzle-test-game/actions/workflows/build.yml)
 
 This project contains a prototype for a Blast puzzle game. The badge above shows the status of the CI workflow which runs linting and type checking on every push to `main`.
+
+## Running tests
+
+Install dependencies once with `npm install` if needed, then run:
+
+```bash
+npm test
+```
+
+This executes the Jest suite defined in the `tests` folder.
