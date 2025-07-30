@@ -1,6 +1,5 @@
-import { _decorator, Component, director, tween, Vec3 } from "cc";
 import { EventBus } from "../core/EventBus";
-const { ccclass } = _decorator;
+const { ccclass } = cc._decorator;
 
 /**
  * Handles showing the result popup when a game ends.
@@ -8,7 +7,7 @@ const { ccclass } = _decorator;
  * can scale smoothly without stretching the corners.
  */
 @ccclass("PopupController")
-export class PopupController extends Component {
+export class PopupController extends cc.Component {
   /** Title label displaying Victory or Defeat text. */
   lblTitle!: { string: string };
   /** Label showing the final score amount. */
@@ -35,11 +34,13 @@ export class PopupController extends Component {
     if (this.lblTitle) this.lblTitle.string = win ? "Victory!" : "Defeat...";
     if (this.lblFinalScore) this.lblFinalScore.string = `Score: ${score}`;
     if (this.btnRestart)
-      this.btnRestart.node.once("click", () => director.loadScene("MenuScene"));
+      this.btnRestart.node.once("click", () =>
+        cc.director.loadScene("MenuScene"),
+      );
 
-    (this.node as unknown as { scale: Vec3 }).scale = new Vec3(0, 0, 0);
-    tween(this.node as unknown as { scale: Vec3 })
-      .to(0.3, { scale: new Vec3(1, 1, 1) }, { easing: "backOut" })
+    (this.node as unknown as { scale: cc.Vec3 }).scale = new cc.Vec3(0, 0, 0);
+    cc.tween(this.node as unknown as { scale: cc.Vec3 })
+      .to(0.3, { scale: new cc.Vec3(1, 1, 1) }, { easing: "backOut" })
       .start();
   }
 }

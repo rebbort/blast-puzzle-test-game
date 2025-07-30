@@ -1,4 +1,3 @@
-import { Vec2 } from "cc";
 import { EventEmitter2 } from "eventemitter2";
 
 const bus = new EventEmitter2();
@@ -60,7 +59,7 @@ it("group selection performs move and returns to WaitingInput", async () => {
   const states: GameState[] = [];
   bus.on("StateChanged", (s) => states.push(s));
   fsm.start();
-  bus.emit("GroupSelected", new Vec2(0, 0));
+  bus.emit("GroupSelected", new cc.Vec2(0, 0));
   await new Promise((r) => setImmediate(r));
   expect(states.slice(0, 5)).toEqual([
     "WaitingInput",
@@ -77,7 +76,7 @@ it("wins when target score reached", async () => {
   const states: GameState[] = [];
   bus.on("StateChanged", (s) => states.push(s));
   fsm.start();
-  bus.emit("GroupSelected", new Vec2(0, 0));
+  bus.emit("GroupSelected", new cc.Vec2(0, 0));
   await new Promise((r) => setImmediate(r));
   expect(states).toContain("Win");
 });
@@ -125,7 +124,7 @@ it("moves to Lose when turns end", async () => {
   const states: GameState[] = [];
   bus.on("StateChanged", (s) => states.push(s));
   fsm.start();
-  bus.emit("GroupSelected", new Vec2(0, 0));
+  bus.emit("GroupSelected", new cc.Vec2(0, 0));
   await new Promise((r) => setImmediate(r));
   expect(states).toContain("Lose");
 });
@@ -139,7 +138,7 @@ it("shuffles board when no moves left", async () => {
   const states: GameState[] = [];
   bus.on("StateChanged", (s) => states.push(s));
   fsm.start();
-  bus.emit("GroupSelected", new Vec2(0, 0));
+  bus.emit("GroupSelected", new cc.Vec2(0, 0));
   await new Promise((r) => setImmediate(r));
   const lastTwo = states.slice(-2);
   expect(lastTwo).toEqual(["Shuffle", "WaitingInput"]);

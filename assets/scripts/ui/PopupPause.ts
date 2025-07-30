@@ -1,6 +1,5 @@
-import { _decorator, Component, director } from "cc";
 import { EventBus } from "../core/EventBus";
-const { ccclass } = _decorator;
+const { ccclass } = cc._decorator;
 
 interface NodeUtils {
   getChildByName(name: string): NodeUtils | null;
@@ -14,7 +13,7 @@ interface NodeUtils {
  * Emits GameResumed or reloads the scene depending on button presses.
  */
 @ccclass("PopupPause")
-export class PopupPause extends Component {
+export class PopupPause extends cc.Component {
   private btnResume: NodeUtils | null = null;
   private btnRestart: NodeUtils | null = null;
 
@@ -31,7 +30,7 @@ export class PopupPause extends Component {
       EventBus.emit("GameResumed");
     });
     this.btnRestart?.node?.on("click", () => {
-      director.loadScene("GameScene");
+      cc.director.loadScene("GameScene");
     });
   }
 }

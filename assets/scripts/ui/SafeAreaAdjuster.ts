@@ -1,5 +1,4 @@
-import { _decorator, Component } from "cc";
-const { ccclass } = _decorator;
+const { ccclass } = cc._decorator;
 
 declare const screen: {
   safeArea: { x: number; y: number; width: number; height: number };
@@ -27,7 +26,7 @@ interface NodeWithUITransform {
  * on phones like iPhone X.
  */
 @ccclass("SafeAreaAdjuster")
-export class SafeAreaAdjuster extends Component {
+export class SafeAreaAdjuster extends cc.Component {
   /** Reads screen.safeArea and applies it to the node's UITransform. */
   start(): void {
     const area = screen.safeArea;

@@ -9,7 +9,6 @@ export type GameState =
   | "Win"
   | "Lose";
 
-import { Vec2 } from "cc";
 import { EventEmitter2 } from "eventemitter2";
 import { Board } from "../board/Board";
 import { BoardSolver } from "../board/BoardSolver";
@@ -45,7 +44,7 @@ export class GameStateMachine {
    * Subscribe to relevant events and enter the initial WaitingInput state.
    */
   start(): void {
-    this.bus.on("GroupSelected", (p: Vec2) => this.onGroupSelected(p));
+    this.bus.on("GroupSelected", (p: cc.Vec2) => this.onGroupSelected(p));
     this.bus.on("BoosterActivated", () => this.onBoosterActivated());
     this.bus.on("BoosterConsumed", () => this.onBoosterConsumed());
     this.bus.on("BoosterCancelled", () => this.onBoosterCancelled());
@@ -57,7 +56,7 @@ export class GameStateMachine {
    * Handles selection of a group by the player.
    * Ignored unless the machine awaits input.
    */
-  private onGroupSelected(start: Vec2): void {
+  private onGroupSelected(start: cc.Vec2): void {
     if (this.state !== "WaitingInput") {
       // Ignore input while another action is executing
       return;
@@ -176,7 +175,7 @@ export class GameStateMachine {
     const tiles: ReturnType<typeof this.board.tileAt>[] = [];
     for (let y = 0; y < cfg.rows; y++) {
       for (let x = 0; x < cfg.cols; x++) {
-        tiles.push(this.board.tileAt(new Vec2(x, y)));
+        tiles.push(this.board.tileAt(new cc.Vec2(x, y)));
       }
     }
     // Fisher–Yates shuffle
@@ -187,7 +186,7 @@ export class GameStateMachine {
     let idx = 0;
     for (let y = 0; y < cfg.rows; y++) {
       for (let x = 0; x < cfg.cols; x++) {
-        this.board.setTile(new Vec2(x, y), tiles[idx++] ?? null);
+        this.board.setTile(new cc.Vec2(x, y), tiles[idx++] ?? null);
       }
     }
   }

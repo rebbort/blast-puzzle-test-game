@@ -1,4 +1,3 @@
-import { Vec2 } from "cc";
 import { Board } from "../Board";
 import { EventEmitter2 } from "eventemitter2";
 import { ICommand } from "./ICommand";
@@ -13,7 +12,7 @@ export class FillCommand implements ICommand {
   constructor(
     private board: Board,
     private bus: EventEmitter2,
-    private slots: Vec2[],
+    private slots: cc.Vec2[],
   ) {}
 
   private get cfg(): BoardConfig {

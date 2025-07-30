@@ -1,4 +1,3 @@
-import { Vec2 } from "cc";
 import { EventEmitter2 } from "eventemitter2";
 
 const bus = new EventEmitter2();
@@ -37,7 +36,7 @@ it("executes remove, fall and fill then emits MoveCompleted", async () => {
   bus.on("fillDone", () => sequence.push("fillDone"));
   bus.on("MoveCompleted", () => sequence.push("MoveCompleted"));
 
-  await executor.execute([new Vec2(0, 0), new Vec2(1, 0)]);
+  await executor.execute([new cc.Vec2(0, 0), new cc.Vec2(1, 0)]);
 
   expect(sequence).toEqual([
     "removeDone",
@@ -54,7 +53,7 @@ it("ignores out of bounds tiles in group", async () => {
     [TileFactory.createNormal("red"), TileFactory.createNormal("red")],
   ]);
   const executor = new MoveExecutor(board, bus);
-  await executor.execute([new Vec2(0, 0), new Vec2(5, 5)]);
+  await executor.execute([new cc.Vec2(0, 0), new cc.Vec2(5, 5)]);
   expect(emitSpy).toHaveBeenLastCalledWith("MoveCompleted");
 });
 
