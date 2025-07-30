@@ -1,0 +1,13 @@
+{
+  "name": "PopupPause",
+  "node": {
+    "name": "PopupPause",
+    "type": "Panel",
+    "slice9": [16, 16, 16, 16],
+    "children": [
+      { "name": "btnResume", "type": "Button", "label": "Resume" },
+      { "name": "btnRestart", "type": "Button", "label": "Restart" }
+    ],
+    "script": "PopupPause"
+  }
+}
