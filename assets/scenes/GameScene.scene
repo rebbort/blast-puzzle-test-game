@@ -9,7 +9,23 @@
     "children": [
       { "name": "TilesLayer" },
       { "name": "FxLayer" },
-      { "name": "HudLayer", "script": "SafeAreaAdjuster" }
+      {
+        "name": "HudLayer",
+        "script": "SafeAreaAdjuster",
+        "children": [
+          { "name": "lblScore", "type": "Label", "string": "0", "align": "left-top" },
+          { "name": "lblMoves", "type": "Label", "string": "0", "align": "right-top" },
+          {
+            "name": "BoosterPanel",
+            "children": [
+              { "name": "btnBomb", "type": "Button", "label": "Bomb" },
+              { "name": "btnSwap", "type": "Button", "label": "Swap" }
+            ]
+          },
+          { "name": "btnPause", "type": "Button", "label": "≡" },
+          { "name": "Controller", "script": "HudController" }
+        ]
+      }
     ]
   }
 }
