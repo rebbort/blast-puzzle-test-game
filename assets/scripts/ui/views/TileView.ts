@@ -7,14 +7,11 @@ export default class TileView extends cc.Component {
   @property(cc.Sprite)
   sprite!: cc.Sprite;
 
-  /**
-   * Applies tile data to this view.
-   * Currently sets the node name to the tile color so tests can inspect it.
-   */
+  /** Cached tile data represented by this view. */
+  private tile!: Tile;
+
+  /** Stores reference to tile for future updates. */
   apply(tile: Tile): void {
-    // In a real project we would map the tile color to a sprite frame.
-    // For the simplified environment we store the color on the node name.
-    // This helps verify correctness without engine specific assets.
-    (this.node as unknown as { name: string }).name = tile.color;
+    this.tile = tile;
   }
 }

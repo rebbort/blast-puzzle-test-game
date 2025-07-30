@@ -19,8 +19,34 @@ export class Vec3 {
 }
 
 export class Node {
+  name = "";
+  parent: Node | null = null;
+  children: Node[] = [];
+  position = new Vec3();
   scale = new Vec3();
   active = false;
+  private components: Component[] = [];
+
+  setPosition(pos: Vec2 | number, y?: number): void {
+    if (pos instanceof Vec2) {
+      this.position.x = pos.x;
+      this.position.y = pos.y;
+    } else {
+      this.position.x = pos;
+      this.position.y = y ?? 0;
+    }
+  }
+
+  addComponent<T extends Component>(Ctor: new () => T): T {
+    const c = new Ctor();
+    c.node = this;
+    this.components.push(c);
+    return c;
+  }
+
+  getComponent<T extends Component>(Ctor: new () => T): T | null {
+    return (this.components.find((c) => c instanceof Ctor) as T) || null;
+  }
 }
 
 export class Component {
@@ -29,6 +55,7 @@ export class Component {
 
 export const _decorator = {
   ccclass: () => () => {},
+  property: () => () => {},
 };
 
 export class Label {
@@ -39,6 +66,33 @@ export class Label {
 export class Button {
   node = new Node();
   static EventType = { CLICK: "click" };
+}
+
+export class Prefab {
+  constructor(
+    public name = "",
+    public comp: new () => Component = Component,
+  ) {}
+}
+
+export function instantiate(prefab: Prefab): Node {
+  const node = new Node();
+  node.name = prefab.name;
+  node.addComponent(prefab.comp);
+  return node;
+}
+
+export function v2(
+  x: number | { x: number; y: number } | Vec2 = 0,
+  y = 0,
+): Vec2 {
+  if (x instanceof Vec2) return new Vec2(x.x, x.y);
+  if (typeof x === "object")
+    return new Vec2(
+      (x as { x: number; y: number }).x,
+      (x as { x: number; y: number }).y,
+    );
+  return new Vec2(x, y);
 }
 
 export class EventTarget {
