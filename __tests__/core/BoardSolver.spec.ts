@@ -7,7 +7,7 @@ const emitSpy = jest.spyOn(bus, "emit");
 jest.mock("../../assets/scripts/core/EventBus", () => ({ EventBus: bus }));
 
 import { Board } from "../../assets/scripts/core/board/Board";
-import { TileFactory } from "../../assets/scripts/core/board/Tile";
+import { TileFactory, TileKind } from "../../assets/scripts/core/board/Tile";
 import { BoardSolver } from "../../assets/scripts/core/board/BoardSolver";
 import { BoardConfig } from "../../assets/scripts/config/ConfigLoader";
 
@@ -99,4 +99,45 @@ it("hasMoves detects available move", () => {
   const board = crossBoard();
   const solver = new BoardSolver(board);
   expect(solver.hasMoves()).toBe(true);
+});
+
+// super tile expansions
+it("expands group for SuperRow", () => {
+  const cfg5: BoardConfig = {
+    cols: 5,
+    rows: 5,
+    tileSize: 1,
+    colors: ["red", "blue"],
+    superThreshold: 3,
+  };
+  const tiles = Array.from({ length: 5 }, () =>
+    Array.from({ length: 5 }, () => TileFactory.createNormal("blue")),
+  );
+  const tile = TileFactory.createNormal("red");
+  tile.kind = TileKind.SuperRow;
+  tiles[0][2] = tile;
+  const board = new Board(cfg5, tiles);
+  const solver = new BoardSolver(board);
+  const res = solver.findGroup(new cc.Vec2(2, 0));
+  expect(res).toHaveLength(5);
+});
+
+it("expands group for SuperClear", () => {
+  const cfg5: BoardConfig = {
+    cols: 5,
+    rows: 5,
+    tileSize: 1,
+    colors: ["red", "blue"],
+    superThreshold: 3,
+  };
+  const tiles = Array.from({ length: 5 }, () =>
+    Array.from({ length: 5 }, () => TileFactory.createNormal("blue")),
+  );
+  const tile = TileFactory.createNormal("red");
+  tile.kind = TileKind.SuperClear;
+  tiles[0][0] = tile;
+  const board = new Board(cfg5, tiles);
+  const solver = new BoardSolver(board);
+  const res = solver.findGroup(new cc.Vec2(0, 0));
+  expect(res).toHaveLength(cfg5.cols * cfg5.rows);
 });
