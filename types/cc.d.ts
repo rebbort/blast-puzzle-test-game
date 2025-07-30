@@ -5,6 +5,35 @@ declare module "cc" {
     y: number;
   }
 
+  export class Vec3 {
+    constructor(x?: number, y?: number, z?: number);
+    x: number;
+    y: number;
+    z: number;
+  }
+
+  export class Node {
+    scale: Vec3;
+  }
+
+  export class Label {
+    string: string;
+  }
+
+  export class Button {
+    node: Node;
+    static EventType: { CLICK: string };
+  }
+
+  export function tween(target: unknown): {
+    to(
+      duration: number,
+      props: Record<string, unknown>,
+      opts?: { easing?: string },
+    ): ReturnType<typeof tween>;
+    start(): void;
+  };
+
   /** Minimal stub for Cocos decorator system. */
   export const _decorator: {
     /** Marks a class as a Cocos component. */

@@ -1,0 +1,14 @@
+{
+  "name": "PopupResult",
+  "node": {
+    "name": "PopupResult",
+    "type": "Panel",
+    "slice9": [16, 16, 16, 16],
+    "children": [
+      { "name": "lblTitle", "type": "Label", "string": "Victory!" },
+      { "name": "lblFinalScore", "type": "Label", "string": "Score: 0" },
+      { "name": "btnRestart", "type": "Button", "label": "Restart" }
+    ],
+    "script": "PopupController"
+  }
+}

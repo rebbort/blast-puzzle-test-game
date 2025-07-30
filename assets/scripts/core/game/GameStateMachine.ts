@@ -143,6 +143,12 @@ export class GameStateMachine {
   private changeState(newState: GameState): void {
     this.state = newState;
     this.bus.emit("StateChanged", newState);
+    if (newState === "Win") {
+      this.bus.emit("GameWon", this.score);
+    }
+    if (newState === "Lose") {
+      this.bus.emit("GameLost", this.score);
+    }
   }
 
   /**
