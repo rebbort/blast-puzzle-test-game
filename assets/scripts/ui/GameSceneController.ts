@@ -12,7 +12,7 @@ interface NodeUtils {
  * director.pause stops the entire engine including timers and animations,
  * while simply blocking input would let those continue running.
  */
-@ccclass("GameSceneController")
+@ccclass("")
 export class GameSceneController extends cc.Component {
   private popup: { node: { active: boolean } } | null = null;
 

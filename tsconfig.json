@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    // Target modern JavaScript output
-    "target": "ESNext",
+    // Target an older ECMAScript version so optional chaining is transpiled
+    "target": "ES2018",
     // Use CommonJS modules so Node can run the code
     "module": "commonjs",
     // Enable strict type checking for better code quality

@@ -6,7 +6,7 @@ const { ccclass } = cc._decorator;
  * The background uses a 9-sliced sprite with 16px borders so it
  * can scale smoothly without stretching the corners.
  */
-@ccclass("PopupController")
+@ccclass("")
 export class PopupController extends cc.Component {
   /** Title label displaying Victory or Defeat text. */
   lblTitle!: { string: string };

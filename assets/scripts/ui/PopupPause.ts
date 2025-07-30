@@ -12,7 +12,7 @@ interface NodeUtils {
  * Controls the pause popup displayed when the game is paused.
  * Emits GameResumed or reloads the scene depending on button presses.
  */
-@ccclass("PopupPause")
+@ccclass("")
 export class PopupPause extends cc.Component {
   private btnResume: NodeUtils | null = null;
   private btnRestart: NodeUtils | null = null;

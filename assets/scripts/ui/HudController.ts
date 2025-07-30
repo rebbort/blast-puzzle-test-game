@@ -19,7 +19,7 @@ const pulse = {};
  * Responsible for updating score/move counters and
  * dispatching events when HUD buttons are pressed.
  */
-@ccclass("HudController")
+@ccclass("")
 export class HudController extends cc.Component {
   private lblScore: cc.Label | null = null;
   private lblMoves: cc.Label | null = null;
