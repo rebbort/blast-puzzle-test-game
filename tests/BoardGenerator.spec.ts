@@ -1,5 +1,5 @@
 import { BoardGenerator } from "../assets/scripts/core/board/BoardGenerator";
-import { BoardConfig } from "../assets/scripts/config/BoardConfig";
+import { BoardConfig } from "../assets/scripts/config/ConfigLoader";
 
 describe("BoardGenerator", () => {
   const cfg: BoardConfig = {

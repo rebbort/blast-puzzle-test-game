@@ -1,15 +1,15 @@
-import { EventEmitter2 } from "eventemitter2";
+import { EventBus } from "../../infrastructure/EventBus";
 import { Board } from "./Board";
 import { BoardSolver } from "./BoardSolver";
 import { Tile } from "./Tile";
-import { BoardConfig } from "../../config/BoardConfig";
+import { BoardConfig } from "../../config/ConfigLoader";
 
 export class ShuffleService {
   private shuffleCount = 0;
   constructor(
     private board: Board,
     private solver: BoardSolver,
-    private bus: EventEmitter2,
+    private bus: EventBus,
     private maxShuffles: number = 3,
   ) {}
 

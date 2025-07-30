@@ -1,8 +1,8 @@
 import { Board } from "../Board";
-import { EventEmitter2 } from "eventemitter2";
+import { EventBus } from "../../../infrastructure/EventBus";
 import { ICommand } from "./ICommand";
 import { TileFactory, TileColor } from "../Tile";
-import { BoardConfig } from "../../../config/BoardConfig";
+import { BoardConfig } from "../../../config/ConfigLoader";
 
 /**
  * Generates new tiles in provided empty slots.
@@ -11,7 +11,7 @@ import { BoardConfig } from "../../../config/BoardConfig";
 export class FillCommand implements ICommand {
   constructor(
     private board: Board,
-    private bus: EventEmitter2,
+    private bus: EventBus,
     private slots: cc.Vec2[],
   ) {}
 

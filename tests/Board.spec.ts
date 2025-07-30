@@ -1,5 +1,5 @@
 import { Board } from "../assets/scripts/core/board/Board";
-import { BoardConfig } from "../assets/scripts/config/BoardConfig";
+import { BoardConfig } from "../assets/scripts/config/ConfigLoader";
 
 describe("Board", () => {
   const cfg: BoardConfig = {

@@ -1,4 +1,4 @@
-import { BoardConfig } from "../../config/BoardConfig";
+import { BoardConfig } from "../../config/ConfigLoader";
 import { Tile, TileColor } from "./Tile";
 
 /**

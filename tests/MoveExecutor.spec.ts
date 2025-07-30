@@ -1,5 +1,5 @@
 import { Board } from "../assets/scripts/core/board/Board";
-import { BoardConfig } from "../assets/scripts/config/BoardConfig";
+import { BoardConfig } from "../assets/scripts/config/ConfigLoader";
 import { TileFactory } from "../assets/scripts/core/board/Tile";
 import { EventBus } from "../assets/scripts/core/EventBus";
 import { MoveExecutor } from "../assets/scripts/core/board/MoveExecutor";

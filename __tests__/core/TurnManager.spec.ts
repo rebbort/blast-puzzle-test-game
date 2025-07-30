@@ -1,8 +1,12 @@
-import { EventEmitter2 } from "eventemitter2";
+import { EventBus } from "../../assets/scripts/infrastructure/EventBus";
 import { TurnManager } from "../../assets/scripts/core/rules/TurnManager";
 
-const bus = new EventEmitter2();
-const emitSpy = jest.spyOn(bus, "emit");
+let bus: EventBus;
+let emitSpy: jest.SpyInstance;
+beforeAll(() => {
+  bus = new EventBus();
+  emitSpy = jest.spyOn(bus, "emit");
+});
 
 beforeEach(() => {
   emitSpy.mockClear();

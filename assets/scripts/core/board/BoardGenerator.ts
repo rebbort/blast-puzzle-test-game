@@ -5,7 +5,7 @@
 import * as seedrandom from "seedrandom";
 import { Board } from "./Board";
 import { TileFactory, TileColor, Tile } from "./Tile";
-import { BoardConfig } from "../../config/BoardConfig";
+import { BoardConfig } from "../../config/ConfigLoader";
 
 /**
  * Creates fully populated boards filled with normal tiles.

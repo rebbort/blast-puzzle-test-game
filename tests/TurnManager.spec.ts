@@ -1,12 +1,13 @@
-import { EventEmitter2 } from "eventemitter2";
+// Тесты больше не используют eventemitter2, вместо него наш EventBus
+import { EventBus } from "../assets/scripts/infrastructure/EventBus";
 import { TurnManager } from "../assets/scripts/core/rules/TurnManager";
 
 describe("TurnManager", () => {
   test("counts down turns and emits TurnUsed", () => {
-    const bus = new EventEmitter2();
+    const bus = new EventBus();
     const tm = new TurnManager(5, bus);
     const used: number[] = [];
-    bus.on("TurnUsed", (left: number) => used.push(left));
+    bus.on("TurnUsed", (left) => used.push(left as number));
     tm.useTurn();
     tm.useTurn();
     tm.useTurn();
@@ -15,7 +16,7 @@ describe("TurnManager", () => {
   });
 
   test("OutOfTurns emitted when reaching zero", () => {
-    const bus = new EventEmitter2();
+    const bus = new EventBus();
     const tm = new TurnManager(2, bus);
     let count = 0;
     bus.on("OutOfTurns", () => count++);

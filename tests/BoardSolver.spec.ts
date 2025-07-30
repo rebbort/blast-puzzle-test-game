@@ -1,7 +1,7 @@
 import { Board } from "../assets/scripts/core/board/Board";
 import { TileFactory } from "../assets/scripts/core/board/Tile";
 import { BoardSolver } from "../assets/scripts/core/board/BoardSolver";
-import { BoardConfig } from "../assets/scripts/config/BoardConfig";
+import { BoardConfig } from "../assets/scripts/config/ConfigLoader";
 
 const cfg: BoardConfig = {
   cols: 3,
