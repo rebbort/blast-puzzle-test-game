@@ -1,23 +1,23 @@
-declare module "cc" {
-  export class Vec2 {
+declare namespace cc {
+  class Vec2 {
     constructor(x?: number, y?: number);
     x: number;
     y: number;
   }
 
-  export class Vec3 {
+  class Vec3 {
     constructor(x?: number, y?: number, z?: number);
     x: number;
     y: number;
     z: number;
   }
 
-  export class Node {
+  class Node {
     scale: Vec3;
     active: boolean;
   }
 
-  export function tween(target: unknown): {
+  function tween(target: unknown): {
     to(
       duration: number,
       props: Record<string, unknown>,
@@ -26,38 +26,30 @@ declare module "cc" {
     start(): void;
   };
 
-  /** Minimal stub for Cocos decorator system. */
-  export const _decorator: {
-    /** Marks a class as a Cocos component. */
+  const _decorator: {
     ccclass(name?: string): ClassDecorator;
   };
 
-  /** Base component class every behaviour derives from. */
-  export class Component {
+  class Component {
     node: unknown;
   }
 
-  /** Provides scene management utilities. */
-  export const director: {
-    /** Loads a scene by its name. */
+  const director: {
     loadScene(name: string): void;
-    /** Pauses the entire director, halting updates. */
     pause(): void;
-    /** Resumes updates after a pause. */
     resume(): void;
   };
 
-  /** Simplified label component used to display text in the HUD. */
-  export class Label {
-    /** Text contents shown on screen. */
+  class Label {
     string: string;
-    /** Node the component is attached to. */
     node: unknown;
   }
 
-  /** Minimal clickable UI element. */
-  export class Button {
-    /** Root node this button controls. */
+  class Button {
     node: unknown;
   }
+}
+
+declare module "cc" {
+  export = cc;
 }

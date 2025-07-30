@@ -1,4 +1,3 @@
-import { Vec2 } from "cc";
 import { EventBus } from "../EventBus";
 import { Board } from "./Board";
 
@@ -18,7 +17,7 @@ export class BoardSolver {
    * @param start Starting board coordinates
    * @returns Array of coordinates belonging to the found group
    */
-  findGroup(start: Vec2): Vec2[] {
+  findGroup(start: cc.Vec2): cc.Vec2[] {
     // Return empty when starting point is invalid or empty
     if (!this.board.inBounds(start)) {
       return [];
@@ -28,13 +27,13 @@ export class BoardSolver {
       return [];
     }
 
-    const result: Vec2[] = [];
-    const stack: Vec2[] = [start];
+    const result: cc.Vec2[] = [];
+    const stack: cc.Vec2[] = [start];
     // "visited" tracks processed cells to prevent infinite loops
     const visited = new Set<string>();
 
     while (stack.length > 0) {
-      const p = stack.pop() as Vec2;
+      const p = stack.pop() as cc.Vec2;
       const key = `${p.x},${p.y}`;
       if (visited.has(key)) continue;
       visited.add(key);

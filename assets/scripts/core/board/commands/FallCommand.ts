@@ -1,4 +1,3 @@
-import { Vec2 } from "cc";
 import { Board } from "../Board";
 import { EventEmitter2 } from "eventemitter2";
 import { ICommand } from "./ICommand";
@@ -30,14 +29,14 @@ export class FallCommand implements ICommand {
 
     this.bus.emit("fallStart", this.columns);
 
-    const emptySlots: Vec2[] = [];
+    const emptySlots: cc.Vec2[] = [];
     const rows = this.cfg.rows;
 
     for (const x of this.columns) {
       const kept: Tile[] = [];
       // Collect existing tiles from bottom to top
       for (let y = rows - 1; y >= 0; y--) {
-        const t = this.board.tileAt(new Vec2(x, y));
+        const t = this.board.tileAt(new cc.Vec2(x, y));
         if (t) {
           kept.push(t);
         }
@@ -45,12 +44,12 @@ export class FallCommand implements ICommand {
       // Place tiles starting from bottom
       let y = rows - 1;
       for (const t of kept) {
-        this.board.setTile(new Vec2(x, y), t);
+        this.board.setTile(new cc.Vec2(x, y), t);
         y--;
       }
       // Clear remaining cells and record them as empty
       for (; y >= 0; y--) {
-        const p = new Vec2(x, y);
+        const p = new cc.Vec2(x, y);
         this.board.setTile(p, null);
         emptySlots.push(p);
       }

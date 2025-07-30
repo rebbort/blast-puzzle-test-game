@@ -1,4 +1,3 @@
-import { Vec2 } from "cc";
 import { EventEmitter2 } from "eventemitter2";
 import { Board } from "./Board";
 import { BoardSolver } from "./BoardSolver";
@@ -50,7 +49,7 @@ export class ShuffleService {
     // Считываем текущее состояние поля в плоский массив.
     for (let y = 0; y < cfg.rows; y++) {
       for (let x = 0; x < cfg.cols; x++) {
-        tiles.push(this.board.tileAt(new Vec2(x, y)));
+        tiles.push(this.board.tileAt(new cc.Vec2(x, y)));
       }
     }
 
@@ -64,7 +63,7 @@ export class ShuffleService {
     let idx = 0;
     for (let x = 0; x < cfg.cols; x++) {
       for (let y = 0; y < cfg.rows; y++) {
-        this.board.setTile(new Vec2(x, y), tiles[idx++] ?? null);
+        this.board.setTile(new cc.Vec2(x, y), tiles[idx++] ?? null);
       }
     }
 

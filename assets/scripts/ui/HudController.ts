@@ -1,6 +1,5 @@
-import { _decorator, Component, Label, tween } from "cc";
 import { EventBus } from "../core/EventBus";
-const { ccclass } = _decorator;
+const { ccclass } = cc._decorator;
 
 interface NodeUtils {
   getChildByName(name: string): NodeUtils | null;
@@ -21,9 +20,9 @@ const pulse = {};
  * dispatching events when HUD buttons are pressed.
  */
 @ccclass("HudController")
-export class HudController extends Component {
-  private lblScore: Label | null = null;
-  private lblMoves: Label | null = null;
+export class HudController extends cc.Component {
+  private lblScore: cc.Label | null = null;
+  private lblMoves: cc.Label | null = null;
   private btnBomb: NodeUtils | null = null;
   private btnSwap: NodeUtils | null = null;
   private btnPause: NodeUtils | null = null;
@@ -34,10 +33,10 @@ export class HudController extends Component {
 
     this.lblScore = root
       .getChildByName("lblScore")
-      ?.getComponent("Label") as Label | null;
+      ?.getComponent("Label") as cc.Label | null;
     this.lblMoves = root
       .getChildByName("lblMoves")
-      ?.getComponent("Label") as Label | null;
+      ?.getComponent("Label") as cc.Label | null;
 
     const panel = root.getChildByName("BoosterPanel") as NodeUtils | null;
     this.btnBomb = panel
@@ -69,7 +68,7 @@ export class HudController extends Component {
       const data = { value: startVal };
       EventBus.emit("AnimationStarted", "score-tween");
       // Tween over half a second using an ease-out curve for smooth feel
-      tween(data).to(0.5, { value: score }, { easing: "quadOut" }).start();
+      cc.tween(data).to(0.5, { value: score }, { easing: "quadOut" }).start();
       const id = setInterval(() => {
         if (this.lblScore)
           this.lblScore.string = String(Math.round(data.value));

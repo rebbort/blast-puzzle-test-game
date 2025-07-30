@@ -1,4 +1,3 @@
-import { Vec2 } from "cc";
 import { Board } from "../Board";
 import { EventEmitter2 } from "eventemitter2";
 import { ICommand } from "./ICommand";
@@ -12,7 +11,7 @@ export class RemoveCommand implements ICommand {
   constructor(
     private board: Board,
     private bus: EventEmitter2,
-    private group: Vec2[],
+    private group: cc.Vec2[],
   ) {}
 
   async execute(): Promise<void> {

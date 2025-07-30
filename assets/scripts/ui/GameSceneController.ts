@@ -1,6 +1,5 @@
-import { _decorator, Component, director } from "cc";
 import { EventBus } from "../core/EventBus";
-const { ccclass } = _decorator;
+const { ccclass } = cc._decorator;
 
 interface NodeUtils {
   getChildByName(name: string): NodeUtils | null;
@@ -14,7 +13,7 @@ interface NodeUtils {
  * while simply blocking input would let those continue running.
  */
 @ccclass("GameSceneController")
-export class GameSceneController extends Component {
+export class GameSceneController extends cc.Component {
   private popup: { node: { active: boolean } } | null = null;
 
   start(): void {
@@ -27,12 +26,12 @@ export class GameSceneController extends Component {
     if (this.popup?.node) this.popup.node.active = false;
 
     EventBus.on("GamePaused", () => {
-      director.pause();
+      cc.director.pause();
       if (this.popup?.node) this.popup.node.active = true;
     });
 
     EventBus.on("GameResumed", () => {
-      director.resume();
+      cc.director.resume();
       if (this.popup?.node) this.popup.node.active = false;
     });
   }

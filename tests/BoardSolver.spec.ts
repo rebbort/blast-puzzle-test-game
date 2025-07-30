@@ -1,4 +1,3 @@
-import { Vec2 } from "cc";
 import { Board } from "../assets/scripts/core/board/Board";
 import { TileFactory } from "../assets/scripts/core/board/Tile";
 import { BoardSolver } from "../assets/scripts/core/board/BoardSolver";
@@ -37,7 +36,7 @@ describe("BoardSolver.findGroup", () => {
   test("returns connected same-color tiles for center", () => {
     const board = createCrossBoard();
     const solver = new BoardSolver(board);
-    const group = solver.findGroup(new Vec2(1, 1));
+    const group = solver.findGroup(new cc.Vec2(1, 1));
     const coords = group.map((p) => [p.x, p.y]);
     expect(coords).toHaveLength(5);
     expect(coords).toEqual(
@@ -54,7 +53,7 @@ describe("BoardSolver.findGroup", () => {
   test("returns empty array when start is out of bounds", () => {
     const board = createCrossBoard();
     const solver = new BoardSolver(board);
-    const group = solver.findGroup(new Vec2(-1, -1));
+    const group = solver.findGroup(new cc.Vec2(-1, -1));
     expect(group).toEqual([]);
   });
 });

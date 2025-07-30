@@ -1,4 +1,3 @@
-import { Vec2 } from "cc";
 import { BoardConfig } from "../../config/BoardConfig";
 import { Tile, TileColor } from "./Tile";
 
@@ -42,7 +41,7 @@ export class Board {
    * @param p Point to test
    * @returns True if the point is inside the board
    */
-  public inBounds(p: Vec2): boolean {
+  public inBounds(p: cc.Vec2): boolean {
     return p.x >= 0 && p.y >= 0 && p.x < this.cfg.cols && p.y < this.cfg.rows;
   }
 
@@ -51,7 +50,7 @@ export class Board {
    * @param p Board coordinates
    * @returns Tile object or null if the position is empty or out of bounds
    */
-  public tileAt(p: Vec2): Tile | null {
+  public tileAt(p: cc.Vec2): Tile | null {
     return this.inBounds(p) ? this.grid[p.y][p.x] : null;
   }
 
@@ -60,7 +59,7 @@ export class Board {
    * @param p Board coordinates
    * @returns Color of tile or null when no tile is present or point is invalid
    */
-  public colorAt(p: Vec2): TileColor | null {
+  public colorAt(p: cc.Vec2): TileColor | null {
     const tile = this.tileAt(p);
     return tile ? tile.color : null;
   }
@@ -71,7 +70,7 @@ export class Board {
    * @param p Board coordinates
    * @param t Tile to place or null to clear the cell
    */
-  public setTile(p: Vec2, t: Tile | null): void {
+  public setTile(p: cc.Vec2, t: Tile | null): void {
     if (!this.inBounds(p)) {
       throw new Error(`setTile out of bounds: (${p.x}, ${p.y})`);
     }
@@ -84,13 +83,13 @@ export class Board {
    * @param p Central point
    * @returns Array of neighbouring coordinates
    */
-  public neighbors4(p: Vec2): Vec2[] {
-    const result: Vec2[] = [];
+  public neighbors4(p: cc.Vec2): cc.Vec2[] {
+    const result: cc.Vec2[] = [];
     const candidates = [
-      new Vec2(p.x, p.y - 1),
-      new Vec2(p.x + 1, p.y),
-      new Vec2(p.x, p.y + 1),
-      new Vec2(p.x - 1, p.y),
+      new cc.Vec2(p.x, p.y - 1),
+      new cc.Vec2(p.x + 1, p.y),
+      new cc.Vec2(p.x, p.y + 1),
+      new cc.Vec2(p.x - 1, p.y),
     ];
     for (const c of candidates) {
       if (this.inBounds(c)) {
@@ -104,12 +103,12 @@ export class Board {
    * Iterates over all cells of the board invoking callback for non-null tiles.
    * @param callback Function called with coordinates and tile
    */
-  public forEach(callback: (p: Vec2, t: Tile) => void): void {
+  public forEach(callback: (p: cc.Vec2, t: Tile) => void): void {
     for (let y = 0; y < this.cfg.rows; y++) {
       for (let x = 0; x < this.cfg.cols; x++) {
         const tile = this.grid[y][x];
         if (tile) {
-          callback(new Vec2(x, y), tile);
+          callback(new cc.Vec2(x, y), tile);
         }
       }
     }

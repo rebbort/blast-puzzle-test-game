@@ -1,4 +1,3 @@
-import { Vec2 } from "cc";
 import { EventBus } from "../assets/scripts/core/EventBus";
 import {
   GameStateMachine,
@@ -61,7 +60,7 @@ describe("GameStateMachine", () => {
     const states: GameState[] = [];
     EventBus.on("StateChanged", (s: GameState) => states.push(s));
     fsm.start();
-    EventBus.emit("GroupSelected", new Vec2(0, 0));
+    EventBus.emit("GroupSelected", new cc.Vec2(0, 0));
     await new Promise((r) => setImmediate(r));
     expect(states.slice(0, 5)).toEqual([
       "WaitingInput",
@@ -77,7 +76,7 @@ describe("GameStateMachine", () => {
     const states: GameState[] = [];
     EventBus.on("StateChanged", (s: GameState) => states.push(s));
     fsm.start();
-    EventBus.emit("GroupSelected", new Vec2(0, 0));
+    EventBus.emit("GroupSelected", new cc.Vec2(0, 0));
     await new Promise((r) => setImmediate(r));
     expect(states).toContain("Win");
   });
@@ -95,7 +94,7 @@ describe("GameStateMachine", () => {
     const states: GameState[] = [];
     EventBus.on("StateChanged", (s: GameState) => states.push(s));
     fsm.start();
-    EventBus.emit("GroupSelected", new Vec2(0, 0));
+    EventBus.emit("GroupSelected", new cc.Vec2(0, 0));
     await new Promise((r) => setImmediate(r));
     const lastTwo = states.slice(-2);
     expect(lastTwo).toEqual(["Shuffle", "WaitingInput"]);
@@ -106,8 +105,8 @@ describe("GameStateMachine", () => {
     const states: GameState[] = [];
     EventBus.on("StateChanged", (s: GameState) => states.push(s));
     fsm.start();
-    EventBus.emit("GroupSelected", new Vec2(0, 0));
-    EventBus.emit("GroupSelected", new Vec2(0, 1));
+    EventBus.emit("GroupSelected", new cc.Vec2(0, 0));
+    EventBus.emit("GroupSelected", new cc.Vec2(0, 1));
     expect(states.filter((s) => s === "ExecutingMove")).toHaveLength(1);
   });
 });

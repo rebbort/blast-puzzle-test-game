@@ -4,8 +4,5 @@ module.exports = {
   preset: 'ts-jest',
   // Run tests in Node environment
   testEnvironment: 'node',
-  // Redirect imports of the cocos Vec2 module to a local stub
-  moduleNameMapper: {
-    '^cc$': '<rootDir>/tests/cc.ts',
-  },
+  setupFiles: ['<rootDir>/tests/setupGlobals.ts'],
 };

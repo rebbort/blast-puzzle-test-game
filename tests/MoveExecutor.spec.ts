@@ -1,4 +1,3 @@
-import { Vec2 } from "cc";
 import { Board } from "../assets/scripts/core/board/Board";
 import { BoardConfig } from "../assets/scripts/config/BoardConfig";
 import { TileFactory } from "../assets/scripts/core/board/Tile";
@@ -32,7 +31,7 @@ describe("MoveExecutor", () => {
     EventBus.on("fillDone", () => events.push("fillDone"));
     EventBus.on("MoveCompleted", () => events.push("MoveCompleted"));
 
-    await executor.execute([new Vec2(0, 1), new Vec2(1, 1)]);
+    await executor.execute([new cc.Vec2(0, 1), new cc.Vec2(1, 1)]);
 
     expect(events).toEqual([
       "removeDone",

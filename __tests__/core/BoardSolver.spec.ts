@@ -1,4 +1,3 @@
-import { Vec2 } from "cc";
 import { EventEmitter2 } from "eventemitter2";
 
 // Create a mock event bus preserving emit functionality
@@ -52,7 +51,7 @@ beforeEach(() => {
 // group of 5 tiles should be returned and event emitted
 it("findGroup emits GroupFound with connected tiles", () => {
   const solver = new BoardSolver(crossBoard());
-  const res = solver.findGroup(new Vec2(1, 1));
+  const res = solver.findGroup(new cc.Vec2(1, 1));
   expect(res).toHaveLength(5);
   expect(emitSpy).toHaveBeenCalledWith("GroupFound", res);
 });
@@ -60,7 +59,7 @@ it("findGroup emits GroupFound with connected tiles", () => {
 // starting outside board returns empty without emitting
 it("findGroup on out of bounds returns empty", () => {
   const solver = new BoardSolver(crossBoard());
-  const res = solver.findGroup(new Vec2(-1, -1));
+  const res = solver.findGroup(new cc.Vec2(-1, -1));
   expect(res).toEqual([]);
   expect(emitSpy).not.toHaveBeenCalled();
 });
@@ -91,9 +90,9 @@ it("hasMoves detects absence of moves", () => {
 // starting on empty cell should return empty
 it("returns empty when start cell has no tile", () => {
   const board = crossBoard();
-  board.setTile(new Vec2(1, 1), null);
+  board.setTile(new cc.Vec2(1, 1), null);
   const solver = new BoardSolver(board);
-  const res = solver.findGroup(new Vec2(1, 1));
+  const res = solver.findGroup(new cc.Vec2(1, 1));
   expect(res).toEqual([]);
 });
 
