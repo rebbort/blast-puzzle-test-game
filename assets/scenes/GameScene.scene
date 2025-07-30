@@ -2,10 +2,14 @@
   "name": "GameScene",
   "canvas": {
     "name": "Canvas",
+    "fitWidth": true,
+    "fitHeight": true,
+    "referenceResolution": [540, 960],
+    "safeArea": true,
     "children": [
       { "name": "TilesLayer" },
       { "name": "FxLayer" },
-      { "name": "HudLayer" }
+      { "name": "HudLayer", "script": "SafeAreaAdjuster" }
     ]
   }
 }
