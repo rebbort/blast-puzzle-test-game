@@ -1,5 +1,5 @@
 import { Board } from "./Board";
-import { EventBus } from "../../infrastructure/EventBus";
+import { ExtendedEventTarget } from "../../infrastructure/ExtendedEventTarget";
 import { RemoveCommand } from "./commands/RemoveCommand";
 import { FallCommand } from "./commands/FallCommand";
 import { FillCommand } from "./commands/FillCommand";
@@ -12,7 +12,7 @@ import { FillCommand } from "./commands/FillCommand";
 export class MoveExecutor {
   constructor(
     private board: Board,
-    private bus: EventBus,
+    private bus: ExtendedEventTarget,
   ) {}
 
   async execute(group: cc.Vec2[]): Promise<void> {

@@ -33,7 +33,7 @@ export function loadBoardConfig(): BoardConfig {
   try {
     // объединяем сохранённые поля с настройками по умолчанию
     const parsed = JSON.parse(raw) as Partial<BoardConfig>;
-    return { ...DefaultBoard, ...parsed };
+    return Object.assign({}, DefaultBoard, parsed);
   } catch {
     // если JSON битый, не ломаем игру
     return DefaultBoard;

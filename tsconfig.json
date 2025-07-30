@@ -1,12 +1,42 @@
+// {
+//   "compilerOptions": {
+//     // Target an older ECMAScript version so optional chaining is transpiled
+//     "target": "ES5",
+//     // Use CommonJS modules so Node can run the code
+//     "module": "commonjs",
+//     // Enable strict type checking for better code quality
+//     "strict": true
+//   },
+//   // Include all TypeScript source and type definition files in the project
+//   "include": [
+//     "**/*.ts",
+//     "**/*.d.ts"
+//   ]
+// }
 {
   "compilerOptions": {
-    // Target an older ECMAScript version so optional chaining is transpiled
-    "target": "ES2018",
-    // Use CommonJS modules so Node can run the code
     "module": "commonjs",
-    // Enable strict type checking for better code quality
-    "strict": true
+    "lib": [
+      "es2015",
+      "es2017",
+      "dom"
+    ],
+    "target": "es5",
+    "experimentalDecorators": true,
+    "skipLibCheck": true,
+    "outDir": "temp/vscode-dist",
+    "forceConsistentCasingInFileNames": true
   },
-  // Include all TypeScript source and type definition files in the project
-  "include": ["**/*.ts", "**/*.d.ts"]
+  "exclude": [
+    "node_modules",
+    "library",
+    "local",
+    "temp",
+    "build",
+    "settings"
+  ],
+  // "include": [
+  //   "**/*.ts",
+  //   "**/*.d.ts"
+  // ]
 }

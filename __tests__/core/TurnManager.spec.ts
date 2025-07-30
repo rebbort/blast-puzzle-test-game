@@ -1,10 +1,10 @@
-import { EventBus } from "../../assets/scripts/infrastructure/EventBus";
+import { ExtendedEventTarget } from "../../assets/scripts/infrastructure/ExtendedEventTarget";
 import { TurnManager } from "../../assets/scripts/core/rules/TurnManager";
 
-let bus: EventBus;
+let bus: ExtendedEventTarget;
 let emitSpy: jest.SpyInstance;
 beforeAll(() => {
-  bus = new EventBus();
+  bus = new ExtendedEventTarget();
   emitSpy = jest.spyOn(bus, "emit");
 });
 

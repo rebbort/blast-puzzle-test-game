@@ -9,7 +9,7 @@ export type GameState =
   | "Win"
   | "Lose";
 
-import { EventBus } from "../../infrastructure/EventBus";
+import { ExtendedEventTarget } from "../../infrastructure/ExtendedEventTarget";
 import { Board } from "../board/Board";
 import { BoardSolver } from "../board/BoardSolver";
 import { MoveExecutor } from "../board/MoveExecutor";
@@ -30,7 +30,7 @@ export class GameStateMachine {
   private shuffles = 0;
 
   constructor(
-    private bus: EventBus,
+    private bus: ExtendedEventTarget,
     private board: Board,
     private solver: BoardSolver,
     private executor: MoveExecutor,

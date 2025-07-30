@@ -2,7 +2,7 @@
  * EventBus — обёртка над cc.EventTarget
  * для публикации/подписки на события внутри игры.
  */
-export class EventBus extends cc.EventTarget {
+export class ExtendedEventTarget extends cc.EventTarget {
   // Можно добавить вспомогательный метод once,
   // так как его нет в cc.EventTarget по умолчанию.
   once(event: string, listener: (...args: unknown[]) => void): void {

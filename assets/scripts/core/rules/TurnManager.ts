@@ -1,4 +1,4 @@
-import { EventBus } from "../../infrastructure/EventBus";
+import { ExtendedEventTarget } from "../../infrastructure/ExtendedEventTarget";
 export class TurnManager {
   /** Remaining turns in the current session. */
   private turnsLeft: number;
@@ -10,7 +10,7 @@ export class TurnManager {
    */
   constructor(
     initialTurns: number,
-    private bus: EventBus,
+    private bus: ExtendedEventTarget,
   ) {
     this.turnsLeft = initialTurns;
   }
