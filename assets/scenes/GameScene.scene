@@ -25,7 +25,19 @@
           { "name": "btnPause", "type": "Button", "label": "≡" },
           { "name": "Controller", "script": "HudController" }
         ]
-      }
+      },
+      {
+        "name": "PopupPause",
+        "type": "Panel",
+        "slice9": [16, 16, 16, 16],
+        "active": false,
+        "children": [
+          { "name": "btnResume", "type": "Button", "label": "Resume" },
+          { "name": "btnRestart", "type": "Button", "label": "Restart" }
+        ],
+        "script": "PopupPause"
+      },
+      { "name": "SceneController", "script": "GameSceneController" }
     ]
   }
 }

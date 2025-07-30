@@ -14,15 +14,7 @@ declare module "cc" {
 
   export class Node {
     scale: Vec3;
-  }
-
-  export class Label {
-    string: string;
-  }
-
-  export class Button {
-    node: Node;
-    static EventType: { CLICK: string };
+    active: boolean;
   }
 
   export function tween(target: unknown): {
@@ -49,6 +41,10 @@ declare module "cc" {
   export const director: {
     /** Loads a scene by its name. */
     loadScene(name: string): void;
+    /** Pauses the entire director, halting updates. */
+    pause(): void;
+    /** Resumes updates after a pause. */
+    resume(): void;
   };
 
   /** Simplified label component used to display text in the HUD. */
