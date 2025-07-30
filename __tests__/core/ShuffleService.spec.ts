@@ -1,15 +1,13 @@
-import { EventEmitter2 } from "eventemitter2";
+import { EventBus } from "../../assets/scripts/infrastructure/EventBus";
 
-const bus = new EventEmitter2();
+const bus = new EventBus();
 const emitSpy = jest.spyOn(bus, "emit");
-
-jest.mock("../../assets/scripts/core/EventBus", () => ({ EventBus: bus }));
 
 import { Board } from "../../assets/scripts/core/board/Board";
 import { BoardSolver } from "../../assets/scripts/core/board/BoardSolver";
 import { TileFactory } from "../../assets/scripts/core/board/Tile";
 import { ShuffleService } from "../../assets/scripts/core/board/ShuffleService";
-import { BoardConfig } from "../../assets/scripts/config/BoardConfig";
+import { BoardConfig } from "../../assets/scripts/config/ConfigLoader";
 
 const cfgSingle: BoardConfig = {
   cols: 1,

@@ -7,7 +7,7 @@ import { Board } from "../assets/scripts/core/board/Board";
 import { BoardSolver } from "../assets/scripts/core/board/BoardSolver";
 import { MoveExecutor } from "../assets/scripts/core/board/MoveExecutor";
 import { TileFactory } from "../assets/scripts/core/board/Tile";
-import { BoardConfig } from "../assets/scripts/config/BoardConfig";
+import { BoardConfig } from "../assets/scripts/config/ConfigLoader";
 import { ScoreStrategyQuadratic } from "../assets/scripts/core/rules/ScoreStrategyQuadratic";
 import { TurnManager } from "../assets/scripts/core/rules/TurnManager";
 

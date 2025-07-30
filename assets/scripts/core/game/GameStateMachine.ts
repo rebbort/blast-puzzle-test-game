@@ -9,13 +9,13 @@ export type GameState =
   | "Win"
   | "Lose";
 
-import { EventEmitter2 } from "eventemitter2";
+import { EventBus } from "../../infrastructure/EventBus";
 import { Board } from "../board/Board";
 import { BoardSolver } from "../board/BoardSolver";
 import { MoveExecutor } from "../board/MoveExecutor";
 import { ScoreStrategy } from "../rules/ScoreStrategy";
 import { TurnManager } from "../rules/TurnManager";
-import { BoardConfig } from "../../config/BoardConfig";
+import { BoardConfig } from "../../config/ConfigLoader";
 
 /**
  * Finite state machine orchestrating a single game session.
@@ -30,7 +30,7 @@ export class GameStateMachine {
   private shuffles = 0;
 
   constructor(
-    private bus: EventEmitter2,
+    private bus: EventBus,
     private board: Board,
     private solver: BoardSolver,
     private executor: MoveExecutor,

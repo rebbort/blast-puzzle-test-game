@@ -1,7 +1,9 @@
-import { EventEmitter2 } from 'eventemitter2';
+// Глобальная шина событий теперь основана на cc.EventTarget
+import { EventBus as BaseBus } from "../infrastructure/EventBus";
 
 /**
- * Global event bus instance used across the game. Utilizes
- * EventEmitter2 for a robust and well-tested implementation.
+ * Глобальный экземпляр EventBus используется во всех частях игры.
+ * Мы отказались от сторонней библиотеки eventemitter2
+ * в пользу упрощённой обёртки на cc.EventTarget.
  */
-export const EventBus = new EventEmitter2();
+export const EventBus = new BaseBus();

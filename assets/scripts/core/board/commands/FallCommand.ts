@@ -1,8 +1,8 @@
 import { Board } from "../Board";
-import { EventEmitter2 } from "eventemitter2";
+import { EventBus } from "../../../infrastructure/EventBus";
 import { ICommand } from "./ICommand";
 import { Tile } from "../Tile";
-import { BoardConfig } from "../../../config/BoardConfig";
+import { BoardConfig } from "../../../config/ConfigLoader";
 
 /**
  * Shifts tiles down in specified columns to remove gaps.
@@ -13,7 +13,7 @@ import { BoardConfig } from "../../../config/BoardConfig";
 export class FallCommand implements ICommand {
   constructor(
     private board: Board,
-    private bus: EventEmitter2,
+    private bus: EventBus,
     private columns: number[],
   ) {}
 

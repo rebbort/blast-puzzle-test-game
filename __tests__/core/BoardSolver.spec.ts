@@ -1,17 +1,15 @@
-import { EventEmitter2 } from "eventemitter2";
+import { EventBus } from "../../assets/scripts/infrastructure/EventBus";
 
 // Create a mock event bus preserving emit functionality
-const bus = new EventEmitter2();
+const bus = new EventBus();
 const emitSpy = jest.spyOn(bus, "emit");
 
-jest.mock("../../assets/scripts/core/EventBus", () => ({
-  EventBus: bus,
-}));
+jest.mock("../../assets/scripts/core/EventBus", () => ({ EventBus: bus }));
 
 import { Board } from "../../assets/scripts/core/board/Board";
 import { TileFactory } from "../../assets/scripts/core/board/Tile";
 import { BoardSolver } from "../../assets/scripts/core/board/BoardSolver";
-import { BoardConfig } from "../../assets/scripts/config/BoardConfig";
+import { BoardConfig } from "../../assets/scripts/config/ConfigLoader";
 
 // Common 3x3 config for tests
 const cfg: BoardConfig = {

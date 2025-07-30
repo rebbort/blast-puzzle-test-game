@@ -38,6 +38,5 @@
     ]
   },
   "dependencies": {
-    "eventemitter2": "^6.4.9"
   }
 }

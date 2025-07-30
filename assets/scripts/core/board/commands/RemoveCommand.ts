@@ -1,5 +1,5 @@
 import { Board } from "../Board";
-import { EventEmitter2 } from "eventemitter2";
+import { EventBus } from "../../../infrastructure/EventBus";
 import { ICommand } from "./ICommand";
 
 /**
@@ -10,7 +10,7 @@ import { ICommand } from "./ICommand";
 export class RemoveCommand implements ICommand {
   constructor(
     private board: Board,
-    private bus: EventEmitter2,
+    private bus: EventBus,
     private group: cc.Vec2[],
   ) {}
 

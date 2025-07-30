@@ -1,19 +1,41 @@
-import { BoardConfig, DefaultBoard } from "./BoardConfig";
+/**
+ * BoardConfig описывает параметры игрового поля: количество колонок и строк,
+ * размер тайла, список возможных цветов и порог создания супер-тайла.
+ */
+export interface BoardConfig {
+  cols: number; // сколько колонок на поле
+  rows: number; // сколько строк на поле
+  tileSize: number; // размер одного тайла в пикселях
+  colors: string[]; // допустимые цвета тайлов
+  superThreshold: number; // размер группы для супер-тайла
+  rngSeed?: string; // необязательно: фиксированный seed
+}
 
-// Загружает конфигурацию поля из localStorage
+/** Значения по умолчанию для поля */
+export const DefaultBoard: BoardConfig = {
+  cols: 8, // классическая ширина
+  rows: 10, // и высота
+  tileSize: 96, // под размеры подготовленных спрайтов
+  colors: ["red", "blue", "green", "yellow", "purple"],
+  superThreshold: 5,
+};
+
+/**
+ * Пытается парсить JSON из localStorage,
+ * иначе возвращает DefaultBoard.
+ */
 export function loadBoardConfig(): BoardConfig {
-  // получаем строку с пользовательскими настройками
-  const data = localStorage.getItem("board-config.json");
-  if (!data) {
-    // если ничего нет, используем стандартную конфигурацию
+  const raw = localStorage.getItem("board-config.json");
+  if (!raw) {
+    // ничего не сохранено — используем дефолт
     return DefaultBoard;
   }
   try {
-    // пробуем разобрать JSON и объединить с дефолтами
-    const parsed = JSON.parse(data) as Partial<BoardConfig>;
+    // объединяем сохранённые поля с настройками по умолчанию
+    const parsed = JSON.parse(raw) as Partial<BoardConfig>;
     return { ...DefaultBoard, ...parsed };
   } catch {
-    // при ошибке парсинга также возвращаем дефолт
+    // если JSON битый, не ломаем игру
     return DefaultBoard;
   }
 }

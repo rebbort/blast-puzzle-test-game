@@ -3,7 +3,7 @@ import { Board } from "../assets/scripts/core/board/Board";
 import { BoardSolver } from "../assets/scripts/core/board/BoardSolver";
 import { TileFactory } from "../assets/scripts/core/board/Tile";
 import { ShuffleService } from "../assets/scripts/core/board/ShuffleService";
-import { BoardConfig } from "../assets/scripts/config/BoardConfig";
+import { BoardConfig } from "../assets/scripts/config/ConfigLoader";
 
 describe("ShuffleService", () => {
   const cfgNoMoves: BoardConfig = {

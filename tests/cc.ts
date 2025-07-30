@@ -41,6 +41,32 @@ export class Button {
   static EventType = { CLICK: "click" };
 }
 
+export class EventTarget {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private listeners: Record<string, ((...args: any[]) => void)[]> = {};
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  on(event: string, cb: (...args: any[]) => void): void {
+    (this.listeners[event] = this.listeners[event] || []).push(cb);
+  }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  off(event: string, cb: (...args: any[]) => void): void {
+    this.listeners[event] = (this.listeners[event] || []).filter(
+      (h) => h !== cb,
+    );
+  }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  emit(event: string, ...args: any[]): void {
+    (this.listeners[event] || []).forEach((h) => h(...args));
+  }
+  removeAllListeners(event?: string): void {
+    if (event) {
+      delete this.listeners[event];
+    } else {
+      this.listeners = {};
+    }
+  }
+}
+
 export const director = {
   loadScene: () => {},
   pause: () => {},
