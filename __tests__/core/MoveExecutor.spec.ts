@@ -4,7 +4,7 @@ const bus = new ExtendedEventTarget();
 const emitSpy = jest.spyOn(bus, "emit");
 
 import { Board } from "../../assets/scripts/core/board/Board";
-import { TileFactory } from "../../assets/scripts/core/board/Tile";
+import { TileFactory, TileKind } from "../../assets/scripts/core/board/Tile";
 import { MoveExecutor } from "../../assets/scripts/core/board/MoveExecutor";
 import { BoardConfig } from "../../assets/scripts/config/ConfigLoader";
 
@@ -60,4 +60,17 @@ it("throws when group is empty", async () => {
   const board = new Board(cfg);
   const executor = new MoveExecutor(board, bus);
   await expect(executor.execute([])).rejects.toThrow();
+});
+
+// spawning a super tile when threshold reached
+it("creates super tile in click cell when group large enough", async () => {
+  const board = new Board(cfg, [
+    [TileFactory.createNormal("red"), TileFactory.createNormal("red")],
+    [TileFactory.createNormal("red"), TileFactory.createNormal("red")],
+  ]);
+  const executor = new MoveExecutor(board, bus);
+  const group = [new cc.Vec2(0, 0), new cc.Vec2(1, 0), new cc.Vec2(0, 1)];
+  await executor.execute(group);
+  const tile = board.tileAt(new cc.Vec2(0, 1));
+  expect(tile?.kind).not.toBe(TileKind.Normal);
 });

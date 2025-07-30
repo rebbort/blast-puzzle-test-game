@@ -85,7 +85,8 @@ it("handles booster activate and cancel", () => {
   const states: GameState[] = [];
   bus.on("StateChanged", (s) => states.push(s as GameState));
   fsm.start();
-  bus.emit("BoosterActivated");
+  // activation now passes booster id
+  bus.emit("BoosterActivated", "bomb");
   bus.emit("BoosterConsumed");
   expect(states).toEqual(["WaitingInput", "BoosterInput", "ExecutingMove"]);
 });
@@ -95,7 +96,8 @@ it("cancels booster back to WaitingInput", () => {
   const states: GameState[] = [];
   bus.on("StateChanged", (s) => states.push(s as GameState));
   fsm.start();
-  bus.emit("BoosterActivated");
+  // include id to match BoosterService API
+  bus.emit("BoosterActivated", "bomb");
   bus.emit("BoosterCancelled");
   expect(states).toEqual(["WaitingInput", "BoosterInput", "WaitingInput"]);
 });
