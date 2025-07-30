@@ -12,7 +12,9 @@ declare module "cc" {
   };
 
   /** Base component class every behaviour derives from. */
-  export class Component {}
+  export class Component {
+    node: unknown;
+  }
 
   /** Provides scene management utilities. */
   export const director: {
