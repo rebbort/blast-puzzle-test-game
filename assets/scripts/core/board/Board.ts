@@ -34,6 +34,16 @@ export class Board {
     }
   }
 
+  /** Number of rows in the board. */
+  public get rows(): number {
+    return this.cfg.rows;
+  }
+
+  /** Number of columns in the board. */
+  public get cols(): number {
+    return this.cfg.cols;
+  }
+
   /**
    * Checks whether a point lies within board boundaries.
    * Coordinates are zero-based and inclusive on the lower bound but exclusive
