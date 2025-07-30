@@ -58,7 +58,7 @@ export class EventTarget {
   emit(event: string, ...args: any[]): void {
     (this.listeners[event] || []).forEach((h) => h(...args));
   }
-  removeAllListeners(event?: string): void {
+  clear(event?: string): void {
     if (event) {
       delete this.listeners[event];
     } else {

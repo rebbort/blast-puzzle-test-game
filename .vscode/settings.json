@@ -5,7 +5,7 @@
   "editor.formatOnSave": true,
   // Use Prettier extension to format TypeScript files
   "[typescript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "vscode.typescript-language-features"
   },
   // Enable Path Intellisense suggestions
   "path-intellisense.autoSlashAfterDirectory": true,

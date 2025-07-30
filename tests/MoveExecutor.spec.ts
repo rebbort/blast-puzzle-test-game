@@ -14,7 +14,7 @@ describe("MoveExecutor", () => {
   };
 
   beforeEach(() => {
-    EventBus.removeAllListeners();
+    EventBus.clear();
   });
 
   test("executes commands in sequence and emits events", async () => {

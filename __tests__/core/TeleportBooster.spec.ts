@@ -1,4 +1,4 @@
-import { EventBus } from "../../assets/scripts/infrastructure/EventBus";
+import { ExtendedEventTarget } from "../../assets/scripts/infrastructure/ExtendedEventTarget";
 
 import { Board } from "../../assets/scripts/core/board/Board";
 import { TileFactory } from "../../assets/scripts/core/board/Tile";
@@ -6,12 +6,12 @@ import { TeleportBooster } from "../../assets/scripts/core/boosters/TeleportBoos
 import { BoardConfig } from "../../assets/scripts/config/ConfigLoader";
 
 describe("TeleportBooster", () => {
-  const bus = new EventBus();
+  const bus = new ExtendedEventTarget();
   const emitSpy = jest.spyOn(bus, "emit");
 
   beforeEach(() => {
     emitSpy.mockClear();
-    bus.removeAllListeners();
+    bus.clear();
   });
 
   const cfg2x2: BoardConfig = {

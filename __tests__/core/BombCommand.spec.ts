@@ -1,4 +1,4 @@
-import { EventBus } from "../../assets/scripts/infrastructure/EventBus";
+import { ExtendedEventTarget } from "../../assets/scripts/infrastructure/ExtendedEventTarget";
 
 import { Board } from "../../assets/scripts/core/board/Board";
 import { TileFactory } from "../../assets/scripts/core/board/Tile";
@@ -14,12 +14,12 @@ const cfg: BoardConfig = {
 };
 
 describe("BombCommand", () => {
-  const bus = new EventBus();
+  const bus = new ExtendedEventTarget();
   const emitSpy = jest.spyOn(bus, "emit");
 
   beforeEach(() => {
     emitSpy.mockClear();
-    bus.removeAllListeners();
+    bus.clear();
   });
 
   it("removes tiles in radius and emits events", async () => {

@@ -39,7 +39,7 @@ function createFSM(target = 10, board?: Board): GameStateMachine {
 
 beforeEach(() => {
   emitSpy.mockClear();
-  bus.removeAllListeners();
+  bus.clear();
 });
 
 // starting the FSM should emit initial state

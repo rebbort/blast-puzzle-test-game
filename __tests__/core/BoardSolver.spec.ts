@@ -43,7 +43,7 @@ function crossBoard(): Board {
 
 beforeEach(() => {
   emitSpy.mockClear();
-  bus.removeAllListeners();
+  bus.clear();
 });
 
 // group of 5 tiles should be returned and event emitted

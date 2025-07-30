@@ -1,5 +1,5 @@
 import { Board } from "../Board";
-import { EventBus } from "../../../infrastructure/EventBus";
+import { ExtendedEventTarget } from "../../../infrastructure/ExtendedEventTarget";
 import { ICommand } from "./ICommand";
 
 /**
@@ -10,7 +10,7 @@ export class SwapCommand implements ICommand {
     private board: Board,
     private a: cc.Vec2,
     private b: cc.Vec2,
-    private bus: EventBus,
+    private bus: ExtendedEventTarget,
   ) {}
 
   async execute(): Promise<void> {

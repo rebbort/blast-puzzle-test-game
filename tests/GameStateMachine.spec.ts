@@ -21,7 +21,7 @@ describe("GameStateMachine", () => {
   };
 
   beforeEach(() => {
-    EventBus.removeAllListeners();
+    EventBus.clear();
   });
 
   function createFSM(target = 10, board?: Board): GameStateMachine {

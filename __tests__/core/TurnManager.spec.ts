@@ -10,7 +10,7 @@ beforeAll(() => {
 
 beforeEach(() => {
   emitSpy.mockClear();
-  bus.removeAllListeners();
+  bus.clear();
 });
 
 // turns decrease and event emitted

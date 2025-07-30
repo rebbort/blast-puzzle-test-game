@@ -26,7 +26,7 @@ const cfgPair: BoardConfig = {
 
 beforeEach(() => {
   emitSpy.mockClear();
-  bus.removeAllListeners();
+  bus.clear();
 });
 
 // when moves exist nothing happens

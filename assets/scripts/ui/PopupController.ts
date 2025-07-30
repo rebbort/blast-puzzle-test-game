@@ -21,8 +21,8 @@ export class PopupController extends cc.Component {
   }
 
   onDisable(): void {
-    EventBus.removeAllListeners("GameWon");
-    EventBus.removeAllListeners("GameLost");
+    EventBus.off("GameWon");
+    EventBus.off("GameLost");
   }
 
   /**

@@ -18,7 +18,7 @@ const cfg: BoardConfig = {
 
 beforeEach(() => {
   emitSpy.mockClear();
-  bus.removeAllListeners();
+  bus.clear();
 });
 
 // normal case: commands executed and events emitted in order

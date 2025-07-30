@@ -55,7 +55,7 @@ declare namespace cc {
     on(event: string, cb: (...args: any[]) => void): void;
     off(event: string, cb: (...args: any[]) => void): void;
     emit(event: string, ...args: any[]): void;
-    removeAllListeners(event?: string): void;
+    clear(event?: string): void;
   }
 }
 

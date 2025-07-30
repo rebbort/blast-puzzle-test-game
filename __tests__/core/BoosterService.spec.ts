@@ -1,14 +1,14 @@
-import { EventBus } from "../../assets/scripts/infrastructure/EventBus";
+import { ExtendedEventTarget } from "../../assets/scripts/infrastructure/ExtendedEventTarget";
 import { BoosterService } from "../../assets/scripts/core/boosters/BoosterService";
 import type { Booster } from "../../assets/scripts/core/boosters/Booster";
 
 describe("BoosterService", () => {
-  const bus = new EventBus();
+  const bus = new ExtendedEventTarget();
   const emitSpy = jest.spyOn(bus, "emit");
 
   beforeEach(() => {
     emitSpy.mockClear();
-    bus.removeAllListeners();
+    bus.clear();
   });
 
   function createBooster(id: string, charges = 1, activatable = true) {

@@ -23,7 +23,7 @@ describe("ShuffleService", () => {
   };
 
   beforeEach(() => {
-    EventBus.removeAllListeners();
+    EventBus.clear();
   });
 
   test("auto shuffles until limit then emits ShuffleLimitExceeded", () => {
