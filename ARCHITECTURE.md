@@ -22,3 +22,21 @@ classDiagram
 The `BoardGenerator` class uses `BoardConfig` to create a `Board` filled
 with `Tile` instances. It ensures the generated board always has at least one
 possible move by regenerating up to ten times if necessary.
+
+## Game Loop
+
+The finite state machine drives the core gameplay. User input is processed in
+`WaitingInput` and, when a booster is activated, in the dedicated
+`BoosterInput` state. The diagram below shows how booster related transitions
+tie into the main loop.
+
+```mermaid
+stateDiagram-v2
+  WaitingInput --> BoosterInput: on 'BoosterActivated'
+  BoosterInput --> ExecutingMove: on 'BoosterConsumed'
+  BoosterInput --> WaitingInput: on 'BoosterCancelled'
+```
+
+After a move or booster action completes in `ExecutingMove` the machine
+continues through tile falling and filling before returning to
+`WaitingInput` or ending the game.
