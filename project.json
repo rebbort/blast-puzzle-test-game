@@ -9,5 +9,9 @@
       "uuid": "game-scene"
     }
   ],
-  "launchScene": "db://assets/scenes/MenuScene.scene"
+  "launchScene": "db://assets/scenes/MenuScene.scene",
+  "description": "",
+  "version": "2.4.14",
+  "id": "2473abca-bfd7-436e-90fa-985f863c4684",
+  "isNew": false
 }
