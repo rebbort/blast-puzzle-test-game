@@ -13,9 +13,9 @@ export interface BoardConfig {
 
 /** Значения по умолчанию для поля */
 export const DefaultBoard: BoardConfig = {
-  cols: 8, // классическая ширина
-  rows: 10, // и высота
-  tileSize: 96, // под размеры подготовленных спрайтов
+  cols: 9, // классическая ширина
+  rows: 11, // и высота
+  tileSize: 100, // под размеры подготовленных спрайтов
   colors: ["red", "blue", "green", "yellow", "purple"],
   superThreshold: 5,
 };
