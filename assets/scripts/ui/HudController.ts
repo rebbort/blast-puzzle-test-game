@@ -1,4 +1,4 @@
-import { _decorator, Component, Label } from "cc";
+import { _decorator, Component, Label, tween } from "cc";
 import { EventBus } from "../core/EventBus";
 const { ccclass } = _decorator;
 
@@ -6,8 +6,14 @@ interface NodeUtils {
   getChildByName(name: string): NodeUtils | null;
   getComponent(name: string): unknown;
   on(event: string, cb: () => void): void;
+  runAction?(action: unknown): void;
   node?: NodeUtils;
 }
+
+// Placeholder animations used with runAction. In the real game these would be
+// cc.Action objects describing the shake/pulse behaviour.
+const shake = {};
+const pulse = {};
 
 /**
  * Controls the Heads Up Display of the GameScene.
@@ -48,11 +54,31 @@ export class HudController extends Component {
     // Update moves counter when a turn is consumed
     EventBus.on("TurnUsed", (left: number) => {
       if (this.lblMoves) this.lblMoves.string = String(left);
+      const moveNode = this.lblMoves?.node as unknown as NodeUtils | undefined;
+      if (left <= 3 && moveNode?.runAction) {
+        EventBus.emit("AnimationStarted", "moves-shake");
+        moveNode.runAction(shake);
+        EventBus.emit("AnimationEnded", "moves-shake");
+      }
     });
 
     // Update score display after a turn ends
     EventBus.on("TurnEnded", ({ score }: { score: number }) => {
-      if (this.lblScore) this.lblScore.string = String(score);
+      if (!this.lblScore) return;
+      const startVal = parseInt(this.lblScore.string, 10) || 0;
+      const data = { value: startVal };
+      EventBus.emit("AnimationStarted", "score-tween");
+      // Tween over half a second using an ease-out curve for smooth feel
+      tween(data).to(0.5, { value: score }, { easing: "quadOut" }).start();
+      const id = setInterval(() => {
+        if (this.lblScore)
+          this.lblScore.string = String(Math.round(data.value));
+      }, 16);
+      setTimeout(() => {
+        clearInterval(id);
+        if (this.lblScore) this.lblScore.string = String(score);
+        EventBus.emit("AnimationEnded", "score-tween");
+      }, 500);
     });
 
     // Booster and pause button interactions
@@ -64,6 +90,16 @@ export class HudController extends Component {
     });
     this.btnPause?.node?.on("click", () => {
       EventBus.emit("GamePaused");
+    });
+
+    EventBus.on("BoosterActivated", (name: string) => {
+      const btn =
+        name === "bomb" ? this.btnBomb : name === "swap" ? this.btnSwap : null;
+      if (btn?.node?.runAction) {
+        EventBus.emit("AnimationStarted", "booster-pulse");
+        btn.node.runAction(pulse);
+        EventBus.emit("AnimationEnded", "booster-pulse");
+      }
     });
   }
 }
