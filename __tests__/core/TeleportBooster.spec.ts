@@ -17,7 +17,8 @@ describe("TeleportBooster", () => {
   const cfg2x2: BoardConfig = {
     cols: 2,
     rows: 2,
-    tileSize: 1,
+    tileWidth: 1,
+    tileHeight: 1,
     colors: ["red", "blue"],
     superThreshold: 3,
   };
@@ -47,7 +48,8 @@ describe("TeleportBooster", () => {
     const cfg: BoardConfig = {
       cols: 2,
       rows: 1,
-      tileSize: 1,
+      tileWidth: 1,
+      tileHeight: 1,
       colors: ["red", "blue"],
       superThreshold: 3,
     };

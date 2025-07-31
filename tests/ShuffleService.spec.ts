@@ -9,7 +9,8 @@ describe("ShuffleService", () => {
   const cfgNoMoves: BoardConfig = {
     cols: 1,
     rows: 1,
-    tileSize: 1,
+    tileWidth: 1,
+    tileHeight: 1,
     colors: ["red"],
     superThreshold: 3,
   };
@@ -17,7 +18,8 @@ describe("ShuffleService", () => {
   const cfgMoves: BoardConfig = {
     cols: 2,
     rows: 1,
-    tileSize: 1,
+    tileWidth: 1,
+    tileHeight: 1,
     colors: ["red"],
     superThreshold: 3,
   };

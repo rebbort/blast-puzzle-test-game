@@ -5,7 +5,8 @@ import { TileKind } from "../../../assets/scripts/core/board/Tile";
 const cfg: BoardConfig = {
   cols: 1,
   rows: 1,
-  tileSize: 1,
+  tileWidth: 1,
+  tileHeight: 1,
   colors: ["red"],
   superThreshold: 3,
   rngSeed: "seed",

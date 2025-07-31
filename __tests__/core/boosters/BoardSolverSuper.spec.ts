@@ -6,7 +6,8 @@ import { BoardConfig } from "../../../assets/scripts/config/ConfigLoader";
 const cfg: BoardConfig = {
   cols: 5,
   rows: 5,
-  tileSize: 1,
+  tileWidth: 1,
+  tileHeight: 1,
   colors: ["red", "blue"],
   superThreshold: 3,
 };

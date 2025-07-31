@@ -5,7 +5,8 @@ describe("BoardGenerator", () => {
   const cfg: BoardConfig = {
     cols: 4,
     rows: 4,
-    tileSize: 1,
+    tileWidth: 1,
+    tileHeight: 1,
     colors: ["red", "blue"],
     superThreshold: 3,
   };

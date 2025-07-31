@@ -85,9 +85,9 @@ export default class GameBoardController extends cc.Component {
    * Uses board size and configured tile size to match the core model.
    */
   private computePos(col: number, row: number): cc.Vec2 {
-    const size = loadBoardConfig().tileSize;
-    const x = (col - this.board.cols / 2 + 0.5) * size;
-    const y = (this.board.rows / 2 - row - 0.5) * size;
+    const cfg = loadBoardConfig();
+    const x = (col - this.board.cols / 2 + 0.5) * cfg.tileWidth;
+    const y = (this.board.rows / 2 - row - 0.5) * cfg.tileHeight;
     return cc.v2(x, y);
   }
 

@@ -11,7 +11,8 @@ import { BoardConfig } from "../../assets/scripts/config/ConfigLoader";
 const cfg: BoardConfig = {
   cols: 2,
   rows: 2,
-  tileSize: 1,
+  tileWidth: 1,
+  tileHeight: 1,
   colors: ["red"],
   superThreshold: 3,
 };
