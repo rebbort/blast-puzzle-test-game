@@ -56,6 +56,13 @@ export class GameStateMachine {
       "Listeners for GroupSelected:",
       this.bus.getListenerCount(EventNames.GroupSelected),
     );
+    // broadcast initial values so HUD can display them
+    const turns = this.turnManager.getRemaining();
+    this.bus.emit(EventNames.TurnsInit, {
+      turns,
+      score: this.score,
+      targetScore: this.targetScore,
+    });
     this.changeState("WaitingInput");
     console.info("FSM started, current state: WaitingInput");
   }
@@ -118,6 +125,8 @@ export class GameStateMachine {
     this.changeState("Filling");
     this.changeState("CheckEnd");
     this.evaluateEnd();
+    // notify HUD about updated score
+    this.bus.emit(EventNames.TurnEnded, { score: this.score });
   }
 
   /**

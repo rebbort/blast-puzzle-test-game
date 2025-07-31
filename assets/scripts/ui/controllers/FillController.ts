@@ -14,11 +14,13 @@ export default class FillController extends cc.Component {
 
   private board!: Board;
   private tilesLayer!: cc.Node;
+  private tileViews!: TileView[][];
 
   onLoad(): void {
     const boardCtrl = this.getComponent(GameBoardController)!;
     this.board = boardCtrl.getBoard();
     this.tilesLayer = this.node.getChildByName("TilesLayer")!;
+    this.tileViews = boardCtrl.tileViews;
     bus.on(EventNames.FillStarted, this.onFill, this);
   }
 
@@ -28,6 +30,8 @@ export default class FillController extends cc.Component {
    * board already contains new tiles when this handler runs.
    */
   private onFill(slots: cc.Vec2[]): void {
+    // Refresh reference in case other controllers replaced the matrix
+    this.tileViews = this.getComponent(GameBoardController)!.tileViews;
     slots.forEach((p) => {
       const view = cc
         .instantiate(this.tilePrefab)
@@ -35,11 +39,14 @@ export default class FillController extends cc.Component {
       view.node.parent = this.tilesLayer;
       const start = this.computePos(p.x, -1);
       view.node.setPosition(start);
-      const tileData = this.board.tileAt(p)!;
-      view.apply(tileData);
       const end = this.computePos(p.x, p.y);
       const dur = Math.abs(start.y - end.y) / 1400;
       view.node.runAction(cc.moveTo(dur, end));
+      this.tileViews[p.y][p.x] = view;
+      // apply tile data after FillCommand updates the board
+      setTimeout(() => {
+        view.apply(this.board.tileAt(p)!);
+      }, 0);
     });
   }
 

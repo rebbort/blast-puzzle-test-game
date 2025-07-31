@@ -62,10 +62,11 @@ export class InfrastructureEventBus {
       console.warn(
         `EventBus: emitted event '${eventName}' has no listeners (possible typo or initialization issue)`,
       );
-      if (typeof CC_DEBUG !== "undefined" && CC_DEBUG) {
-        console.warn(new Error().stack);
-      }
+      // if (typeof CC_DEBUG !== "undefined" && CC_DEBUG) {
+      //   console.warn(new Error().stack);
+      // }
     }
+    console.log("emit", eventName, args);
     this.target.emit(eventName, ...args);
   }
 

@@ -57,10 +57,29 @@ describe("GameStateMachine", () => {
     expect(states).toEqual(["WaitingInput"]);
   });
 
+  test("start announces initial turns and score", () => {
+    const fsm = createFSM();
+    let turns: number | undefined;
+    let score: number | undefined;
+    EventBus.on(EventNames.TurnUsed, (t) => (turns = t as number));
+    EventBus.on(
+      EventNames.TurnEnded,
+      (s: { score: number }) => (score = s.score),
+    );
+    fsm.start();
+    expect(turns).toBe(5);
+    expect(score).toBe(0);
+  });
+
   test("group selection performs full move sequence", async () => {
     const fsm = createFSM();
     const states: GameState[] = [];
     EventBus.on(EventNames.StateChanged, (s: GameState) => states.push(s));
+    let ended: number | undefined;
+    EventBus.on(
+      EventNames.TurnEnded,
+      (s: { score: number }) => (ended = s.score),
+    );
     fsm.start();
     EventBus.emit(EventNames.GroupSelected, new cc.Vec2(0, 0));
     await new Promise((r) => setImmediate(r));
@@ -71,6 +90,7 @@ describe("GameStateMachine", () => {
       "Filling",
       "CheckEnd",
     ]);
+    expect(ended).toBeGreaterThan(0);
   });
 
   test("win when reaching target score", async () => {
