@@ -1,4 +1,5 @@
 import { EventBus } from "../EventBus";
+import { EventNames } from "../events/EventNames";
 import { Board } from "./Board";
 import { Tile, TileKind } from "./Tile";
 import { BoardConfig } from "../../config/ConfigLoader";
@@ -136,7 +137,7 @@ export class BoardSolver {
     });
 
     // Notify listeners that a group has been found
-    EventBus.emit("GroupFound", result);
+    EventBus.emit(EventNames.GroupFound, result);
     return result;
   }
 

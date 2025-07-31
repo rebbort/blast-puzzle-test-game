@@ -1,4 +1,5 @@
-import { ExtendedEventTarget } from "../../infrastructure/ExtendedEventTarget";
+import { InfrastructureEventBus } from "../../infrastructure/InfrastructureEventBus";
+import { EventNames } from "../events/EventNames";
 export class TurnManager {
   /** Remaining turns in the current session. */
   private turnsLeft: number;
@@ -10,7 +11,7 @@ export class TurnManager {
    */
   constructor(
     initialTurns: number,
-    private bus: ExtendedEventTarget,
+    private bus: InfrastructureEventBus,
   ) {
     this.turnsLeft = initialTurns;
   }
@@ -23,9 +24,9 @@ export class TurnManager {
    */
   useTurn(): void {
     this.turnsLeft--;
-    this.bus.emit("TurnUsed", this.turnsLeft);
+    this.bus.emit(EventNames.TurnUsed, this.turnsLeft);
     if (this.turnsLeft === 0) {
-      this.bus.emit("OutOfTurns");
+      this.bus.emit(EventNames.OutOfTurns);
     }
   }
 

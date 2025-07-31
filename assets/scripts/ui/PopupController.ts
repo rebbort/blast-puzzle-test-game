@@ -1,4 +1,5 @@
 import { EventBus } from "../core/EventBus";
+import { EventNames } from "../core/events/EventNames";
 const { ccclass } = cc._decorator;
 
 /**
@@ -16,13 +17,15 @@ export class PopupController extends cc.Component {
   btnRestart!: { node: { once: (event: string, cb: () => void) => void } };
 
   onEnable(): void {
-    EventBus.on("GameWon", (score: number) => this.show(true, score));
-    EventBus.on("GameLost", (score: number) => this.show(false, score));
+    EventBus.on(EventNames.GameWon, (score: number) => this.show(true, score));
+    EventBus.on(EventNames.GameLost, (score: number) =>
+      this.show(false, score),
+    );
   }
 
   onDisable(): void {
-    EventBus.off("GameWon");
-    EventBus.off("GameLost");
+    EventBus.off(EventNames.GameWon);
+    EventBus.off(EventNames.GameLost);
   }
 
   /**

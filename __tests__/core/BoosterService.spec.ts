@@ -1,9 +1,10 @@
-import { ExtendedEventTarget } from "../../assets/scripts/infrastructure/ExtendedEventTarget";
+import { InfrastructureEventBus } from "../../assets/scripts/infrastructure/InfrastructureEventBus";
 import { BoosterService } from "../../assets/scripts/core/boosters/BoosterService";
 import type { Booster } from "../../assets/scripts/core/boosters/Booster";
+import { EventNames } from "../../assets/scripts/core/events/EventNames";
 
 describe("BoosterService", () => {
-  const bus = new ExtendedEventTarget();
+  const bus = new InfrastructureEventBus();
   const emitSpy = jest.spyOn(bus, "emit");
 
   beforeEach(() => {
@@ -45,7 +46,7 @@ describe("BoosterService", () => {
     svc.register(b.booster);
     svc.activate("bomb");
     expect(b.started).toBe(true);
-    expect(emitSpy).toHaveBeenCalledWith("BoosterActivated", "bomb");
+    expect(emitSpy).toHaveBeenCalledWith(EventNames.BoosterActivated, "bomb");
   });
 
   it("activate does nothing when canActivate false", () => {
@@ -63,12 +64,12 @@ describe("BoosterService", () => {
     svc.register(booster);
     svc.consume("bomb");
     expect(booster.charges).toBe(1);
-    expect(emitSpy).toHaveBeenCalledWith("BoosterConsumed", "bomb");
+    expect(emitSpy).toHaveBeenCalledWith(EventNames.BoosterConsumed, "bomb");
   });
 
   it("cancel emits BoosterCancelled", () => {
     const svc = new BoosterService(bus);
     svc.cancel();
-    expect(emitSpy).toHaveBeenCalledWith("BoosterCancelled");
+    expect(emitSpy).toHaveBeenCalledWith(EventNames.BoosterCancelled);
   });
 });

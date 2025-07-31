@@ -4,6 +4,7 @@ import { BoardSolver } from "../assets/scripts/core/board/BoardSolver";
 import { TileFactory } from "../assets/scripts/core/board/Tile";
 import { ShuffleService } from "../assets/scripts/core/board/ShuffleService";
 import { BoardConfig } from "../assets/scripts/config/ConfigLoader";
+import { EventNames } from "../assets/scripts/core/events/EventNames";
 
 describe("ShuffleService", () => {
   const cfgNoMoves: BoardConfig = {
@@ -34,10 +35,14 @@ describe("ShuffleService", () => {
     const service = new ShuffleService(board, solver, EventBus, 3);
 
     const events: string[] = [];
-    EventBus.on("AutoShuffle", () => events.push("AutoShuffle"));
-    EventBus.on("ShuffleDone", () => events.push("ShuffleDone"));
-    EventBus.on("ShuffleLimitExceeded", () => {
-      events.push("ShuffleLimitExceeded");
+    EventBus.on(EventNames.AutoShuffle, () =>
+      events.push(EventNames.AutoShuffle),
+    );
+    EventBus.on(EventNames.ShuffleDone, () =>
+      events.push(EventNames.ShuffleDone),
+    );
+    EventBus.on(EventNames.ShuffleLimitExceeded, () => {
+      events.push(EventNames.ShuffleLimitExceeded);
     });
 
     service.ensureMoves();
@@ -49,13 +54,13 @@ describe("ShuffleService", () => {
     service.ensureMoves();
 
     expect(events).toEqual([
-      "AutoShuffle",
-      "ShuffleDone",
-      "AutoShuffle",
-      "ShuffleDone",
-      "AutoShuffle",
-      "ShuffleDone",
-      "ShuffleLimitExceeded",
+      EventNames.AutoShuffle,
+      EventNames.ShuffleDone,
+      EventNames.AutoShuffle,
+      EventNames.ShuffleDone,
+      EventNames.AutoShuffle,
+      EventNames.ShuffleDone,
+      EventNames.ShuffleLimitExceeded,
     ]);
   });
 
@@ -67,10 +72,14 @@ describe("ShuffleService", () => {
     const service = new ShuffleService(board, solver, EventBus, 3);
 
     const events: string[] = [];
-    EventBus.on("AutoShuffle", () => events.push("AutoShuffle"));
-    EventBus.on("ShuffleDone", () => events.push("ShuffleDone"));
-    EventBus.on("ShuffleLimitExceeded", () =>
-      events.push("ShuffleLimitExceeded"),
+    EventBus.on(EventNames.AutoShuffle, () =>
+      events.push(EventNames.AutoShuffle),
+    );
+    EventBus.on(EventNames.ShuffleDone, () =>
+      events.push(EventNames.ShuffleDone),
+    );
+    EventBus.on(EventNames.ShuffleLimitExceeded, () =>
+      events.push(EventNames.ShuffleLimitExceeded),
     );
 
     service.ensureMoves();

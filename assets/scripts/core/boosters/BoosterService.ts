@@ -1,5 +1,6 @@
-import { ExtendedEventTarget } from "../../infrastructure/ExtendedEventTarget";
+import { InfrastructureEventBus } from "../../infrastructure/InfrastructureEventBus";
 import type { Booster } from "./Booster";
+import { EventNames } from "../events/EventNames";
 
 /**
  * Хранит все доступные бустеры,
@@ -9,7 +10,7 @@ export class BoosterService {
   /** Коллекция зарегистрированных бустеров по их id. */
   private boosters: Record<string, Booster> = {};
 
-  constructor(private bus: ExtendedEventTarget) {}
+  constructor(private bus: InfrastructureEventBus) {}
 
   /**
    * Регистрирует новый бустер.
@@ -40,7 +41,11 @@ export class BoosterService {
     // Переводим игру в режим выбора клетки/клеток
     boost.start();
     // Сообщаем подписчикам об активации конкретного бустера
-    this.bus.emit("BoosterActivated", id);
+    this.bus.emit(EventNames.BoosterActivated, id);
+    console.debug(
+      "Listeners for BoosterActivated:",
+      this.bus.getListenerCount(EventNames.BoosterActivated),
+    );
   }
 
   /**
@@ -60,7 +65,7 @@ export class BoosterService {
     // Уменьшаем количество зарядов
     boost.charges--;
     // Оповещаем, что заряд израсходован
-    this.bus.emit("BoosterConsumed", id);
+    this.bus.emit(EventNames.BoosterConsumed, id);
   }
 
   /**
@@ -68,6 +73,6 @@ export class BoosterService {
    */
   cancel(): void {
     // Сообщаем слушателям, что активация прервана
-    this.bus.emit("BoosterCancelled");
+    this.bus.emit(EventNames.BoosterCancelled);
   }
 }

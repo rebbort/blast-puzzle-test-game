@@ -40,3 +40,8 @@ stateDiagram-v2
 After a move or booster action completes in `ExecutingMove` the machine
 continues through tile falling and filling before returning to
 `WaitingInput` or ending the game.
+
+### Event flow
+
+Components communicate via the global event bus. All event names are centralized in [`EventNames.ts`](assets/scripts/core/events/EventNames.ts).
+The bus keeps an internal registry of subscribers and logs a warning when events fire without any listeners.

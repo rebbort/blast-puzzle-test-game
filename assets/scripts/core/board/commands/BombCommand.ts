@@ -1,7 +1,8 @@
 import { Board } from "../Board";
-import { ExtendedEventTarget } from "../../../infrastructure/ExtendedEventTarget";
+import { InfrastructureEventBus } from "../../../infrastructure/InfrastructureEventBus";
 import { ICommand } from "./ICommand";
 import { RemoveCommand } from "./RemoveCommand";
+import { EventNames } from "../../events/EventNames";
 
 /**
  * Схлопывает все тайлы в радиусе R от center.
@@ -11,7 +12,7 @@ export class BombCommand implements ICommand {
     private board: Board,
     private center: cc.Vec2,
     private radius: number,
-    private bus: ExtendedEventTarget,
+    private bus: InfrastructureEventBus,
   ) {}
 
   async execute(): Promise<void> {
@@ -34,11 +35,11 @@ export class BombCommand implements ICommand {
 
     // Ждём завершения RemoveCommand
     await new Promise<void>((resolve) => {
-      this.bus.once("removeDone", () => resolve());
+      this.bus.once(EventNames.TilesRemoved, () => resolve());
       void new RemoveCommand(this.board, this.bus, group).execute();
     });
 
     // Отправляем событие о завершении применения бустера
-    this.bus.emit("MoveCompleted");
+    this.bus.emit(EventNames.MoveCompleted);
   }
 }

@@ -1,6 +1,7 @@
 import { Board } from "../Board";
-import { ExtendedEventTarget } from "../../../infrastructure/ExtendedEventTarget";
+import { InfrastructureEventBus } from "../../../infrastructure/InfrastructureEventBus";
 import { ICommand } from "./ICommand";
+import { EventNames } from "../../events/EventNames";
 
 /**
  * Swaps tiles at two positions on the board and notifies listeners.
@@ -10,7 +11,7 @@ export class SwapCommand implements ICommand {
     private board: Board,
     private a: cc.Vec2,
     private b: cc.Vec2,
-    private bus: ExtendedEventTarget,
+    private bus: InfrastructureEventBus,
   ) {}
 
   async execute(): Promise<void> {
@@ -21,6 +22,6 @@ export class SwapCommand implements ICommand {
     const tB = this.board.tileAt(this.b);
     this.board.setTile(this.a, tB);
     this.board.setTile(this.b, tA);
-    this.bus.emit("SwapDone");
+    this.bus.emit(EventNames.SwapDone);
   }
 }

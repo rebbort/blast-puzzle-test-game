@@ -9,13 +9,14 @@ export type GameState =
   | "Win"
   | "Lose";
 
-import { ExtendedEventTarget } from "../../infrastructure/ExtendedEventTarget";
+import { InfrastructureEventBus } from "../../infrastructure/InfrastructureEventBus";
 import { Board } from "../board/Board";
 import { BoardSolver } from "../board/BoardSolver";
 import { MoveExecutor } from "../board/MoveExecutor";
 import { ScoreStrategy } from "../rules/ScoreStrategy";
 import { TurnManager } from "../rules/TurnManager";
 import { BoardConfig } from "../../config/ConfigLoader";
+import { EventNames } from "../events/EventNames";
 
 /**
  * Finite state machine orchestrating a single game session.
@@ -30,7 +31,7 @@ export class GameStateMachine {
   private shuffles = 0;
 
   constructor(
-    private bus: ExtendedEventTarget,
+    private bus: InfrastructureEventBus,
     private board: Board,
     private solver: BoardSolver,
     private executor: MoveExecutor,
@@ -44,12 +45,19 @@ export class GameStateMachine {
    * Subscribe to relevant events and enter the initial WaitingInput state.
    */
   start(): void {
-    this.bus.on("GroupSelected", (p: cc.Vec2) => this.onGroupSelected(p));
-    this.bus.on("BoosterActivated", () => this.onBoosterActivated());
-    this.bus.on("BoosterConsumed", () => this.onBoosterConsumed());
-    this.bus.on("BoosterCancelled", () => this.onBoosterCancelled());
-    this.bus.on("MoveCompleted", () => this.onMoveCompleted());
+    this.bus.on(EventNames.GroupSelected, (p: cc.Vec2) =>
+      this.onGroupSelected(p),
+    );
+    this.bus.on(EventNames.BoosterActivated, () => this.onBoosterActivated());
+    this.bus.on(EventNames.BoosterConsumed, () => this.onBoosterConsumed());
+    this.bus.on(EventNames.BoosterCancelled, () => this.onBoosterCancelled());
+    this.bus.on(EventNames.MoveCompleted, () => this.onMoveCompleted());
+    console.debug(
+      "Listeners for GroupSelected:",
+      this.bus.getListenerCount(EventNames.GroupSelected),
+    );
     this.changeState("WaitingInput");
+    console.info("FSM started, current state: WaitingInput");
   }
 
   /**
@@ -57,7 +65,11 @@ export class GameStateMachine {
    * Ignored unless the machine awaits input.
    */
   private onGroupSelected(start: cc.Vec2): void {
+    console.info("FSM received GroupSelected at", start);
     if (this.state !== "WaitingInput") {
+      console.info(
+        `Ignored GroupSelected because current state is ${this.state}`,
+      );
       // Ignore input while another action is executing
       return;
     }
@@ -141,12 +153,13 @@ export class GameStateMachine {
    */
   private changeState(newState: GameState): void {
     this.state = newState;
-    this.bus.emit("StateChanged", newState);
+    this.bus.emit(EventNames.StateChanged, newState);
+    console.info("State changed to", newState);
     if (newState === "Win") {
-      this.bus.emit("GameWon", this.score);
+      this.bus.emit(EventNames.GameWon, this.score);
     }
     if (newState === "Lose") {
-      this.bus.emit("GameLost", this.score);
+      this.bus.emit(EventNames.GameLost, this.score);
     }
   }
 

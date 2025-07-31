@@ -1,8 +1,9 @@
 import { Booster } from "./Booster";
 import { Board } from "../board/Board";
-import { ExtendedEventTarget } from "../../infrastructure/ExtendedEventTarget";
+import { InfrastructureEventBus } from "../../infrastructure/InfrastructureEventBus";
 import { SwapCommand } from "../board/commands/SwapCommand";
 import { BoardSolver } from "../board/BoardSolver";
+import { EventNames } from "../events/EventNames";
 
 /**
  * Teleport booster allows swapping any two tiles.
@@ -15,7 +16,7 @@ export class TeleportBooster implements Booster {
   charges: number;
   constructor(
     private board: Board,
-    private bus: ExtendedEventTarget,
+    private bus: InfrastructureEventBus,
     charges: number,
   ) {
     this.charges = charges;
@@ -36,20 +37,20 @@ export class TeleportBooster implements Booster {
       const solver = new BoardSolver(this.board);
       if (solver.hasMoves()) {
         this.charges--;
-        this.bus.emit("BoosterConsumed", this.id);
+        this.bus.emit(EventNames.BoosterConsumed, this.id);
       } else {
         // Revert the swap when it doesn't yield any moves
         await new SwapCommand(this.board, first, b, this.bus).execute();
-        this.bus.emit("SwapCancelled");
+        this.bus.emit(EventNames.SwapCancelled);
       }
     };
 
     const onFirst = (posA: unknown) => {
       first = posA as cc.Vec2;
-      this.bus.once("GroupSelected", onSecond);
+      this.bus.once(EventNames.GroupSelected, onSecond);
     };
 
     // Wait for the first cell selection
-    this.bus.once("GroupSelected", onFirst);
+    this.bus.once(EventNames.GroupSelected, onFirst);
   }
 }

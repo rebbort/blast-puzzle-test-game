@@ -2,6 +2,7 @@ const { ccclass } = cc._decorator;
 
 import { loadBoardConfig } from "../../config/ConfigLoader";
 import { EventBus as bus } from "../../core/EventBus";
+import { EventNames } from "../../core/events/EventNames";
 
 @ccclass()
 export default class TileInputController extends cc.Component {
@@ -26,8 +27,12 @@ export default class TileInputController extends cc.Component {
           (this.node.height / 2 - (local.y - 12)) /
             loadBoardConfig().tileHeight,
         );
-        bus.emit("GroupSelected", { x: col, y: row });
+        bus.emit(EventNames.GroupSelected, { x: col, y: row });
         console.log("GroupSelected", { x: col, y: row });
+        console.debug(
+          "Listeners for GroupSelected:",
+          bus.getListenerCount(EventNames.GroupSelected),
+        );
       },
       this,
     );

@@ -1,15 +1,16 @@
-import { ExtendedEventTarget } from "../../infrastructure/ExtendedEventTarget";
+import { InfrastructureEventBus } from "../../infrastructure/InfrastructureEventBus";
 import { Board } from "./Board";
 import { BoardSolver } from "./BoardSolver";
 import { Tile } from "./Tile";
 import { BoardConfig } from "../../config/ConfigLoader";
+import { EventNames } from "../events/EventNames";
 
 export class ShuffleService {
   private shuffleCount = 0;
   constructor(
     private board: Board,
     private solver: BoardSolver,
-    private bus: ExtendedEventTarget,
+    private bus: InfrastructureEventBus,
     private maxShuffles: number = 3,
   ) {}
 
@@ -27,14 +28,14 @@ export class ShuffleService {
 
     if (this.shuffleCount < this.maxShuffles) {
       // Сообщаем, что будет автоматическая перетасовка.
-      this.bus.emit("AutoShuffle");
+      this.bus.emit(EventNames.AutoShuffle);
       // Увеличиваем счётчик перед самой операцией.
       this.shuffleCount++;
       // Перемешиваем тайлы на поле.
       this.shuffle();
     } else {
       // Достигнут предел, больше тасовать нельзя.
-      this.bus.emit("ShuffleLimitExceeded");
+      this.bus.emit(EventNames.ShuffleLimitExceeded);
     }
   }
 
@@ -68,7 +69,7 @@ export class ShuffleService {
     }
 
     // Уведомляем слушателей об окончании перетасовки.
-    this.bus.emit("ShuffleDone");
+    this.bus.emit(EventNames.ShuffleDone);
   }
 
   /**

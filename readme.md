@@ -15,6 +15,15 @@ npm test
 
 This executes the Jest suite defined in the `tests` folder.
 
+## Events
+
+All engine-wide events are defined in [`EventNames.ts`](assets/scripts/core/events/EventNames.ts). Use these constants when emitting or subscribing instead of string literals.
+The global `EventBus` tracks listeners and warns in development when an emitted event has no subscribers.
+
+## FSM integration
+
+`GameScene.ts` composes the core classes and starts the `GameStateMachine` when the scene loads. See `tools/fsm-smoke.ts` for a minimal script demonstrating the event flow from user input to state transitions.
+
 ## QA
 
 For manual mobile checks see the [UI Test Checklist](docs/UI_TEST_CHECKLIST.md).

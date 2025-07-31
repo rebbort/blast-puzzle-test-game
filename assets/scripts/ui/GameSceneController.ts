@@ -1,4 +1,5 @@
 import { EventBus } from "../core/EventBus";
+import { EventNames } from "../core/events/EventNames";
 const { ccclass } = cc._decorator;
 
 interface NodeUtils {
@@ -25,12 +26,12 @@ export class GameSceneController extends cc.Component {
     } | null;
     if (this.popup?.node) this.popup.node.active = false;
 
-    EventBus.on("GamePaused", () => {
+    EventBus.on(EventNames.GamePaused, () => {
       cc.director.pause();
       if (this.popup?.node) this.popup.node.active = true;
     });
 
-    EventBus.on("GameResumed", () => {
+    EventBus.on(EventNames.GameResumed, () => {
       cc.director.resume();
       if (this.popup?.node) this.popup.node.active = false;
     });

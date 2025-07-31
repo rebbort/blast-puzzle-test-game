@@ -1,10 +1,11 @@
-import { ExtendedEventTarget } from "../../assets/scripts/infrastructure/ExtendedEventTarget";
+import { InfrastructureEventBus } from "../../assets/scripts/infrastructure/InfrastructureEventBus";
 import { TurnManager } from "../../assets/scripts/core/rules/TurnManager";
+import { EventNames } from "../../assets/scripts/core/events/EventNames";
 
-let bus: ExtendedEventTarget;
+let bus: InfrastructureEventBus;
 let emitSpy: jest.SpyInstance;
 beforeAll(() => {
-  bus = new ExtendedEventTarget();
+  bus = new InfrastructureEventBus();
   emitSpy = jest.spyOn(bus, "emit");
 });
 
@@ -26,7 +27,7 @@ it("useTurn decreases remaining turns", () => {
 it("emits OutOfTurns when reaching zero", () => {
   const tm = new TurnManager(1, bus);
   let called = 0;
-  bus.on("OutOfTurns", () => called++);
+  bus.on(EventNames.OutOfTurns, () => called++);
   tm.useTurn();
   expect(called).toBe(1);
 });

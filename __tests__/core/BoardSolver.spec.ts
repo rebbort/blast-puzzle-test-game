@@ -1,7 +1,7 @@
-import { ExtendedEventTarget } from "../../assets/scripts/infrastructure/ExtendedEventTarget";
+import { InfrastructureEventBus } from "../../assets/scripts/infrastructure/InfrastructureEventBus";
 
 // Create a mock event bus preserving emit functionality
-const bus = new ExtendedEventTarget();
+const bus = new InfrastructureEventBus();
 const emitSpy = jest.spyOn(bus, "emit");
 
 jest.mock("../../assets/scripts/core/EventBus", () => ({ EventBus: bus }));

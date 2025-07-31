@@ -1,17 +1,18 @@
 import { Board } from "../Board";
-import { ExtendedEventTarget } from "../../../infrastructure/ExtendedEventTarget";
+import { InfrastructureEventBus } from "../../../infrastructure/InfrastructureEventBus";
 import { ICommand } from "./ICommand";
 import { TileFactory, TileColor } from "../Tile";
 import { BoardConfig } from "../../../config/ConfigLoader";
+import { EventNames } from "../../events/EventNames";
 
 /**
  * Generates new tiles in provided empty slots.
- * Emits 'fillStart' and 'fillDone'. No payload is passed with 'fillDone'.
+ * Emits 'FillStarted' and 'FillDone'. No payload is passed with 'FillDone'.
  */
 export class FillCommand implements ICommand {
   constructor(
     private board: Board,
-    private bus: ExtendedEventTarget,
+    private bus: InfrastructureEventBus,
     private slots: cc.Vec2[],
   ) {}
 
@@ -25,7 +26,7 @@ export class FillCommand implements ICommand {
       throw new Error("FillCommand: no slots provided");
     }
 
-    this.bus.emit("fillStart", this.slots);
+    this.bus.emit(EventNames.FillStarted, this.slots);
 
     for (const p of this.slots) {
       if (!this.board.inBounds(p)) continue;
@@ -33,7 +34,7 @@ export class FillCommand implements ICommand {
       this.board.setTile(p, TileFactory.createNormal(color));
     }
 
-    this.bus.emit("fillDone");
+    this.bus.emit(EventNames.FillDone);
   }
 
   private randomColor(): TileColor {
