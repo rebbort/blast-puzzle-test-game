@@ -22,9 +22,14 @@ beforeEach(() => {
     length: 0,
   };
   EventBus.clear();
-  (cc.Node as any).prototype.runAction = function (action: any) {
-    if (action && action.type === "moveTo") {
+  (cc.Node as any).prototype.runAction = function run(action: any) {
+    if (!action) return;
+    if (action.type === "moveTo") {
       this.setPosition(action.x, action.y);
+    } else if (action.type === "sequence" || action.type === "spawn") {
+      action.acts.forEach((a: any) => run.call(this, a));
+    } else if (action.type === "callFunc") {
+      action.fn();
     }
   };
   (cc as any).moveTo = (d: number, x: any, y?: number) => {
@@ -34,6 +39,11 @@ beforeEach(() => {
   (cc as any).fadeOut = () => ({ type: "fadeOut" });
   (cc as any).scaleTo = () => ({ type: "scaleTo" });
   (cc as any).spawn = (...acts: any[]) => ({ type: "spawn", acts });
+  (cc as any).sequence = (...acts: any[]) => ({ type: "sequence", acts });
+  (cc as any).callFunc = (fn: () => void) => ({ type: "callFunc", fn });
+  (cc.Node as any).prototype.destroy = function () {
+    this.destroyed = true;
+  };
 });
 
 describe("Move flow integration", () => {
@@ -78,6 +88,8 @@ describe("Move flow integration", () => {
     (boardCtrl as any).spawnAllTiles();
 
     const original = boardCtrl.tileViews.map((r) => r.slice());
+    const removedA = original[2][0];
+    const removedB = original[2][1];
 
     const flow = root.addComponent(MoveFlowController);
     flow.tilesLayer = layer;
@@ -103,5 +115,7 @@ describe("Move flow integration", () => {
     expect(views[2][0].node.position.y).toBe(pos(0, 2).y);
 
     expect(views.flat().filter(Boolean).length).toBe(cfg.cols * cfg.rows);
+    expect((removedA.node as any).destroyed).toBe(true);
+    expect((removedB.node as any).destroyed).toBe(true);
   });
 });

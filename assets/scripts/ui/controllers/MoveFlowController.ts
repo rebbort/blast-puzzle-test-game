@@ -41,7 +41,14 @@ export default class MoveFlowController extends cc.Component {
     positions.forEach((p) => {
       const view = this.tileViews[p.y]?.[p.x];
       if (!view) return;
-      view.node.runAction(cc.spawn(cc.scaleTo(0.15, 0), cc.fadeOut(0.15)));
+      view.node.runAction(
+        cc.sequence(
+          cc.spawn(cc.scaleTo(0.15, 0), cc.fadeOut(0.15)),
+          cc.callFunc(() => view.node.destroy()),
+        ),
+      );
+      this.tileViews[p.y][p.x] = undefined as unknown as TileView;
+      this.boardCtrl.tileViews[p.y][p.x] = undefined as unknown as TileView;
     });
   }
 
@@ -55,7 +62,10 @@ export default class MoveFlowController extends cc.Component {
     // Build mapping from tile model instances to their views
     const map = new Map<unknown, TileView>();
     this.tileViews.forEach((row) =>
-      row.forEach((v) => map.set((v as unknown as { tile: unknown }).tile, v)),
+      row.forEach((v) => {
+        if (!v) return;
+        map.set((v as unknown as { tile: unknown }).tile, v);
+      }),
     );
 
     // Reconstruct matrix according to board state and move views
