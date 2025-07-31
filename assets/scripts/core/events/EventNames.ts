@@ -12,6 +12,7 @@ export const EventNames = {
   FillDone: "FillDone",
   FallStarted: "FallStarted",
   FallDone: "FallDone",
+  TurnsInit: "TurnsInit",
   TurnUsed: "TurnUsed",
   TurnEnded: "TurnEnded",
   OutOfTurns: "OutOfTurns",

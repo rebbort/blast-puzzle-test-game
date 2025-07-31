@@ -57,8 +57,12 @@ export class GameStateMachine {
       this.bus.getListenerCount(EventNames.GroupSelected),
     );
     // broadcast initial values so HUD can display them
-    this.bus.emit(EventNames.TurnUsed, this.turnManager.getRemaining());
-    this.bus.emit(EventNames.TurnEnded, { score: this.score });
+    const turns = this.turnManager.getRemaining();
+    this.bus.emit(EventNames.TurnsInit, {
+      turns,
+      score: this.score,
+      targetScore: this.targetScore,
+    });
     this.changeState("WaitingInput");
     console.info("FSM started, current state: WaitingInput");
   }
