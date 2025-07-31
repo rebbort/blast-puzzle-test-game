@@ -5,41 +5,18 @@ import { BoardGenerator } from "../../core/board/BoardGenerator";
 import { loadBoardConfig } from "../../config/ConfigLoader";
 import TileView from "../views/TileView";
 import MoveFlowController from "./MoveFlowController";
-import type { Tile } from "../../core/board/Tile";
-import { TileKind } from "../../core/board/Tile";
 
 @ccclass()
 export default class GameBoardController extends cc.Component {
   /** Vertical offset for tile positioning. */
   static readonly VERTICAL_OFFSET = 12;
 
-  /** Prefabs for normal tile colors. */
+  /** Базовый префаб узла тайла. */
   @property(cc.Prefab)
-  tileRedPrefab!: cc.Prefab;
-  @property(cc.Prefab)
-  tileBluePrefab!: cc.Prefab;
-  @property(cc.Prefab)
-  tileGreenPrefab!: cc.Prefab;
-  @property(cc.Prefab)
-  tileYellowPrefab!: cc.Prefab;
-  @property(cc.Prefab)
-  tilePurplePrefab!: cc.Prefab;
-
-  /** Prefabs for booster tiles. */
-  @property(cc.Prefab)
-  boosterRowPrefab!: cc.Prefab;
-  @property(cc.Prefab)
-  boosterColPrefab!: cc.Prefab;
-  @property(cc.Prefab)
-  boosterBombPrefab!: cc.Prefab;
-  @property(cc.Prefab)
-  boosterClearPrefab!: cc.Prefab;
+  tileNodePrefab!: cc.Prefab;
   /** Parent node for all tile instances. */
   @property(cc.Node)
   tilesLayer!: cc.Node;
-
-  /** Map from color/kind to prefab for quick lookup. */
-  private prefabMap: Record<string, cc.Prefab> = {};
 
   /** Board model generated on load. */
   private board!: Board;
@@ -62,8 +39,6 @@ export default class GameBoardController extends cc.Component {
     const cfg = loadBoardConfig();
     // 2) Сгенерировать Board
     this.board = new BoardGenerator().generate(cfg);
-    // build prefab lookup once prefabs are assigned
-    this.initPrefabMap();
     // 3) Спавнить по каждой клетке
     this.spawnAllTiles();
     // Attach MoveFlowController on the same node for animation handling
@@ -81,7 +56,7 @@ export default class GameBoardController extends cc.Component {
       this.tileViews[r] = [];
       for (let c = 0; c < this.board.cols; c++) {
         const tileData = this.board.tileAt(new cc.Vec2(c, r))!;
-        const node = cc.instantiate(this.prefabFor(tileData));
+        const node = cc.instantiate(this.tileNodePrefab);
         node.parent = this.tilesLayer;
         // устанавливаем anchorPoint на (0, 1) для origin (0, 1)
         node.setAnchorPoint(cc.v2(0, 1));
@@ -102,7 +77,7 @@ export default class GameBoardController extends cc.Component {
    */
   spawn(pos: cc.Vec2): TileView {
     const tileData = this.board.tileAt(pos)!;
-    const node = cc.instantiate(this.prefabFor(tileData));
+    const node = cc.instantiate(this.tileNodePrefab);
     node.parent = this.tilesLayer;
     node.setAnchorPoint(cc.v2(0, 1));
     node.setPosition(this.computePos(pos.x, pos.y));
@@ -124,30 +99,6 @@ export default class GameBoardController extends cc.Component {
       (this.board.rows / 2 - row) * cfg.tileHeight -
       GameBoardController.VERTICAL_OFFSET;
     return cc.v2(x, y);
-  }
-
-  /** Builds a map from color/kind to prefab for quick access. */
-  private initPrefabMap(): void {
-    this.prefabMap = {
-      "Normal-red": this.tileRedPrefab,
-      "Normal-blue": this.tileBluePrefab,
-      "Normal-green": this.tileGreenPrefab,
-      "Normal-yellow": this.tileYellowPrefab,
-      "Normal-purple": this.tilePurplePrefab,
-      SuperRow: this.boosterRowPrefab,
-      SuperCol: this.boosterColPrefab,
-      SuperBomb: this.boosterBombPrefab,
-      SuperClear: this.boosterClearPrefab,
-    };
-  }
-
-  /** Selects prefab according to tile color and kind. */
-  private prefabFor(tile: Tile): cc.Prefab {
-    if (tile.kind === TileKind.Normal) {
-      return this.prefabMap[`Normal-${tile.color}`];
-    }
-    const key = TileKind[tile.kind] as keyof typeof TileKind;
-    return this.prefabMap[key];
   }
 
   /**

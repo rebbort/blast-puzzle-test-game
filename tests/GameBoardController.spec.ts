@@ -44,36 +44,9 @@ describe("GameBoardController", () => {
     controller["board"] = board;
     controller.tilesLayer = new cc.Node() as unknown as cc.Node;
 
-    // assign prefabs
+    // assign base prefab
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    controller.tileRedPrefab = new (cc.Prefab as any)("TileRed", TileView);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    controller.tileBluePrefab = new (cc.Prefab as any)("TileBlue", TileView);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    controller.tileGreenPrefab = new (cc.Prefab as any)("TileGreen", TileView);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    controller.tileYellowPrefab = new (cc.Prefab as any)(
-      "TileYellow",
-      TileView,
-    );
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    controller.tilePurplePrefab = new (cc.Prefab as any)(
-      "TilePurple",
-      TileView,
-    );
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    controller.boosterRowPrefab = new (cc.Prefab as any)("TileRow", TileView);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    controller.boosterColPrefab = new (cc.Prefab as any)("TileCol", TileView);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    controller.boosterBombPrefab = new (cc.Prefab as any)("TileBomb", TileView);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    controller.boosterClearPrefab = new (cc.Prefab as any)(
-      "TileClear",
-      TileView,
-    );
-
-    controller["initPrefabMap"]();
+    controller.tileNodePrefab = new (cc.Prefab as any)("TileNode", TileView);
 
     const applySpy = jest.spyOn(TileView.prototype, "apply");
 
@@ -82,9 +55,6 @@ describe("GameBoardController", () => {
     expect(applySpy).toHaveBeenCalledTimes(4);
     const views = (controller as unknown as { tileViews: TileView[][] })
       .tileViews;
-    expect(views[0][0].node.name).toBe("TileRed");
-    expect(views[0][1].node.name).toBe("TileBomb");
-    expect(views[1][0].node.name).toBe("TileGreen");
-    expect(views[1][1].node.name).toBe("TileClear");
+    views.flat().forEach((v) => expect(v.node.name).toBe("TileNode"));
   });
 });

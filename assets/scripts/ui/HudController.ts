@@ -54,6 +54,20 @@ export class HudController extends cc.Component {
   start(): void {
     const root = this.node as unknown as NodeUtils;
 
+    // Fallback lookup of label references when not assigned in editor
+    if (!this.lblState) {
+      const n = root.getChildByName("lblState");
+      this.lblState = n?.getComponent("Label") as unknown as cc.Label;
+    }
+    if (!this.lblScore) {
+      const n = root.getChildByName("lblScore");
+      this.lblScore = n?.getComponent("Label") as unknown as cc.Label;
+    }
+    if (!this.lblMoves) {
+      const n = root.getChildByName("lblMoves");
+      this.lblMoves = n?.getComponent("Label") as unknown as cc.Label;
+    }
+
     const panel = root.getChildByName("BoosterPanel") as NodeUtils | null;
     this.btnBomb = panel
       ?.getChildByName("btnBomb")

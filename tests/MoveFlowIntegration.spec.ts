@@ -74,17 +74,8 @@ describe("Move flow integration", () => {
     const boardCtrl = root.addComponent(GameBoardController);
     (boardCtrl as any).board = board;
     boardCtrl.tilesLayer = layer;
-    const prefab = new (cc.Prefab as any)("Tile", TileView);
-    boardCtrl.tileRedPrefab = prefab;
-    boardCtrl.tileBluePrefab = prefab;
-    boardCtrl.tileGreenPrefab = prefab;
-    boardCtrl.tileYellowPrefab = prefab;
-    boardCtrl.tilePurplePrefab = prefab;
-    boardCtrl.boosterRowPrefab = prefab;
-    boardCtrl.boosterColPrefab = prefab;
-    boardCtrl.boosterBombPrefab = prefab;
-    boardCtrl.boosterClearPrefab = prefab;
-    boardCtrl["initPrefabMap"]();
+    const prefab = new (cc.Prefab as any)("TileNode", TileView);
+    boardCtrl.tileNodePrefab = prefab;
     (boardCtrl as any).spawnAllTiles();
 
     const original = boardCtrl.tileViews.map((r) => r.slice());
@@ -96,7 +87,7 @@ describe("Move flow integration", () => {
     (flow as any).onLoad();
 
     const fill = root.addComponent(FillController);
-    fill.tilePrefab = prefab;
+    fill.tileNodePrefab = prefab;
     (fill as any).getComponent = (Ctor: unknown) =>
       root.getComponent(Ctor as any);
     (fill as any).onLoad();
@@ -137,17 +128,8 @@ describe("Move flow integration", () => {
     const boardCtrl = root.addComponent(GameBoardController);
     (boardCtrl as any).board = board;
     boardCtrl.tilesLayer = layer;
-    const prefab = new (cc.Prefab as any)("Tile", TileView);
-    boardCtrl.tileRedPrefab = prefab;
-    boardCtrl.tileBluePrefab = prefab;
-    boardCtrl.tileGreenPrefab = prefab;
-    boardCtrl.tileYellowPrefab = prefab;
-    boardCtrl.tilePurplePrefab = prefab;
-    boardCtrl.boosterRowPrefab = prefab;
-    boardCtrl.boosterColPrefab = prefab;
-    boardCtrl.boosterBombPrefab = prefab;
-    boardCtrl.boosterClearPrefab = prefab;
-    boardCtrl["initPrefabMap"]();
+    const prefab = new (cc.Prefab as any)("TileNode", TileView);
+    boardCtrl.tileNodePrefab = prefab;
     (boardCtrl as any).spawnAllTiles();
 
     const flow = root.addComponent(MoveFlowController);
@@ -155,7 +137,7 @@ describe("Move flow integration", () => {
     (flow as any).onLoad();
 
     const fill = root.addComponent(FillController);
-    fill.tilePrefab = prefab;
+    fill.tileNodePrefab = prefab;
     (fill as any).getComponent = (Ctor: unknown) =>
       root.getComponent(Ctor as any);
     (fill as any).onLoad();
