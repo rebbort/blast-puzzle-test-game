@@ -1,5 +1,5 @@
 import { Board } from "../Board";
-import { EventBus } from "../../../infrastructure/EventBus";
+import { EventBus } from "../../../infrastructure/InfrastructureEventBus";
 import { ICommand } from "./ICommand";
 import { Tile } from "../Tile";
 import { BoardConfig } from "../../../config/ConfigLoader";

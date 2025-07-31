@@ -1,4 +1,4 @@
-import { EventBus } from "../../infrastructure/EventBus";
+import { EventBus } from "../../infrastructure/InfrastructureEventBus";
 import { EventNames } from "../events/EventNames";
 export class TurnManager {
   /** Remaining turns in the current session. */

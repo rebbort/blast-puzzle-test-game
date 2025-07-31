@@ -1,4 +1,4 @@
-import { EventBus } from "../../assets/scripts/infrastructure/EventBus";
+import { InfrastructureEventBus } from "../../assets/scripts/infrastructure/InfrastructureEventBus";
 
 import { Board } from "../../assets/scripts/core/board/Board";
 import { TileFactory } from "../../assets/scripts/core/board/Tile";
@@ -16,7 +16,7 @@ const cfg: BoardConfig = {
 };
 
 describe("BombBooster", () => {
-  const bus = new EventBus();
+  const bus = new InfrastructureEventBus();
   const emitSpy = jest.spyOn(bus, "emit");
 
   beforeEach(() => {

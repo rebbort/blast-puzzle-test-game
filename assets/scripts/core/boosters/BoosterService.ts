@@ -1,4 +1,4 @@
-import { EventBus } from "../../infrastructure/EventBus";
+import { InfrastructureEventBus } from "../../infrastructure/InfrastructureEventBus";
 import type { Booster } from "./Booster";
 import { EventNames } from "../events/EventNames";
 
@@ -10,7 +10,7 @@ export class BoosterService {
   /** Коллекция зарегистрированных бустеров по их id. */
   private boosters: Record<string, Booster> = {};
 
-  constructor(private bus: EventBus) {}
+  constructor(private bus: InfrastructureEventBus) {}
 
   /**
    * Регистрирует новый бустер.

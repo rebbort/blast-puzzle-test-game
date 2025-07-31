@@ -1,5 +1,5 @@
 import { Board } from "../Board";
-import { EventBus } from "../../../infrastructure/EventBus";
+import { InfrastructureEventBus } from "../../../infrastructure/InfrastructureEventBus";
 import { ICommand } from "./ICommand";
 import { RemoveCommand } from "./RemoveCommand";
 import { EventNames } from "../../events/EventNames";
@@ -12,7 +12,7 @@ export class BombCommand implements ICommand {
     private board: Board,
     private center: cc.Vec2,
     private radius: number,
-    private bus: EventBus,
+    private bus: InfrastructureEventBus,
   ) {}
 
   async execute(): Promise<void> {

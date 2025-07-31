@@ -1,4 +1,4 @@
-import { EventBus } from "../../assets/scripts/infrastructure/EventBus";
+import { EventBus } from "../../assets/scripts/infrastructure/InfrastructureEventBus";
 
 // Create a mock event bus preserving emit functionality
 const bus = new EventBus();

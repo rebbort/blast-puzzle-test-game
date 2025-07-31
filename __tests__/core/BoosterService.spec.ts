@@ -1,10 +1,10 @@
-import { EventBus } from "../../assets/scripts/infrastructure/EventBus";
+import { InfrastructureEventBus } from "../../assets/scripts/infrastructure/InfrastructureEventBus";
 import { BoosterService } from "../../assets/scripts/core/boosters/BoosterService";
 import type { Booster } from "../../assets/scripts/core/boosters/Booster";
 import { EventNames } from "../../assets/scripts/core/events/EventNames";
 
 describe("BoosterService", () => {
-  const bus = new EventBus();
+  const bus = new InfrastructureEventBus();
   const emitSpy = jest.spyOn(bus, "emit");
 
   beforeEach(() => {

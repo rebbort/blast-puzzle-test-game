@@ -1,4 +1,4 @@
-import { EventBus } from "../../assets/scripts/infrastructure/EventBus";
+import { InfrastructureEventBus } from "../../assets/scripts/infrastructure/InfrastructureEventBus";
 
 import { Board } from "../../assets/scripts/core/board/Board";
 import { TileFactory } from "../../assets/scripts/core/board/Tile";
@@ -7,7 +7,7 @@ import { BoardConfig } from "../../assets/scripts/config/ConfigLoader";
 import { EventNames } from "../../assets/scripts/core/events/EventNames";
 
 describe("TeleportBooster", () => {
-  const bus = new EventBus();
+  const bus = new InfrastructureEventBus();
   const emitSpy = jest.spyOn(bus, "emit");
 
   beforeEach(() => {

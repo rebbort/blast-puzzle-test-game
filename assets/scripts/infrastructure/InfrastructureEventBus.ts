@@ -1,4 +1,4 @@
-export class EventBus {
+export class InfrastructureEventBus {
   private target = new cc.EventTarget();
   private registry: Map<string, Set<(...args: unknown[]) => void>> = new Map();
 

@@ -1,5 +1,5 @@
 // Глобальная шина событий теперь основана на cc.EventTarget with diagnostics
-import { EventBus as InfrastructureEventBus } from "../infrastructure/EventBus";
+import { InfrastructureEventBus } from "../infrastructure/InfrastructureEventBus";
 
 /**
  * Глобальный экземпляр EventBus используется во всех частях игры.

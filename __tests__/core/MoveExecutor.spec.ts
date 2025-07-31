@@ -1,6 +1,6 @@
-import { EventBus } from "../../assets/scripts/infrastructure/EventBus";
+import { InfrastructureEventBus } from "../../assets/scripts/infrastructure/InfrastructureEventBus";
 
-const bus = new EventBus();
+const bus = new InfrastructureEventBus();
 const emitSpy = jest.spyOn(bus, "emit");
 
 import { Board } from "../../assets/scripts/core/board/Board";
