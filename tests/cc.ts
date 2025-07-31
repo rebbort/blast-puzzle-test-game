@@ -26,6 +26,11 @@ export class Node {
   scale = new Vec3();
   active = false;
   private components: Component[] = [];
+  // Anchor point is ignored in tests but must exist for code calling it
+  // Called by production code; does nothing in tests
+  setAnchorPoint(): void {
+    // no-op for test environment
+  }
 
   setPosition(pos: Vec2 | number, y?: number): void {
     if (pos instanceof Vec2) {
