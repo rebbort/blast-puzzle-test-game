@@ -15,6 +15,10 @@ npm test
 
 This executes the Jest suite defined in the `tests` folder.
 
+## Events
+
+All engine-wide events are defined in [`EventNames.ts`](assets/scripts/core/events/EventNames.ts). Use these constants when emitting or subscribing instead of string literals.
+
 ## QA
 
 For manual mobile checks see the [UI Test Checklist](docs/UI_TEST_CHECKLIST.md).

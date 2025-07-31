@@ -18,6 +18,7 @@ import { Board } from "../../../assets/scripts/core/board/Board";
 import { TileFactory } from "../../../assets/scripts/core/board/Tile";
 import { BombBooster } from "../../../assets/scripts/core/boosters/BombBooster";
 import { BoardConfig } from "../../../assets/scripts/config/ConfigLoader";
+import { EventNames } from "../../../assets/scripts/core/events/EventNames";
 
 const cfg: BoardConfig = {
   cols: 3,
@@ -39,11 +40,11 @@ it("consumes charge and clears R-zone", async () => {
   const booster = new BombBooster(board, bus, 1, 1);
 
   booster.start();
-  bus.emit("GroupSelected", new cc.Vec2(1, 1));
+  bus.emit(EventNames.GroupSelected, new cc.Vec2(1, 1));
   await new Promise((r) => setImmediate(r));
 
   expect(booster.charges).toBe(0);
-  expect(emitSpy).toHaveBeenCalledWith("BoosterConsumed", "bomb");
+  expect(emitSpy).toHaveBeenCalledWith(EventNames.BoosterConsumed, "bomb");
   for (let x = 0; x < 3; x++) {
     for (let y = 0; y < 3; y++) {
       const p = new cc.Vec2(x, y);

@@ -18,6 +18,7 @@ import { Board } from "../../../assets/scripts/core/board/Board";
 import { TileFactory } from "../../../assets/scripts/core/board/Tile";
 import { TeleportBooster } from "../../../assets/scripts/core/boosters/TeleportBooster";
 import { BoardConfig } from "../../../assets/scripts/config/ConfigLoader";
+import { EventNames } from "../../../assets/scripts/core/events/EventNames";
 
 const cfg2x2: BoardConfig = {
   cols: 2,
@@ -38,17 +39,19 @@ it("consumes charge on successful swap", async () => {
   ]);
   const booster = new TeleportBooster(board, bus, 1);
   const seq: string[] = [];
-  bus.on("SwapDone", () => seq.push("SwapDone"));
-  bus.on("BoosterConsumed", () => seq.push("BoosterConsumed"));
+  bus.on(EventNames.SwapDone, () => seq.push(EventNames.SwapDone));
+  bus.on(EventNames.BoosterConsumed, () =>
+    seq.push(EventNames.BoosterConsumed),
+  );
 
   booster.start();
-  bus.emit("GroupSelected", new cc.Vec2(1, 0));
-  bus.emit("GroupSelected", new cc.Vec2(1, 1));
+  bus.emit(EventNames.GroupSelected, new cc.Vec2(1, 0));
+  bus.emit(EventNames.GroupSelected, new cc.Vec2(1, 1));
   await new Promise((r) => setImmediate(r));
 
   expect(booster.charges).toBe(0);
-  expect(seq).toEqual(["SwapDone", "BoosterConsumed"]);
-  expect(emitSpy).toHaveBeenCalledWith("BoosterConsumed", "teleport");
+  expect(seq).toEqual([EventNames.SwapDone, EventNames.BoosterConsumed]);
+  expect(emitSpy).toHaveBeenCalledWith(EventNames.BoosterConsumed, "teleport");
   expect(board.colorAt(new cc.Vec2(1, 0))).toBe("red");
   expect(board.colorAt(new cc.Vec2(1, 1))).toBe("blue");
 });
@@ -70,15 +73,15 @@ it("cancels swap when no moves available", async () => {
   );
   const booster = new TeleportBooster(board, bus, 1);
   const events: string[] = [];
-  bus.on("SwapCancelled", () => events.push("SwapCancelled"));
+  bus.on(EventNames.SwapCancelled, () => events.push(EventNames.SwapCancelled));
 
   booster.start();
-  bus.emit("GroupSelected", new cc.Vec2(0, 0));
-  bus.emit("GroupSelected", new cc.Vec2(1, 0));
+  bus.emit(EventNames.GroupSelected, new cc.Vec2(0, 0));
+  bus.emit(EventNames.GroupSelected, new cc.Vec2(1, 0));
   await new Promise((r) => setImmediate(r));
 
   expect(booster.charges).toBe(1);
-  expect(events).toEqual(["SwapCancelled"]);
+  expect(events).toEqual([EventNames.SwapCancelled]);
   expect(board.colorAt(new cc.Vec2(0, 0))).toBe("red");
   expect(board.colorAt(new cc.Vec2(1, 0))).toBe("blue");
 });

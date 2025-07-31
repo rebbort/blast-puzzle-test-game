@@ -8,6 +8,7 @@ import { BoardSolver } from "../../assets/scripts/core/board/BoardSolver";
 import { TileFactory } from "../../assets/scripts/core/board/Tile";
 import { ShuffleService } from "../../assets/scripts/core/board/ShuffleService";
 import { BoardConfig } from "../../assets/scripts/config/ConfigLoader";
+import { EventNames } from "../../assets/scripts/core/events/EventNames";
 
 const cfgSingle: BoardConfig = {
   cols: 1,
@@ -51,11 +52,11 @@ it("auto shuffles until limit then emits ShuffleLimitExceeded", () => {
   service.ensureMoves();
   service.ensureMoves();
   expect(emitSpy.mock.calls.map((c) => c[0])).toEqual([
-    "AutoShuffle",
-    "ShuffleDone",
-    "AutoShuffle",
-    "ShuffleDone",
-    "ShuffleLimitExceeded",
+    EventNames.AutoShuffle,
+    EventNames.ShuffleDone,
+    EventNames.AutoShuffle,
+    EventNames.ShuffleDone,
+    EventNames.ShuffleLimitExceeded,
   ]);
 });
 
@@ -69,7 +70,7 @@ it("reset allows shuffling again", () => {
   emitSpy.mockClear();
   service.reset();
   service.ensureMoves();
-  expect(emitSpy.mock.calls[0][0]).toBe("AutoShuffle");
+  expect(emitSpy.mock.calls[0][0]).toBe(EventNames.AutoShuffle);
 });
 
 // direct shuffle mixes tiles and emits ShuffleDone
@@ -80,5 +81,5 @@ it("shuffle performs Fisher-Yates step", () => {
   const solver = new BoardSolver(board);
   const service = new ShuffleService(board, solver, bus, 1);
   service.shuffle();
-  expect(emitSpy).toHaveBeenCalledWith("ShuffleDone");
+  expect(emitSpy).toHaveBeenCalledWith(EventNames.ShuffleDone);
 });

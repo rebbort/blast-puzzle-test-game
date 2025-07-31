@@ -4,6 +4,7 @@ import { Board } from "../../assets/scripts/core/board/Board";
 import { TileFactory } from "../../assets/scripts/core/board/Tile";
 import { SwapCommand } from "../../assets/scripts/core/board/commands/SwapCommand";
 import { BoardConfig } from "../../assets/scripts/config/ConfigLoader";
+import { EventNames } from "../../assets/scripts/core/events/EventNames";
 
 describe("SwapCommand", () => {
   const bus = new ExtendedEventTarget();
@@ -34,12 +35,12 @@ describe("SwapCommand", () => {
       bus,
     );
     const seq: string[] = [];
-    bus.on("SwapDone", () => seq.push("SwapDone"));
+    bus.on(EventNames.SwapDone, () => seq.push(EventNames.SwapDone));
 
     await cmd.execute();
 
     expect(board.tileAt(new cc.Vec2(0, 0))?.color).toBe("blue");
     expect(board.tileAt(new cc.Vec2(1, 0))?.color).toBe("red");
-    expect(seq).toEqual(["SwapDone"]);
+    expect(seq).toEqual([EventNames.SwapDone]);
   });
 });

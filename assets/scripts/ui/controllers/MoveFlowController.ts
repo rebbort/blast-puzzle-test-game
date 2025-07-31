@@ -1,6 +1,7 @@
 const { ccclass, property } = cc._decorator;
 
 import { EventBus as bus } from "../../core/EventBus";
+import { EventNames } from "../../core/events/EventNames";
 import GameBoardController from "./GameBoardController";
 import TileView from "../views/TileView";
 import { loadBoardConfig } from "../../config/ConfigLoader";
@@ -20,9 +21,9 @@ export default class MoveFlowController extends cc.Component {
     this.tileViews = board.tileViews;
 
     // Listen for core events signalling board updates
-    bus.on("TilesRemoved", this.onRemove, this);
-    bus.on("FallStarted", this.onFall, this);
-    bus.on("FillStarted", this.onFill, this);
+    bus.on(EventNames.TilesRemoved, this.onRemove, this);
+    bus.on(EventNames.FallStarted, this.onFall, this);
+    bus.on(EventNames.FillStarted, this.onFill, this);
   }
 
   /**

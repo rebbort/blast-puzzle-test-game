@@ -6,6 +6,7 @@ import { FillCommand } from "./commands/FillCommand";
 import { TileFactory } from "./Tile";
 import { BoardConfig } from "../../config/ConfigLoader";
 import { SuperTileFactory } from "../boosters/SuperTileFactory";
+import { EventNames } from "../events/EventNames";
 
 /**
  * Executes a full player move by removing a group, letting tiles fall
@@ -28,7 +29,7 @@ export class MoveExecutor {
     const startTile = this.board.tileAt(start);
 
     // 1. Remove tiles and wait for completion
-    const removeDone = this.wait("removeDone");
+    const removeDone = this.wait(EventNames.TilesRemoved);
     new RemoveCommand(this.board, this.bus, group).execute();
     const [dirtyCols] = (await removeDone) as [number[]];
 
@@ -42,17 +43,17 @@ export class MoveExecutor {
     }
 
     // 2. Let tiles fall in affected columns
-    const fallDone = this.wait("fallDone");
+    const fallDone = this.wait(EventNames.FallDone);
     new FallCommand(this.board, this.bus, dirtyCols).execute();
     const [emptySlots] = (await fallDone) as [cc.Vec2[]];
 
     // 3. Fill empty spaces with new tiles
-    const fillDone = this.wait("fillDone");
+    const fillDone = this.wait(EventNames.FillDone);
     new FillCommand(this.board, this.bus, emptySlots).execute();
     await fillDone;
 
     // Signal completion of the whole move
-    this.bus.emit("MoveCompleted");
+    this.bus.emit(EventNames.MoveCompleted);
   }
 
   /**

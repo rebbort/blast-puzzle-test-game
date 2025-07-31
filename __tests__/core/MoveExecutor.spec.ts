@@ -7,6 +7,7 @@ import { Board } from "../../assets/scripts/core/board/Board";
 import { TileFactory, TileKind } from "../../assets/scripts/core/board/Tile";
 import { MoveExecutor } from "../../assets/scripts/core/board/MoveExecutor";
 import { BoardConfig } from "../../assets/scripts/config/ConfigLoader";
+import { EventNames } from "../../assets/scripts/core/events/EventNames";
 
 const cfg: BoardConfig = {
   cols: 2,
@@ -30,18 +31,20 @@ it("executes remove, fall and fill then emits MoveCompleted", async () => {
   ]);
   const executor = new MoveExecutor(board, bus);
   const sequence: string[] = [];
-  bus.on("removeDone", () => sequence.push("removeDone"));
-  bus.on("fallDone", () => sequence.push("fallDone"));
-  bus.on("fillDone", () => sequence.push("fillDone"));
-  bus.on("MoveCompleted", () => sequence.push("MoveCompleted"));
+  bus.on(EventNames.TilesRemoved, () => sequence.push(EventNames.TilesRemoved));
+  bus.on(EventNames.FallDone, () => sequence.push(EventNames.FallDone));
+  bus.on(EventNames.FillDone, () => sequence.push(EventNames.FillDone));
+  bus.on(EventNames.MoveCompleted, () =>
+    sequence.push(EventNames.MoveCompleted),
+  );
 
   await executor.execute([new cc.Vec2(0, 0), new cc.Vec2(1, 0)]);
 
   expect(sequence).toEqual([
-    "removeDone",
-    "fallDone",
-    "fillDone",
-    "MoveCompleted",
+    EventNames.TilesRemoved,
+    EventNames.FallDone,
+    EventNames.FillDone,
+    EventNames.MoveCompleted,
   ]);
 });
 
@@ -53,7 +56,7 @@ it("ignores out of bounds tiles in group", async () => {
   ]);
   const executor = new MoveExecutor(board, bus);
   await executor.execute([new cc.Vec2(0, 0), new cc.Vec2(5, 5)]);
-  expect(emitSpy).toHaveBeenLastCalledWith("MoveCompleted");
+  expect(emitSpy).toHaveBeenLastCalledWith(EventNames.MoveCompleted);
 });
 
 // error case: empty group should reject

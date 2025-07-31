@@ -3,10 +3,11 @@ import { ExtendedEventTarget } from "../../../infrastructure/ExtendedEventTarget
 import { ICommand } from "./ICommand";
 import { Tile } from "../Tile";
 import { BoardConfig } from "../../../config/ConfigLoader";
+import { EventNames } from "../../events/EventNames";
 
 /**
  * Shifts tiles down in specified columns to remove gaps.
- * Emits 'fallStart' and 'fallDone'. The 'fallDone' event carries
+ * Emits 'FallStarted' and 'FallDone'. The 'FallDone' event carries
  * the list of coordinates that became empty at the top of columns
  * after falling which should be filled by the next command.
  */
@@ -27,7 +28,7 @@ export class FallCommand implements ICommand {
       throw new Error("FallCommand: no columns specified");
     }
 
-    this.bus.emit("fallStart", this.columns);
+    this.bus.emit(EventNames.FallStarted, this.columns);
 
     const emptySlots: cc.Vec2[] = [];
     const rows = this.cfg.rows;
@@ -55,6 +56,6 @@ export class FallCommand implements ICommand {
       }
     }
 
-    this.bus.emit("fallDone", emptySlots);
+    this.bus.emit(EventNames.FallDone, emptySlots);
   }
 }

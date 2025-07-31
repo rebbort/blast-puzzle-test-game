@@ -16,6 +16,7 @@ import { MoveExecutor } from "../board/MoveExecutor";
 import { ScoreStrategy } from "../rules/ScoreStrategy";
 import { TurnManager } from "../rules/TurnManager";
 import { BoardConfig } from "../../config/ConfigLoader";
+import { EventNames } from "../events/EventNames";
 
 /**
  * Finite state machine orchestrating a single game session.
@@ -44,11 +45,13 @@ export class GameStateMachine {
    * Subscribe to relevant events and enter the initial WaitingInput state.
    */
   start(): void {
-    this.bus.on("GroupSelected", (p: cc.Vec2) => this.onGroupSelected(p));
-    this.bus.on("BoosterActivated", () => this.onBoosterActivated());
-    this.bus.on("BoosterConsumed", () => this.onBoosterConsumed());
-    this.bus.on("BoosterCancelled", () => this.onBoosterCancelled());
-    this.bus.on("MoveCompleted", () => this.onMoveCompleted());
+    this.bus.on(EventNames.GroupSelected, (p: cc.Vec2) =>
+      this.onGroupSelected(p),
+    );
+    this.bus.on(EventNames.BoosterActivated, () => this.onBoosterActivated());
+    this.bus.on(EventNames.BoosterConsumed, () => this.onBoosterConsumed());
+    this.bus.on(EventNames.BoosterCancelled, () => this.onBoosterCancelled());
+    this.bus.on(EventNames.MoveCompleted, () => this.onMoveCompleted());
     this.changeState("WaitingInput");
   }
 
@@ -141,12 +144,12 @@ export class GameStateMachine {
    */
   private changeState(newState: GameState): void {
     this.state = newState;
-    this.bus.emit("StateChanged", newState);
+    this.bus.emit(EventNames.StateChanged, newState);
     if (newState === "Win") {
-      this.bus.emit("GameWon", this.score);
+      this.bus.emit(EventNames.GameWon, this.score);
     }
     if (newState === "Lose") {
-      this.bus.emit("GameLost", this.score);
+      this.bus.emit(EventNames.GameLost, this.score);
     }
   }
 

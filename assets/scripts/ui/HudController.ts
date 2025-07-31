@@ -1,4 +1,5 @@
 import { EventBus } from "../core/EventBus";
+import { EventNames } from "../core/events/EventNames";
 const { ccclass } = cc._decorator;
 
 interface NodeUtils {
@@ -51,22 +52,22 @@ export class HudController extends cc.Component {
       ?.getComponent("Button") as NodeUtils | null;
 
     // Update moves counter when a turn is consumed
-    EventBus.on("TurnUsed", (left: number) => {
+    EventBus.on(EventNames.TurnUsed, (left: number) => {
       if (this.lblMoves) this.lblMoves.string = String(left);
       const moveNode = this.lblMoves?.node as unknown as NodeUtils | undefined;
       if (left <= 3 && moveNode?.runAction) {
-        EventBus.emit("AnimationStarted", "moves-shake");
+        EventBus.emit(EventNames.AnimationStarted, "moves-shake");
         moveNode.runAction(shake);
-        EventBus.emit("AnimationEnded", "moves-shake");
+        EventBus.emit(EventNames.AnimationEnded, "moves-shake");
       }
     });
 
     // Update score display after a turn ends
-    EventBus.on("TurnEnded", ({ score }: { score: number }) => {
+    EventBus.on(EventNames.TurnEnded, ({ score }: { score: number }) => {
       if (!this.lblScore) return;
       const startVal = parseInt(this.lblScore.string, 10) || 0;
       const data = { value: startVal };
-      EventBus.emit("AnimationStarted", "score-tween");
+      EventBus.emit(EventNames.AnimationStarted, "score-tween");
       // Tween over half a second using an ease-out curve for smooth feel
       cc.tween(data).to(0.5, { value: score }, { easing: "quadOut" }).start();
       const id = setInterval(() => {
@@ -76,28 +77,28 @@ export class HudController extends cc.Component {
       setTimeout(() => {
         clearInterval(id);
         if (this.lblScore) this.lblScore.string = String(score);
-        EventBus.emit("AnimationEnded", "score-tween");
+        EventBus.emit(EventNames.AnimationEnded, "score-tween");
       }, 500);
     });
 
     // Booster and pause button interactions
     this.btnBomb?.node?.on("click", () => {
-      EventBus.emit("BoosterActivated", "bomb");
+      EventBus.emit(EventNames.BoosterActivated, "bomb");
     });
     this.btnSwap?.node?.on("click", () => {
-      EventBus.emit("BoosterActivated", "swap");
+      EventBus.emit(EventNames.BoosterActivated, "swap");
     });
     this.btnPause?.node?.on("click", () => {
-      EventBus.emit("GamePaused");
+      EventBus.emit(EventNames.GamePaused);
     });
 
-    EventBus.on("BoosterActivated", (name: string) => {
+    EventBus.on(EventNames.BoosterActivated, (name: string) => {
       const btn =
         name === "bomb" ? this.btnBomb : name === "swap" ? this.btnSwap : null;
       if (btn?.node?.runAction) {
-        EventBus.emit("AnimationStarted", "booster-pulse");
+        EventBus.emit(EventNames.AnimationStarted, "booster-pulse");
         btn.node.runAction(pulse);
-        EventBus.emit("AnimationEnded", "booster-pulse");
+        EventBus.emit(EventNames.AnimationEnded, "booster-pulse");
       }
     });
   }

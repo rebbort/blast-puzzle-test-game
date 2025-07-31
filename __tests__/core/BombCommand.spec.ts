@@ -4,6 +4,7 @@ import { Board } from "../../assets/scripts/core/board/Board";
 import { TileFactory } from "../../assets/scripts/core/board/Tile";
 import { BombCommand } from "../../assets/scripts/core/board/commands/BombCommand";
 import { BoardConfig } from "../../assets/scripts/config/ConfigLoader";
+import { EventNames } from "../../assets/scripts/core/events/EventNames";
 
 const cfg: BoardConfig = {
   cols: 3,
@@ -30,12 +31,12 @@ describe("BombCommand", () => {
     const board = new Board(cfg, tiles);
     const cmd = new BombCommand(board, new cc.Vec2(1, 1), 1, bus);
     const seq: string[] = [];
-    bus.on("removeDone", () => seq.push("removeDone"));
-    bus.on("MoveCompleted", () => seq.push("MoveCompleted"));
+    bus.on(EventNames.TilesRemoved, () => seq.push(EventNames.TilesRemoved));
+    bus.on(EventNames.MoveCompleted, () => seq.push(EventNames.MoveCompleted));
 
     await cmd.execute();
 
-    expect(seq).toEqual(["removeDone", "MoveCompleted"]);
+    expect(seq).toEqual([EventNames.TilesRemoved, EventNames.MoveCompleted]);
     // center tile remains, остальные восемь должны быть пустыми
     for (let x = 0; x < 3; x++) {
       for (let y = 0; y < 3; y++) {

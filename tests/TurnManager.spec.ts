@@ -1,13 +1,14 @@
 // Тесты больше не используют eventemitter2, вместо него наш EventBus
 import { ExtendedEventTarget } from "../assets/scripts/infrastructure/ExtendedEventTarget";
 import { TurnManager } from "../assets/scripts/core/rules/TurnManager";
+import { EventNames } from "../assets/scripts/core/events/EventNames";
 
 describe("TurnManager", () => {
   test("counts down turns and emits TurnUsed", () => {
     const bus = new ExtendedEventTarget();
     const tm = new TurnManager(5, bus);
     const used: number[] = [];
-    bus.on("TurnUsed", (left) => used.push(left as number));
+    bus.on(EventNames.TurnUsed, (left) => used.push(left as number));
     tm.useTurn();
     tm.useTurn();
     tm.useTurn();
@@ -19,7 +20,7 @@ describe("TurnManager", () => {
     const bus = new ExtendedEventTarget();
     const tm = new TurnManager(2, bus);
     let count = 0;
-    bus.on("OutOfTurns", () => count++);
+    bus.on(EventNames.OutOfTurns, () => count++);
     tm.useTurn();
     expect(count).toBe(0);
     tm.useTurn();

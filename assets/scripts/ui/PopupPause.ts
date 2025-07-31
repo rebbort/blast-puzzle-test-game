@@ -1,4 +1,5 @@
 import { EventBus } from "../core/EventBus";
+import { EventNames } from "../core/events/EventNames";
 const { ccclass } = cc._decorator;
 
 interface NodeUtils {
@@ -27,7 +28,7 @@ export class PopupPause extends cc.Component {
       ?.getComponent("Button") as NodeUtils | null;
 
     this.btnResume?.node?.on("click", () => {
-      EventBus.emit("GameResumed");
+      EventBus.emit(EventNames.GameResumed);
     });
     this.btnRestart?.node?.on("click", () => {
       cc.director.loadScene("GameScene");
