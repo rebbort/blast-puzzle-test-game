@@ -3,7 +3,7 @@ const { ccclass } = cc._decorator;
 import { loadBoardConfig } from "../../config/ConfigLoader";
 import { EventBus as bus } from "../../core/EventBus";
 
-@ccclass("TileInputController")
+@ccclass()
 export default class TileInputController extends cc.Component {
   onLoad(): void {
     if (this.node.width === 0 || this.node.height === 0) {

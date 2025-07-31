@@ -8,7 +8,7 @@ import MoveFlowController from "./MoveFlowController";
 import type { Tile } from "../../core/board/Tile";
 import { TileKind } from "../../core/board/Tile";
 
-@ccclass("GameBoardController")
+@ccclass()
 export default class GameBoardController extends cc.Component {
   /** Vertical offset for tile positioning. */
   static readonly VERTICAL_OFFSET = 12;

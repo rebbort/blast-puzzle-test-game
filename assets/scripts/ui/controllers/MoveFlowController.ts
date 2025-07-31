@@ -5,7 +5,7 @@ import GameBoardController from "./GameBoardController";
 import TileView from "../views/TileView";
 import { loadBoardConfig } from "../../config/ConfigLoader";
 
-@ccclass("MoveFlowController")
+@ccclass()
 export default class MoveFlowController extends cc.Component {
   /** Parent node for new tile views */
   @property(cc.Node)
