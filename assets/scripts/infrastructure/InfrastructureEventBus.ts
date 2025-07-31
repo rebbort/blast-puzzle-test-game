@@ -8,14 +8,17 @@ export class InfrastructureEventBus {
     target?: unknown,
     useCapture?: boolean,
   ): void {
+    // Привязываем контекст если передан target
+    const boundHandler = target ? handler.bind(target) : handler;
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (this.target as any).on(eventName, handler, target, useCapture);
+    this.target.on(eventName, boundHandler, target, useCapture);
     let set = this.registry.get(eventName);
     if (!set) {
       set = new Set();
       this.registry.set(eventName, set);
     }
-    set.add(handler);
+    set.add(boundHandler);
   }
 
   off(
@@ -23,15 +26,18 @@ export class InfrastructureEventBus {
     handler?: (...args: unknown[]) => void,
     target?: unknown,
   ): void {
+    // Привязываем контекст если передан target и handler
+    const boundHandler = target && handler ? handler.bind(target) : handler;
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (this.target as any).off(eventName, handler, target);
+    this.target.off(eventName, boundHandler, target);
     const set = this.registry.get(eventName);
-    if (set && handler) {
-      set.delete(handler);
+    if (set && boundHandler) {
+      set.delete(boundHandler);
       if (set.size === 0) {
         this.registry.delete(eventName);
       }
-    } else if (set && !handler) {
+    } else if (set && !boundHandler) {
       this.registry.delete(eventName);
     }
   }
@@ -43,7 +49,9 @@ export class InfrastructureEventBus {
   ): void {
     const callback = (...args: unknown[]) => {
       this.off(event, callback, target);
-      listener(...args);
+      // Привязываем контекст для listener
+      const boundListener = target ? listener.bind(target) : listener;
+      boundListener(...args);
     };
     this.on(event, callback, target);
   }
@@ -70,13 +78,13 @@ export class InfrastructureEventBus {
       const set = this.registry.get(eventName);
       if (set) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        set.forEach((h) => (this.target as any).off(eventName, h));
+        set.forEach((h) => this.target.off(eventName, h));
       }
       this.registry.delete(eventName);
     } else {
       this.registry.forEach((handlers, evt) => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        handlers.forEach((h) => (this.target as any).off(evt, h));
+        handlers.forEach((h) => this.target.off(evt, h));
       });
       this.registry.clear();
     }

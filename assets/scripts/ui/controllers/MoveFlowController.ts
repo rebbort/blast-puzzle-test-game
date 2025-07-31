@@ -21,7 +21,7 @@ export default class MoveFlowController extends cc.Component {
     this.tileViews = board.tileViews;
 
     // Listen for core events signalling board updates
-    bus.on(EventNames.TilesRemoved, this.onRemove, this);
+    bus.on(EventNames.RemoveStarted, this.onRemove, this);
     bus.on(EventNames.FallStarted, this.onFall, this);
     bus.on(EventNames.FillStarted, this.onFill, this);
   }
@@ -31,6 +31,8 @@ export default class MoveFlowController extends cc.Component {
    * @param positions coordinates of tiles removed by the core
    */
   private onRemove(positions: cc.Vec2[]): void {
+    console.log("onRemove called, this:", this);
+    console.log("tileViews:", this.tileViews);
     positions.forEach((p) => {
       const view = this.tileViews[p.y][p.x];
       view.node.runAction(cc.spawn(cc.scaleTo(0.15, 0), cc.fadeOut(0.15)));
