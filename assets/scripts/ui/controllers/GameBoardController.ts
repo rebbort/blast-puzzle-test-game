@@ -4,13 +4,14 @@ import { Board } from "../../core/board/Board";
 import { BoardGenerator } from "../../core/board/BoardGenerator";
 import { loadBoardConfig } from "../../config/ConfigLoader";
 import TileView from "../views/TileView";
+import MoveFlowController from "./MoveFlowController";
 import type { Tile } from "../../core/board/Tile";
 import { TileKind } from "../../core/board/Tile";
 
 @ccclass("GameBoardController")
 export default class GameBoardController extends cc.Component {
   /** Vertical offset for tile positioning. */
-  private static readonly VERTICAL_OFFSET = 12;
+  static readonly VERTICAL_OFFSET = 12;
 
   /** Prefabs for normal tile colors. */
   @property(cc.Prefab)
@@ -43,7 +44,7 @@ export default class GameBoardController extends cc.Component {
   /** Board model generated on load. */
   private board!: Board;
   /** Matrix of view components mirroring board state. */
-  private tileViews: TileView[][] = [];
+  tileViews: TileView[][] = [];
 
   /**
    * Generates the game board when this controller loads.
@@ -61,6 +62,9 @@ export default class GameBoardController extends cc.Component {
     this.initPrefabMap();
     // 3) Спавнить по каждой клетке
     this.spawnAllTiles();
+    // Attach MoveFlowController on the same node for animation handling
+    const flow = this.node.addComponent(MoveFlowController);
+    flow.tilesLayer = this.tilesLayer;
     // 4) Создаем дебаг сетку
     this.createDebugGrid();
   }
@@ -87,6 +91,22 @@ export default class GameBoardController extends cc.Component {
         this.tileViews[r][c] = view;
       }
     }
+  }
+
+  /**
+   * Spawns a single tile view at the given board position and stores it.
+   */
+  spawn(pos: cc.Vec2): TileView {
+    const tileData = this.board.tileAt(pos)!;
+    const node = cc.instantiate(this.prefabFor(tileData));
+    node.parent = this.tilesLayer;
+    node.setAnchorPoint(cc.v2(0, 1));
+    node.setPosition(this.computePos(pos.x, pos.y));
+    node.zIndex = this.board.rows - pos.y - 1;
+    const view = node.getComponent(TileView) as TileView;
+    view.apply(tileData);
+    this.tileViews[pos.y][pos.x] = view;
+    return view;
   }
 
   /**
