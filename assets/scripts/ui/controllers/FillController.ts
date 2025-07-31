@@ -9,8 +9,9 @@ import { loadBoardConfig } from "../../config/ConfigLoader";
 
 @ccclass("FillController")
 export default class FillController extends cc.Component {
+  /** Базовый префаб TileNode для новых тайлов. */
   @property(cc.Prefab)
-  tilePrefab!: cc.Prefab;
+  tileNodePrefab!: cc.Prefab;
 
   private board!: Board;
   private tilesLayer!: cc.Node;
@@ -34,7 +35,7 @@ export default class FillController extends cc.Component {
     this.tileViews = this.getComponent(GameBoardController)!.tileViews;
     slots.forEach((p) => {
       const view = cc
-        .instantiate(this.tilePrefab)
+        .instantiate(this.tileNodePrefab)
         .getComponent(TileView) as TileView;
       view.node.parent = this.tilesLayer;
       const start = this.computePos(p.x, -1);

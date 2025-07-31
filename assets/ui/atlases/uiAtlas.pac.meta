@@ -18,6 +18,15 @@
   "packable": false,
   "premultiplyAlpha": false,
   "filterMode": "bilinear",
-  "platformSettings": {},
+  "platformSettings": {
+    "default": {
+      "formats": [
+        {
+          "name": "png",
+          "quality": 80
+        }
+      ]
+    }
+  },
   "subMetas": {}
 }

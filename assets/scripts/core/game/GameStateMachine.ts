@@ -63,6 +63,9 @@ export class GameStateMachine {
       score: this.score,
       targetScore: this.targetScore,
     });
+    // legacy events expected by older HUD/tests
+    this.bus.emit(EventNames.TurnUsed, turns);
+    this.bus.emit(EventNames.TurnEnded, { score: this.score });
     this.changeState("WaitingInput");
     console.info("FSM started, current state: WaitingInput");
   }
