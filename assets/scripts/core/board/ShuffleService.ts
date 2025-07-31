@@ -1,4 +1,4 @@
-import { ExtendedEventTarget } from "../../infrastructure/ExtendedEventTarget";
+import { EventBus } from "../../infrastructure/EventBus";
 import { Board } from "./Board";
 import { BoardSolver } from "./BoardSolver";
 import { Tile } from "./Tile";
@@ -10,7 +10,7 @@ export class ShuffleService {
   constructor(
     private board: Board,
     private solver: BoardSolver,
-    private bus: ExtendedEventTarget,
+    private bus: EventBus,
     private maxShuffles: number = 3,
   ) {}
 

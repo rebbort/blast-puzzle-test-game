@@ -18,6 +18,7 @@ This executes the Jest suite defined in the `tests` folder.
 ## Events
 
 All engine-wide events are defined in [`EventNames.ts`](assets/scripts/core/events/EventNames.ts). Use these constants when emitting or subscribing instead of string literals.
+The global `EventBus` tracks listeners and warns in development when an emitted event has no subscribers.
 
 ## QA
 

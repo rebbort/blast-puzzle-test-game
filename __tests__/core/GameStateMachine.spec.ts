@@ -1,6 +1,6 @@
-import { ExtendedEventTarget } from "../../assets/scripts/infrastructure/ExtendedEventTarget";
+import { EventBus } from "../../assets/scripts/infrastructure/EventBus";
 
-const bus = new ExtendedEventTarget();
+const bus = new EventBus();
 const emitSpy = jest.spyOn(bus, "emit");
 
 import {

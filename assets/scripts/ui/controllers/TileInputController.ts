@@ -29,6 +29,10 @@ export default class TileInputController extends cc.Component {
         );
         bus.emit(EventNames.GroupSelected, { x: col, y: row });
         console.log("GroupSelected", { x: col, y: row });
+        console.debug(
+          "Listeners for GroupSelected:",
+          bus.getListenerCount(EventNames.GroupSelected),
+        );
       },
       this,
     );

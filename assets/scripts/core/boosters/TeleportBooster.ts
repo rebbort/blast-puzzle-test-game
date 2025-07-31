@@ -1,6 +1,6 @@
 import { Booster } from "./Booster";
 import { Board } from "../board/Board";
-import { ExtendedEventTarget } from "../../infrastructure/ExtendedEventTarget";
+import { EventBus } from "../../infrastructure/EventBus";
 import { SwapCommand } from "../board/commands/SwapCommand";
 import { BoardSolver } from "../board/BoardSolver";
 import { EventNames } from "../events/EventNames";
@@ -16,7 +16,7 @@ export class TeleportBooster implements Booster {
   charges: number;
   constructor(
     private board: Board,
-    private bus: ExtendedEventTarget,
+    private bus: EventBus,
     charges: number,
   ) {
     this.charges = charges;

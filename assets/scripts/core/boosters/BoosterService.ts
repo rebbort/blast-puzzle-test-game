@@ -1,4 +1,4 @@
-import { ExtendedEventTarget } from "../../infrastructure/ExtendedEventTarget";
+import { EventBus } from "../../infrastructure/EventBus";
 import type { Booster } from "./Booster";
 import { EventNames } from "../events/EventNames";
 
@@ -10,7 +10,7 @@ export class BoosterService {
   /** Коллекция зарегистрированных бустеров по их id. */
   private boosters: Record<string, Booster> = {};
 
-  constructor(private bus: ExtendedEventTarget) {}
+  constructor(private bus: EventBus) {}
 
   /**
    * Регистрирует новый бустер.
@@ -42,6 +42,10 @@ export class BoosterService {
     boost.start();
     // Сообщаем подписчикам об активации конкретного бустера
     this.bus.emit(EventNames.BoosterActivated, id);
+    console.debug(
+      "Listeners for BoosterActivated:",
+      this.bus.getListenerCount(EventNames.BoosterActivated),
+    );
   }
 
   /**

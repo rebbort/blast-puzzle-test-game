@@ -1,6 +1,6 @@
 import { Booster } from "./Booster";
 import { Board } from "../board/Board";
-import { ExtendedEventTarget } from "../../infrastructure/ExtendedEventTarget";
+import { EventBus } from "../../infrastructure/EventBus";
 import { BombCommand } from "../board/commands/BombCommand";
 import { EventNames } from "../events/EventNames";
 
@@ -13,7 +13,7 @@ export class BombBooster implements Booster {
   charges: number;
   constructor(
     private board: Board,
-    private bus: ExtendedEventTarget,
+    private bus: EventBus,
     charges: number,
     private radius: number,
   ) {

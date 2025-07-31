@@ -13,7 +13,7 @@ jest.mock("../../../assets/scripts/infrastructure/EventBus", () => {
   };
 });
 
-import { ExtendedEventTarget } from "../../../assets/scripts/infrastructure/ExtendedEventTarget";
+import { EventBus } from "../../../assets/scripts/infrastructure/EventBus";
 import { Board } from "../../../assets/scripts/core/board/Board";
 import { TileFactory } from "../../../assets/scripts/core/board/Tile";
 import { BombBooster } from "../../../assets/scripts/core/boosters/BombBooster";
@@ -31,7 +31,7 @@ const cfg: BoardConfig = {
 
 // Проверяем расход заряда и радиус действия бомбы
 it("consumes charge and clears R-zone", async () => {
-  const bus = new ExtendedEventTarget();
+  const bus = new EventBus();
   const emitSpy = jest.spyOn(bus, "emit");
   const tiles = Array.from({ length: 3 }, () =>
     Array.from({ length: 3 }, () => TileFactory.createNormal("red")),

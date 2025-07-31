@@ -1,4 +1,4 @@
-import { ExtendedEventTarget } from "../../assets/scripts/infrastructure/ExtendedEventTarget";
+import { EventBus } from "../../assets/scripts/infrastructure/EventBus";
 
 import { Board } from "../../assets/scripts/core/board/Board";
 import { TileFactory } from "../../assets/scripts/core/board/Tile";
@@ -16,7 +16,7 @@ const cfg: BoardConfig = {
 };
 
 describe("BombBooster", () => {
-  const bus = new ExtendedEventTarget();
+  const bus = new EventBus();
   const emitSpy = jest.spyOn(bus, "emit");
 
   beforeEach(() => {

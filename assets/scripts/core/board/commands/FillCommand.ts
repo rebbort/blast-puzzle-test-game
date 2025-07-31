@@ -1,5 +1,5 @@
 import { Board } from "../Board";
-import { ExtendedEventTarget } from "../../../infrastructure/ExtendedEventTarget";
+import { EventBus } from "../../../infrastructure/EventBus";
 import { ICommand } from "./ICommand";
 import { TileFactory, TileColor } from "../Tile";
 import { BoardConfig } from "../../../config/ConfigLoader";
@@ -12,7 +12,7 @@ import { EventNames } from "../../events/EventNames";
 export class FillCommand implements ICommand {
   constructor(
     private board: Board,
-    private bus: ExtendedEventTarget,
+    private bus: EventBus,
     private slots: cc.Vec2[],
   ) {}
 

@@ -9,7 +9,7 @@ export type GameState =
   | "Win"
   | "Lose";
 
-import { ExtendedEventTarget } from "../../infrastructure/ExtendedEventTarget";
+import { EventBus } from "../../infrastructure/EventBus";
 import { Board } from "../board/Board";
 import { BoardSolver } from "../board/BoardSolver";
 import { MoveExecutor } from "../board/MoveExecutor";
@@ -31,7 +31,7 @@ export class GameStateMachine {
   private shuffles = 0;
 
   constructor(
-    private bus: ExtendedEventTarget,
+    private bus: EventBus,
     private board: Board,
     private solver: BoardSolver,
     private executor: MoveExecutor,
@@ -52,6 +52,10 @@ export class GameStateMachine {
     this.bus.on(EventNames.BoosterConsumed, () => this.onBoosterConsumed());
     this.bus.on(EventNames.BoosterCancelled, () => this.onBoosterCancelled());
     this.bus.on(EventNames.MoveCompleted, () => this.onMoveCompleted());
+    console.debug(
+      "Listeners for GroupSelected:",
+      this.bus.getListenerCount(EventNames.GroupSelected),
+    );
     this.changeState("WaitingInput");
   }
 

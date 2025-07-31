@@ -52,8 +52,8 @@ declare namespace cc {
 
   class EventTarget {
     private listeners: Record<string, ((...args: any[]) => void)[]>;
-    on(event: string, cb: (...args: any[]) => void): void;
-    off(event: string, cb: (...args: any[]) => void): void;
+    on(event: string, cb: (...args: any[]) => void, target?: any): void;
+    off(event: string, cb: (...args: any[]) => void, target?: any): void;
     emit(event: string, ...args: any[]): void;
     clear(event?: string): void;
   }

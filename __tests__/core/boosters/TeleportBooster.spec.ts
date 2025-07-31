@@ -13,7 +13,7 @@ jest.mock("../../../assets/scripts/infrastructure/EventBus", () => {
   };
 });
 
-import { ExtendedEventTarget } from "../../../assets/scripts/infrastructure/ExtendedEventTarget";
+import { EventBus } from "../../../assets/scripts/infrastructure/EventBus";
 import { Board } from "../../../assets/scripts/core/board/Board";
 import { TileFactory } from "../../../assets/scripts/core/board/Tile";
 import { TeleportBooster } from "../../../assets/scripts/core/boosters/TeleportBooster";
@@ -31,7 +31,7 @@ const cfg2x2: BoardConfig = {
 
 // Swap происходит и заряд тратится, если после обмена есть ходы
 it("consumes charge on successful swap", async () => {
-  const bus = new ExtendedEventTarget();
+  const bus = new EventBus();
   const emitSpy = jest.spyOn(bus, "emit");
   const board = new Board(cfg2x2, [
     [TileFactory.createNormal("red"), TileFactory.createNormal("blue")],
@@ -59,7 +59,7 @@ it("consumes charge on successful swap", async () => {
 // Когда после обмена нет ходов, заряд не тратится, а событие SwapCancelled
 // уведомляет о возврате
 it("cancels swap when no moves available", async () => {
-  const bus = new ExtendedEventTarget();
+  const bus = new EventBus();
   const board = new Board(
     {
       cols: 2,

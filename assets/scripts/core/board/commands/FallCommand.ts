@@ -1,5 +1,5 @@
 import { Board } from "../Board";
-import { ExtendedEventTarget } from "../../../infrastructure/ExtendedEventTarget";
+import { EventBus } from "../../../infrastructure/EventBus";
 import { ICommand } from "./ICommand";
 import { Tile } from "../Tile";
 import { BoardConfig } from "../../../config/ConfigLoader";
@@ -14,7 +14,7 @@ import { EventNames } from "../../events/EventNames";
 export class FallCommand implements ICommand {
   constructor(
     private board: Board,
-    private bus: ExtendedEventTarget,
+    private bus: EventBus,
     private columns: number[],
   ) {}
 
