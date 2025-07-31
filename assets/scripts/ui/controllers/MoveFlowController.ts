@@ -23,7 +23,6 @@ export default class MoveFlowController extends cc.Component {
     // Listen for core events signalling board updates
     bus.on(EventNames.RemoveStarted, this.onRemove, this);
     bus.on(EventNames.FallStarted, this.onFall, this);
-    bus.on(EventNames.FillStarted, this.onFill, this);
   }
 
   /**
@@ -56,26 +55,6 @@ export default class MoveFlowController extends cc.Component {
         const dur = dist / 1400;
         view.node.runAction(cc.moveTo(dur, view.node.x, targetY));
       });
-    });
-  }
-
-  /**
-   * Spawns new tiles for empty slots and drops them in.
-   * @param slots array of board coordinates supplied by FillCommand.
-   */
-  private onFill(slots: cc.Vec2[]): void {
-    slots.forEach((p) => {
-      // Instantiate via GameBoardController.spawn to reuse prefabs
-      const board = this.node.getComponent(GameBoardController)!;
-      const view = board.spawn(p);
-      // Place above the board then drop down
-      const startPos = this.computePos(p.x, -1);
-      view.node.setPosition(startPos.x, startPos.y);
-      view.node.parent = this.tilesLayer;
-      const target = this.computePos(p.x, p.y);
-      const dist = Math.abs(startPos.y - target.y);
-      const dur = dist / 1400;
-      view.node.runAction(cc.moveTo(dur, target));
     });
   }
 
