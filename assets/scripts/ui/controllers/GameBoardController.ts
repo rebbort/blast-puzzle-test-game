@@ -43,6 +43,10 @@ export default class GameBoardController extends cc.Component {
 
   /** Board model generated on load. */
   private board!: Board;
+
+  getBoard(): Board {
+    return this.board;
+  }
   /** Matrix of view components mirroring board state. */
   tileViews: TileView[][] = [];
 

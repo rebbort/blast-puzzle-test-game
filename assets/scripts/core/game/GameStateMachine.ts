@@ -9,7 +9,7 @@ export type GameState =
   | "Win"
   | "Lose";
 
-import { EventBus } from "../../infrastructure/EventBus";
+import { EventBus } from "../EventBus";
 import { Board } from "../board/Board";
 import { BoardSolver } from "../board/BoardSolver";
 import { MoveExecutor } from "../board/MoveExecutor";
@@ -31,7 +31,7 @@ export class GameStateMachine {
   private shuffles = 0;
 
   constructor(
-    private bus: EventBus,
+    private bus: typeof EventBus,
     private board: Board,
     private solver: BoardSolver,
     private executor: MoveExecutor,
@@ -57,6 +57,7 @@ export class GameStateMachine {
       this.bus.getListenerCount(EventNames.GroupSelected),
     );
     this.changeState("WaitingInput");
+    console.info("FSM started, current state: WaitingInput");
   }
 
   /**
@@ -64,7 +65,11 @@ export class GameStateMachine {
    * Ignored unless the machine awaits input.
    */
   private onGroupSelected(start: cc.Vec2): void {
+    console.info("FSM received GroupSelected at", start);
     if (this.state !== "WaitingInput") {
+      console.info(
+        `Ignored GroupSelected because current state is ${this.state}`,
+      );
       // Ignore input while another action is executing
       return;
     }
@@ -149,6 +154,7 @@ export class GameStateMachine {
   private changeState(newState: GameState): void {
     this.state = newState;
     this.bus.emit(EventNames.StateChanged, newState);
+    console.info("State changed to", newState);
     if (newState === "Win") {
       this.bus.emit(EventNames.GameWon, this.score);
     }
