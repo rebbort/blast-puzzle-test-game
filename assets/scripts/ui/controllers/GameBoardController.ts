@@ -70,8 +70,12 @@ export default class GameBoardController extends cc.Component {
         const tileData = this.board.tileAt(new cc.Vec2(c, r))!;
         const node = cc.instantiate(this.prefabFor(tileData));
         node.parent = this.tilesLayer;
+        // устанавливаем anchorPoint на (0, 1) для origin (0, 1)
+        node.setAnchorPoint(cc.v2(0, 1));
         // позиционируем точно как в Core
         node.setPosition(this.computePos(c, r));
+        // устанавливаем z-index: каждый следующий слой ниже
+        node.zIndex = this.board.rows - r - 1;
         // сохраняем TileView для обновлений
         const view = node.getComponent(TileView) as TileView;
         view.apply(tileData);
@@ -87,7 +91,7 @@ export default class GameBoardController extends cc.Component {
   private computePos(col: number, row: number): cc.Vec2 {
     const cfg = loadBoardConfig();
     const x = (col - this.board.cols / 2 + 0.5) * cfg.tileWidth;
-    const y = (this.board.rows / 2 - row - 0.5) * cfg.tileHeight;
+    const y = (this.board.rows / 2 - row - 0.5) * cfg.tileHeight - 12;
     return cc.v2(x, y);
   }
 
