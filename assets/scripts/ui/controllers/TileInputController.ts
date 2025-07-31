@@ -6,6 +6,12 @@ import { EventBus as bus } from "../../core/EventBus";
 @ccclass("TileInputController")
 export default class TileInputController extends cc.Component {
   onLoad(): void {
+    if (this.node.width === 0 || this.node.height === 0) {
+      const cfg = loadBoardConfig();
+      this.node.width = cfg.cols * cfg.tileWidth;
+      this.node.height = cfg.rows * cfg.tileHeight;
+    }
+
     // Attach a single click listener on the tilesLayer node
     this.node.on(
       cc.Node.EventType.TOUCH_END,
@@ -17,9 +23,11 @@ export default class TileInputController extends cc.Component {
           (local.x + this.node.width / 2) / loadBoardConfig().tileWidth,
         );
         const row = Math.floor(
-          (this.node.height / 2 - local.y) / loadBoardConfig().tileHeight,
+          (this.node.height / 2 - (local.y - 12)) /
+            loadBoardConfig().tileHeight,
         );
         bus.emit("GroupSelected", { x: col, y: row });
+        console.log("GroupSelected", { x: col, y: row });
       },
       this,
     );

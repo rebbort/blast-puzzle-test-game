@@ -52,7 +52,7 @@
       "ctor": "Float64Array",
       "array": [
         0,
-        0,
+        5.823,
         0,
         0,
         0,
@@ -105,9 +105,7 @@
     "_fillStart": 0,
     "_fillRange": 0,
     "_isTrimmedMode": true,
-    "_atlas": {
-      "__uuid__": "421bd7e5-4325-4ab6-989a-17559365d76b"
-    },
+    "_atlas": null,
     "_id": ""
   },
   {
