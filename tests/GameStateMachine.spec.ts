@@ -15,7 +15,8 @@ describe("GameStateMachine", () => {
   const cfg: BoardConfig = {
     cols: 2,
     rows: 2,
-    tileSize: 1,
+    tileWidth: 1,
+    tileHeight: 1,
     colors: ["red"],
     superThreshold: 3,
   };
@@ -85,7 +86,8 @@ describe("GameStateMachine", () => {
     const singleCfg: BoardConfig = {
       cols: 1,
       rows: 1,
-      tileSize: 1,
+      tileWidth: 1,
+      tileHeight: 1,
       colors: ["red"],
       superThreshold: 3,
     };

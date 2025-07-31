@@ -5,7 +5,8 @@
 export interface BoardConfig {
   cols: number; // сколько колонок на поле
   rows: number; // сколько строк на поле
-  tileSize: number; // размер одного тайла в пикселях
+  tileWidth: number; // ширина одного тайла в пикселях
+  tileHeight: number; // высота одного тайла в пикселях
   colors: string[]; // допустимые цвета тайлов
   superThreshold: number; // размер группы для супер-тайла
   rngSeed?: string; // необязательно: фиксированный seed
@@ -15,7 +16,8 @@ export interface BoardConfig {
 export const DefaultBoard: BoardConfig = {
   cols: 9, // классическая ширина
   rows: 11, // и высота
-  tileSize: 100, // под размеры подготовленных спрайтов
+  tileWidth: 100, // под размеры подготовленных спрайтов
+  tileHeight: 100,
   colors: ["red", "blue", "green", "yellow", "purple"],
   superThreshold: 5,
 };
@@ -32,8 +34,16 @@ export function loadBoardConfig(): BoardConfig {
   }
   try {
     // объединяем сохранённые поля с настройками по умолчанию
-    const parsed = JSON.parse(raw) as Partial<BoardConfig>;
-    return Object.assign({}, DefaultBoard, parsed);
+    // поддерживая старое поле tileSize при наличии
+    const parsed = JSON.parse(raw) as Partial<
+      BoardConfig & { tileSize?: number }
+    >;
+    const combined = Object.assign({}, DefaultBoard, parsed);
+    if (typeof parsed.tileSize === "number") {
+      combined.tileWidth = parsed.tileSize;
+      combined.tileHeight = parsed.tileSize;
+    }
+    return combined;
   } catch {
     // если JSON битый, не ломаем игру
     return DefaultBoard;

@@ -17,7 +17,8 @@ describe("SwapCommand", () => {
   const cfg: BoardConfig = {
     cols: 2,
     rows: 1,
-    tileSize: 1,
+    tileWidth: 1,
+    tileHeight: 1,
     colors: ["red", "blue"],
     superThreshold: 3,
   };
