@@ -36,10 +36,11 @@ export default class MoveFlowController extends cc.Component {
    * @param positions coordinates of tiles removed by the core
    */
   private onRemove(positions: cc.Vec2[]): void {
-    console.log("onRemove called, this:", this);
-    console.log("tileViews:", this.tileViews);
+    // Refresh local reference in case another controller replaced it
+    this.tileViews = this.boardCtrl.tileViews;
     positions.forEach((p) => {
-      const view = this.tileViews[p.y][p.x];
+      const view = this.tileViews[p.y]?.[p.x];
+      if (!view) return;
       view.node.runAction(cc.spawn(cc.scaleTo(0.15, 0), cc.fadeOut(0.15)));
     });
   }
