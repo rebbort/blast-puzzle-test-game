@@ -118,4 +118,65 @@ describe("Move flow integration", () => {
     expect((removedA.node as any).destroyed).toBe(true);
     expect((removedB.node as any).destroyed).toBe(true);
   });
+
+  test("matrix stays complete after two sequential moves", async () => {
+    const tiles = [
+      [TileFactory.createNormal("red"), TileFactory.createNormal("red")],
+      [TileFactory.createNormal("red"), TileFactory.createNormal("red")],
+      [TileFactory.createNormal("red"), TileFactory.createNormal("red")],
+    ];
+    const board = new Board(cfg, tiles);
+
+    const root = new cc.Node();
+    const layer = new cc.Node();
+    layer.name = "TilesLayer";
+    (root as any).children.push(layer);
+    (root as any).getChildByName = (n: string) =>
+      n === "TilesLayer" ? layer : null;
+
+    const boardCtrl = root.addComponent(GameBoardController);
+    (boardCtrl as any).board = board;
+    boardCtrl.tilesLayer = layer;
+    const prefab = new (cc.Prefab as any)("Tile", TileView);
+    boardCtrl.tileRedPrefab = prefab;
+    boardCtrl.tileBluePrefab = prefab;
+    boardCtrl.tileGreenPrefab = prefab;
+    boardCtrl.tileYellowPrefab = prefab;
+    boardCtrl.tilePurplePrefab = prefab;
+    boardCtrl.boosterRowPrefab = prefab;
+    boardCtrl.boosterColPrefab = prefab;
+    boardCtrl.boosterBombPrefab = prefab;
+    boardCtrl.boosterClearPrefab = prefab;
+    boardCtrl["initPrefabMap"]();
+    (boardCtrl as any).spawnAllTiles();
+
+    const flow = root.addComponent(MoveFlowController);
+    flow.tilesLayer = layer;
+    (flow as any).onLoad();
+
+    const fill = root.addComponent(FillController);
+    fill.tilePrefab = prefab;
+    (fill as any).getComponent = (Ctor: unknown) =>
+      root.getComponent(Ctor as any);
+    (fill as any).onLoad();
+
+    const executor = new MoveExecutor(board, EventBus);
+    // First move removes bottom row
+    await executor.execute([new cc.Vec2(0, 2), new cc.Vec2(1, 2)]);
+
+    const firstBottomA = boardCtrl.tileViews[2][0];
+    const firstBottomB = boardCtrl.tileViews[2][1];
+
+    // Wait for FillController async callbacks
+    await new Promise((r) => setTimeout(r, 0));
+
+    // Second move removes the new bottom row
+    await executor.execute([new cc.Vec2(0, 2), new cc.Vec2(1, 2)]);
+
+    const views = boardCtrl.tileViews;
+    expect(views.flat().filter(Boolean).length).toBe(cfg.cols * cfg.rows);
+    views.forEach((row) => row.forEach((v) => expect(v).toBeDefined()));
+    expect((firstBottomA.node as any).destroyed).toBe(true);
+    expect((firstBottomB.node as any).destroyed).toBe(true);
+  });
 });

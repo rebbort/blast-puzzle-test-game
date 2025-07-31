@@ -39,12 +39,14 @@ export default class FillController extends cc.Component {
       view.node.parent = this.tilesLayer;
       const start = this.computePos(p.x, -1);
       view.node.setPosition(start);
-      const tileData = this.board.tileAt(p)!;
-      view.apply(tileData);
       const end = this.computePos(p.x, p.y);
       const dur = Math.abs(start.y - end.y) / 1400;
       view.node.runAction(cc.moveTo(dur, end));
       this.tileViews[p.y][p.x] = view;
+      // apply tile data after FillCommand updates the board
+      setTimeout(() => {
+        view.apply(this.board.tileAt(p)!);
+      }, 0);
     });
   }
 
