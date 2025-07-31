@@ -27,22 +27,20 @@ export default class FillController extends cc.Component {
    * Core.FillCommand updates the model before emitting FillStarted so the
    * board already contains new tiles when this handler runs.
    */
-  private onFill(slots: Record<number, cc.Vec2[]>): void {
-    for (const [, positions] of Object.entries(slots)) {
-      positions.forEach((p) => {
-        const view = cc
-          .instantiate(this.tilePrefab)
-          .getComponent(TileView) as TileView;
-        view.node.parent = this.tilesLayer;
-        const start = this.computePos(p.x, -1);
-        view.node.setPosition(start);
-        const tileData = this.board.tileAt(p)!;
-        view.apply(tileData);
-        const end = this.computePos(p.x, p.y);
-        const dur = Math.abs(start.y - end.y) / 1400;
-        view.node.runAction(cc.moveTo(dur, end));
-      });
-    }
+  private onFill(slots: cc.Vec2[]): void {
+    slots.forEach((p) => {
+      const view = cc
+        .instantiate(this.tilePrefab)
+        .getComponent(TileView) as TileView;
+      view.node.parent = this.tilesLayer;
+      const start = this.computePos(p.x, -1);
+      view.node.setPosition(start);
+      const tileData = this.board.tileAt(p)!;
+      view.apply(tileData);
+      const end = this.computePos(p.x, p.y);
+      const dur = Math.abs(start.y - end.y) / 1400;
+      view.node.runAction(cc.moveTo(dur, end));
+    });
   }
 
   /**
