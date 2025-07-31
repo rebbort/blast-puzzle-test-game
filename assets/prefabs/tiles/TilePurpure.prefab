@@ -13,7 +13,7 @@
   },
   {
     "__type__": "cc.Node",
-    "_name": "TileGreen",
+    "_name": "TilePurpure",
     "_objFlags": 0,
     "_parent": null,
     "_children": [],
@@ -92,7 +92,7 @@
     "_srcBlendFactor": 770,
     "_dstBlendFactor": 771,
     "_spriteFrame": {
-      "__uuid__": "160eeaa0-e464-494d-8604-13fdbb8851b7"
+      "__uuid__": "6d2a0e8d-ac8c-48fc-acfb-cb1ac55e3b32"
     },
     "_type": 0,
     "_sizeMode": 1,

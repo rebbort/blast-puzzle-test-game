@@ -1,1 +1,9 @@
-{"ver":"1.3.2","uuid":"tilebomb"}
+{
+  "ver": "1.3.2",
+  "uuid": "1e06292f-7a42-44ae-86fa-b48a2f73e96d",
+  "importer": "prefab",
+  "optimizationPolicy": "AUTO",
+  "asyncLoadAssets": false,
+  "readonly": false,
+  "subMetas": {}
+}

@@ -78,10 +78,10 @@
     "_active": true,
     "_components": [
       {
-        "__id__": 41
+        "__id__": 42
       },
       {
-        "__id__": 42
+        "__id__": 43
       }
     ],
     "_prefab": null,
@@ -255,6 +255,9 @@
       },
       {
         "__id__": 40
+      },
+      {
+        "__id__": 41
       }
     ],
     "_prefab": null,
@@ -1561,6 +1564,46 @@
     },
     "_enabled": true,
     "_id": "ecI0+/+3tBC4OAxyhoLO5y"
+  },
+  {
+    "__type__": "01fa9k3VdlCfbh0rx8vvxB5",
+    "_name": "",
+    "_objFlags": 0,
+    "node": {
+      "__id__": 5
+    },
+    "_enabled": true,
+    "tileRedPrefab": {
+      "__uuid__": "831d08bf-7e40-49ac-944c-77465fc92c30"
+    },
+    "tileBluePrefab": {
+      "__uuid__": "f0825239-279e-4bac-a9d5-f3c60376aa5d"
+    },
+    "tileGreenPrefab": {
+      "__uuid__": "03911ac0-e6af-4e44-9d13-aa6bd3283ff6"
+    },
+    "tileYellowPrefab": {
+      "__uuid__": "62f1ea35-28b3-47ce-9750-02c60aaacab4"
+    },
+    "tilePurplePrefab": {
+      "__uuid__": "13096f14-8fe5-4f56-b7ef-c6af880fd89a"
+    },
+    "boosterRowPrefab": {
+      "__uuid__": "54bb732e-a0d4-4a09-a782-88b9f54a3552"
+    },
+    "boosterColPrefab": {
+      "__uuid__": "a13375d2-8d00-4a0f-a8a0-619aec847421"
+    },
+    "boosterBombPrefab": {
+      "__uuid__": "1e06292f-7a42-44ae-86fa-b48a2f73e96d"
+    },
+    "boosterClearPrefab": {
+      "__uuid__": "1b02b6c4-91f8-4f61-b771-d82ac5fe26ec"
+    },
+    "tilesLayer": {
+      "__id__": 6
+    },
+    "_id": "32E75ZBU9DyLmxoLfTAUTL"
   },
   {
     "__type__": "cc.Canvas",

@@ -1,1 +1,9 @@
-{"ver":"1.3.2","uuid":"tilered"}
+{
+  "ver": "1.3.2",
+  "uuid": "831d08bf-7e40-49ac-944c-77465fc92c30",
+  "importer": "prefab",
+  "optimizationPolicy": "AUTO",
+  "asyncLoadAssets": false,
+  "readonly": false,
+  "subMetas": {}
+}
