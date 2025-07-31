@@ -14,3 +14,7 @@ npm test
 ```
 
 This executes the Jest suite defined in the `tests` folder.
+
+## QA
+
+For manual mobile checks see the [UI Test Checklist](docs/UI_TEST_CHECKLIST.md).
