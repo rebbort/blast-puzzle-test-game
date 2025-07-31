@@ -24,6 +24,7 @@ const pulse = {};
 export class HudController extends cc.Component {
   private lblScore: cc.Label | null = null;
   private lblMoves: cc.Label | null = null;
+  private lblState: cc.Label | null = null;
   private btnBomb: NodeUtils | null = null;
   private btnSwap: NodeUtils | null = null;
   private btnPause: NodeUtils | null = null;
@@ -37,6 +38,9 @@ export class HudController extends cc.Component {
       ?.getComponent("Label") as cc.Label | null;
     this.lblMoves = root
       .getChildByName("lblMoves")
+      ?.getComponent("Label") as cc.Label | null;
+    this.lblState = root
+      .getChildByName("lblState")
       ?.getComponent("Label") as cc.Label | null;
 
     const panel = root.getChildByName("BoosterPanel") as NodeUtils | null;
@@ -100,6 +104,11 @@ export class HudController extends cc.Component {
         btn.node.runAction(pulse);
         EventBus.emit(EventNames.AnimationEnded, "booster-pulse");
       }
+    });
+
+    // Display current FSM state in the HUD
+    EventBus.on(EventNames.StateChanged, (state: string) => {
+      if (this.lblState) this.lblState.string = state;
     });
   }
 }
