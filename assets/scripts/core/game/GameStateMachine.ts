@@ -57,6 +57,7 @@ export class GameStateMachine {
       this.bus.getListenerCount(EventNames.GroupSelected),
     );
     this.changeState("WaitingInput");
+    console.info("FSM started, current state: WaitingInput");
   }
 
   /**
@@ -64,7 +65,11 @@ export class GameStateMachine {
    * Ignored unless the machine awaits input.
    */
   private onGroupSelected(start: cc.Vec2): void {
+    console.info("FSM received GroupSelected at", start);
     if (this.state !== "WaitingInput") {
+      console.info(
+        `Ignored GroupSelected because current state is ${this.state}`,
+      );
       // Ignore input while another action is executing
       return;
     }
@@ -149,6 +154,7 @@ export class GameStateMachine {
   private changeState(newState: GameState): void {
     this.state = newState;
     this.bus.emit(EventNames.StateChanged, newState);
+    console.info("State changed to", newState);
     if (newState === "Win") {
       this.bus.emit(EventNames.GameWon, this.score);
     }
