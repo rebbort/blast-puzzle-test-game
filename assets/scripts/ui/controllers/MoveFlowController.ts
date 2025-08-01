@@ -69,7 +69,7 @@ export default class MoveFlowController extends cc.Component {
       for (let colIndex = 0; colIndex < row.length; colIndex++) {
         const v = row[colIndex];
         if (!v) continue;
-        map.set((v as unknown as { tile: unknown }).tile, v);
+        map.set(v.tile, v);
       }
     }
 

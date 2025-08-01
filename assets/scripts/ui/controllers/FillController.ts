@@ -52,7 +52,7 @@ export default class FillController extends cc.Component {
       byCol[p.x].push(p);
     }
 
-    const delayStep = 0.05;
+    const delayStep = 0.15;
 
     for (const colStr of Object.keys(byCol)) {
       const list = byCol[parseInt(colStr, 10)];
@@ -78,27 +78,33 @@ export default class FillController extends cc.Component {
           view.node.active,
         );
 
-        view.node.setAnchorPoint(cc.v2(0, 1));
+        // Устанавливаем anchorPoint на нижний центр для бамп эффекта
+        view.node.setAnchorPoint(cc.v2(0.5, 0));
+
         const start = this.computePos(p.x, -1);
         view.node.setPosition(start);
         const end = this.computePos(p.x, p.y);
         const dur = Math.abs(start.y - end.y) / 1400;
         const maybe = view.node as unknown as { stopAllActions?: () => void };
         if (typeof maybe.stopAllActions === "function") maybe.stopAllActions();
-
         const action = cc.sequence(
           cc.delayTime(index * delayStep),
           cc.moveTo(dur, end.x, end.y),
           cc.callFunc(() => {
-            cc.tween(view.node as unknown as cc.Node)
-              .to(0.05, { scale: new cc.Vec3(1.1, 1.1, 1) })
-              .to(0.05, { scale: new cc.Vec3(1, 1, 1) })
-              .start();
+            // Бамп эффект
+            const bumpAction = cc.sequence(
+              cc.scaleTo(0.5, 0.5, 0.5),
+              cc.scaleTo(0.5, 1, 1),
+            );
+            view.node.runAction(bumpAction);
+          }),
+          cc.callFunc(() => {
+            // Возвращаем anchorPoint обратно на верхний левый угол
+            view.node.setAnchorPoint(cc.v2(0, 1));
           }),
         );
-        (
-          view.node as unknown as { runAction?: (a: unknown) => void }
-        ).runAction?.(action);
+
+        view.node.runAction(action);
 
         view.node.zIndex = this.board.rows - p.y - 1;
         this.tileViews[p.y][p.x] = view;
