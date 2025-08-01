@@ -31,7 +31,9 @@ describe("TileView", () => {
   }
 
   test("apply swaps visuals and triggers fx", () => {
+    const root = new cc.Node();
     const viewNode = new cc.Node();
+    viewNode.parent = root;
     const view = viewNode.addComponent(TileView);
     view.visualRoot = new cc.Node();
 
@@ -55,7 +57,11 @@ describe("TileView", () => {
     view.apply(tile);
     expect(spy.mock.calls[2][0]).toBe(superPrefab);
 
+    const fxNode = new cc.Node();
+    spy.mockImplementation(() => fxNode);
+
     view.activateSuper();
     expect(spy.mock.calls[3][0]).toBe(activatePrefab);
+    expect(fxNode.parent).toBe(root);
   });
 });

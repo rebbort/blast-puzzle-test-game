@@ -212,12 +212,20 @@ describe("Move flow integration", () => {
 
     const view = boardCtrl.tileViews[0][0];
     const spy = jest.spyOn(view, "activateSuper");
+    view["activateFx"] = new (cc.Prefab as any)("fx", cc.Component);
+    const fxNode = new cc.Node();
+    const instSpy = jest
+      .spyOn(cc, "instantiate")
+      .mockImplementationOnce(() => fxNode);
 
     const flow = root.addComponent(MoveFlowController);
     flow.tilesLayer = layer;
     (flow as any).onLoad();
 
     EventBus.emit(EventNames.RemoveStarted, [new cc.Vec2(0, 0)]);
+
+    expect(fxNode.parent).toBe(layer);
+    instSpy.mockRestore();
 
     expect(spy).toHaveBeenCalled();
   });
