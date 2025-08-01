@@ -10,10 +10,19 @@ interface NodeUtils {
   node?: NodeUtils;
 }
 
-// Placeholder animations used with runAction. In the real game these would be
-// cc.Action objects describing the shake/pulse behaviour.
-const shake = {};
-const pulse = {};
+// Helper creators for simple actions used with runAction. Defined as functions
+// to avoid accessing the `cc` global during tests where action APIs are not
+// stubbed.
+function createShake(): cc.ActionInterval {
+  return cc.repeat(
+    cc.sequence(cc.moveBy(0.05, 5, 0), cc.moveBy(0.05, -5, 0)),
+    2,
+  );
+}
+
+function createPulse(): cc.ActionInterval {
+  return cc.sequence(cc.scaleTo(0.1, 1.2), cc.scaleTo(0.1, 1));
+}
 
 /**
  * Controls the Heads Up Display of the GameScene.
@@ -113,7 +122,7 @@ export class HudController extends cc.Component {
     const moveNode = this.lblMoves?.node as NodeUtils | undefined;
     if (left <= 3 && moveNode?.runAction) {
       EventBus.emit(EventNames.AnimationStarted, "moves-shake");
-      moveNode.runAction(shake);
+      moveNode.runAction(createShake());
       EventBus.emit(EventNames.AnimationEnded, "moves-shake");
     }
   }
@@ -170,7 +179,7 @@ export class HudController extends cc.Component {
       name === "bomb" ? this.btnBomb : name === "swap" ? this.btnSwap : null;
     if (btn?.node?.runAction) {
       EventBus.emit(EventNames.AnimationStarted, "booster-pulse");
-      btn.node.runAction(pulse);
+      btn.node.runAction(createPulse());
       EventBus.emit(EventNames.AnimationEnded, "booster-pulse");
     }
   }
