@@ -131,3 +131,30 @@ export const director = {
   pause: () => {},
   resume: () => {},
 };
+
+export function tween<T extends { position?: unknown; scale?: unknown }>(
+  target: T,
+): {
+  delay: (d: number) => unknown;
+  to: (d: number, props: Partial<T>) => unknown;
+  call: (fn: () => void) => unknown;
+  start: () => unknown;
+} {
+  const chain = {
+    delay() {
+      return chain;
+    },
+    to(_d: number, props: Partial<T>) {
+      Object.assign(target as object, props);
+      return chain;
+    },
+    call(fn: () => void) {
+      fn();
+      return chain;
+    },
+    start() {
+      return chain;
+    },
+  };
+  return chain;
+}

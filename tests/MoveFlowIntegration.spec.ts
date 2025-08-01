@@ -38,6 +38,30 @@ beforeEach(() => {
   };
   (cc as any).fadeOut = () => ({ type: "fadeOut" });
   (cc as any).scaleTo = () => ({ type: "scaleTo" });
+  (cc as any).tween = (target: any) => {
+    const chain = {
+      delay() {
+        return this;
+      },
+      to(_d: number, props: any) {
+        if (props.position) {
+          target.position = props.position;
+        }
+        if (props.scale) {
+          target.scale = props.scale;
+        }
+        return this;
+      },
+      call(fn: () => void) {
+        fn();
+        return this;
+      },
+      start() {
+        return this;
+      },
+    } as any;
+    return chain;
+  };
   (cc as any).spawn = (...acts: any[]) => ({ type: "spawn", acts });
   (cc as any).sequence = (...acts: any[]) => ({ type: "sequence", acts });
   (cc as any).callFunc = (fn: () => void) => ({ type: "callFunc", fn });

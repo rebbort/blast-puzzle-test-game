@@ -45,40 +45,66 @@ export default class FillController extends cc.Component {
       !!this.tileNodePrefab,
     );
 
+    const byCol: { [key: number]: cc.Vec2[] } = {};
     for (let i = 0; i < slots.length; i++) {
       const p = slots[i];
-      const view = cc
-        .instantiate(this.tileNodePrefab)
-        .getComponent(TileView) as TileView;
-
-      console.log(
-        "FillController: Created view for position",
-        p,
-        "view:",
-        view,
-      );
-
-      view.node.parent = this.tilesLayer;
-      view.node.active = true;
-      console.log("FillController: Set parent, node active:", view.node.active);
-
-      view.node.setAnchorPoint(cc.v2(0, 1));
-      const start = this.computePos(p.x, -1);
-      view.node.setPosition(start);
-      const end = this.computePos(p.x, p.y);
-      const dur = Math.abs(start.y - end.y) / 1400;
-      if (
-        typeof (view.node as unknown as { stopAllActions?: () => void })
-          .stopAllActions === "function"
-      ) {
-        (
-          view.node as unknown as { stopAllActions: () => void }
-        ).stopAllActions();
-      }
-      view.node.runAction(cc.moveTo(dur, end));
-      view.node.zIndex = this.board.rows - p.y - 1;
-      this.tileViews[p.y][p.x] = view;
+      if (!byCol[p.x]) byCol[p.x] = [];
+      byCol[p.x].push(p);
     }
+
+    const delayStep = 0.05;
+
+    Object.keys(byCol).forEach((colStr) => {
+      const col = parseInt(colStr, 10);
+      const list = byCol[col];
+      list.sort((a, b) => b.y - a.y); // bottom first
+      for (let index = 0; index < list.length; index++) {
+        const p = list[index];
+        const view = cc
+          .instantiate(this.tileNodePrefab)
+          .getComponent(TileView) as TileView;
+
+        console.log(
+          "FillController: Created view for position",
+          p,
+          "view:",
+          view,
+        );
+
+        view.node.parent = this.tilesLayer;
+        view.node.active = true;
+        console.log(
+          "FillController: Set parent, node active:",
+          view.node.active,
+        );
+
+        view.node.setAnchorPoint(cc.v2(0, 1));
+        const start = this.computePos(p.x, -1);
+        view.node.setPosition(start);
+        const end = this.computePos(p.x, p.y);
+        const dur = Math.abs(start.y - end.y) / 1400;
+        const maybe = view.node as unknown as { stopAllActions?: () => void };
+        if (typeof maybe.stopAllActions === "function") maybe.stopAllActions();
+
+        setTimeout(
+          () => {
+            cc.tween(view.node as unknown as { position: cc.Vec3 })
+              .to(dur, { position: new cc.Vec3(end.x, end.y, 0) })
+              .start();
+            setTimeout(() => {
+              cc.tween(view.node as unknown as { scale: cc.Vec3 })
+                .to(0.05, { scale: new cc.Vec3(1.1, 1.1, 1) })
+                .to(0.05, { scale: new cc.Vec3(1, 1, 1) })
+                .start();
+            }, dur * 1000);
+          },
+          index * delayStep * 1000,
+        );
+
+        view.node.zIndex = this.board.rows - p.y - 1;
+        this.tileViews[p.y][p.x] = view;
+      }
+    });
   }
 
   private onFillDone(): void {
