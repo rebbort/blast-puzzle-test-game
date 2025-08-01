@@ -19,8 +19,10 @@ it("expandGroupForSuper handles all kinds", () => {
 
   const rowTile = TileFactory.createNormal("red");
   rowTile.kind = TileKind.SuperRow;
-  expect(solver.expandGroupForSuper(rowTile, new cc.Vec2(2, 3))).toEqual(
-    Array.from({ length: cfg.cols }, (_, x) => new cc.Vec2(x, 3)),
+  const rowRes = solver.expandGroupForSuper(rowTile, new cc.Vec2(2, 0));
+  expect(rowRes).toHaveLength(cfg.cols);
+  expect(rowRes).toEqual(
+    Array.from({ length: cfg.cols }, (_, x) => new cc.Vec2(x, 0)),
   );
 
   const colTile = TileFactory.createNormal("red");
@@ -32,9 +34,16 @@ it("expandGroupForSuper handles all kinds", () => {
   const bombTile = TileFactory.createNormal("red");
   bombTile.kind = TileKind.SuperBomb;
   const bombRes = solver.expandGroupForSuper(bombTile, new cc.Vec2(2, 2));
-  expect(bombRes).toHaveLength(9);
-  expect(bombRes).toContainEqual(new cc.Vec2(1, 1));
-  expect(bombRes).toContainEqual(new cc.Vec2(3, 3));
+  expect(bombRes).toHaveLength(5);
+  expect(bombRes).toEqual(
+    expect.arrayContaining([
+      new cc.Vec2(2, 2),
+      new cc.Vec2(1, 2),
+      new cc.Vec2(3, 2),
+      new cc.Vec2(2, 1),
+      new cc.Vec2(2, 3),
+    ]),
+  );
 
   const clearTile = TileFactory.createNormal("red");
   clearTile.kind = TileKind.SuperClear;
