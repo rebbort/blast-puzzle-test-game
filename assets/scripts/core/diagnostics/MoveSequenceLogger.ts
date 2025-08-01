@@ -65,12 +65,12 @@ export class MoveSequenceLogger {
     this.update("fill started");
   }
 
-  private onFillDone(newTiles: { pos: cc.Vec2; tile: unknown }[]): void {
+  private onFillDone(newTiles?: { pos: cc.Vec2; tile: unknown }[]): void {
     if (this.fillTimer) {
       clearTimeout(this.fillTimer);
       this.fillTimer = null;
     }
-    this.added += newTiles.length;
+    this.added += newTiles?.length ?? 0;
     this.cycles++;
     this.update("fill done");
   }
