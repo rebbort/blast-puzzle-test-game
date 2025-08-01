@@ -5,6 +5,7 @@ import { MoveExecutor } from "./core/board/MoveExecutor";
 import { ScoreStrategyQuadratic } from "./core/rules/ScoreStrategyQuadratic";
 import { TurnManager } from "./core/rules/TurnManager";
 import GameBoardController from "./ui/controllers/GameBoardController";
+import { MoveSequenceLogger } from "./core/diagnostics/MoveSequenceLogger";
 
 const { ccclass } = cc._decorator;
 
@@ -24,6 +25,9 @@ export default class GameScene extends cc.Component {
     const executor = new MoveExecutor(board, EventBus);
     const scoreStrategy = new ScoreStrategyQuadratic(1);
     const turns = new TurnManager(20, EventBus);
+
+    // Diagnostic helper that tracks event sequence for each move.
+    new MoveSequenceLogger(EventBus, board);
 
     this.fsm = new GameStateMachine(
       EventBus,

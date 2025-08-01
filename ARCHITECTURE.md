@@ -49,3 +49,5 @@ continues through tile falling and filling before returning to
 
 Components communicate via the global event bus. All event names are centralized in [`EventNames.ts`](assets/scripts/core/events/EventNames.ts).
 The bus keeps an internal registry of subscribers and logs a warning when events fire without any listeners.
+
+To aid troubleshooting, a `MoveSequenceLogger` listens to key move events (`GroupSelected`, `TilesRemoved`, `FallDone`, `FillStarted`, `FillDone`). It warns when `FillDone` is missing for more than 600 ms and prints a summary of how many tiles were removed or spawned. A small badge component subscribes to this logger and displays the latest step, turning red if such a mismatch occurs.
