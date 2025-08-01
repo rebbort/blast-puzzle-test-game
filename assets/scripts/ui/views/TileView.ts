@@ -116,36 +116,36 @@ export default class TileView extends cc.Component {
   pressFeedback(): void {
     this.isFeedbackActive = true;
     const target = this.node;
-    const width = (target as unknown as { width?: number }).width ?? 0;
-    const height = (target as unknown as { height?: number }).height ?? 0;
+    // const width = (target as unknown as { width?: number }).width ?? 0;
+    // const height = (target as unknown as { height?: number }).height ?? 0;
 
-    // determine current pos/anchor and convert to default top-left origin
-    const getPos =
-      (target as unknown as { getPosition?: () => cc.Vec2 }).getPosition?.bind(
-        target,
-      ) || (() => (target as unknown as { position: cc.Vec2 }).position);
-    const getAnchor =
-      (
-        target as unknown as { getAnchorPoint?: () => cc.Vec2 }
-      ).getAnchorPoint?.bind(target) || (() => cc.v2(0, 1));
+    // // determine current pos/anchor and convert to default top-left origin
+    // const getPos =
+    //   (target as unknown as { getPosition?: () => cc.Vec2 }).getPosition?.bind(
+    //     target,
+    //   ) || (() => (target as unknown as { position: cc.Vec2 }).position);
+    // const getAnchor =
+    //   (
+    //     target as unknown as { getAnchorPoint?: () => cc.Vec2 }
+    //   ).getAnchorPoint?.bind(target) || (() => cc.v2(0, 1));
 
-    const curPos: cc.Vec2 = getPos();
-    const curAnchor: cc.Vec2 = getAnchor();
+    // const curPos: cc.Vec2 = getPos();
+    // const curAnchor: cc.Vec2 = getAnchor();
 
     const defaultAnchor = cc.v2(0, 1);
-    const basePos = cc.v2(
-      curPos.x + width * (curAnchor.x - defaultAnchor.x),
-      curPos.y + height * (curAnchor.y - defaultAnchor.y),
-    );
+    // const basePos = cc.v2(
+    //   curPos.x + width * (curAnchor.x - defaultAnchor.x),
+    //   curPos.y + height * (curAnchor.y - defaultAnchor.y),
+    // );
 
-    const centerOffset = cc.v2(
-      width * (0.5 - defaultAnchor.x),
-      height * (0.5 - defaultAnchor.y),
-    );
-    const centerPos = cc.v2(
-      basePos.x + centerOffset.x,
-      basePos.y + centerOffset.y,
-    );
+    // const centerOffset = cc.v2(
+    //   width * (0.5 - defaultAnchor.x),
+    //   height * (0.5 - defaultAnchor.y),
+    // );
+    // const centerPos = cc.v2(
+    //   basePos.x + centerOffset.x,
+    //   basePos.y + centerOffset.y,
+    // );
 
     const maybe = target as unknown as {
       stopAllActions?: () => void;
@@ -154,8 +154,8 @@ export default class TileView extends cc.Component {
     if (typeof maybe.stopAllActions === "function") maybe.stopAllActions();
     if (typeof maybe.setScale === "function") maybe.setScale(1, 1);
 
-    target.setAnchorPoint(cc.v2(0.5, 0.5));
-    target.setPosition(centerPos);
+    // target.setAnchorPoint(cc.v2(0.5, 0.5));
+    // target.setPosition(centerPos);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     target.runAction(
@@ -165,7 +165,7 @@ export default class TileView extends cc.Component {
         cc.scaleTo(0.1, 1.0),
         cc.callFunc(() => {
           target.setAnchorPoint(defaultAnchor);
-          target.setPosition(basePos);
+          // target.setPosition(basePos);
           this.isFeedbackActive = false;
         }),
       ),

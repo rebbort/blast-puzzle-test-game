@@ -45,3 +45,7 @@ continues through tile falling and filling before returning to
 
 Components communicate via the global event bus. All event names are centralized in [`EventNames.ts`](assets/scripts/core/events/EventNames.ts).
 The bus keeps an internal registry of subscribers and logs a warning when events fire without any listeners.
+
+### Super tile behavior
+
+Earlier versions accidentally swapped the logic for `SuperRow` and `SuperBomb` tiles which made row tiles explode in a radius and bombs clear a row. The mapping is now implemented explicitly via a `switch` in `BoardSolver.expandGroupForSuper` with a runtime assertion for unknown kinds. Unit tests verify the exact coordinates for both tile types so regressions are caught early.
