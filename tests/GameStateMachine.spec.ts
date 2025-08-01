@@ -83,9 +83,6 @@ describe("GameStateMachine", () => {
     fsm.start();
     EventBus.emit(EventNames.GroupSelected, new cc.Vec2(0, 0));
     await new Promise((r) => setImmediate(r));
-    await new Promise((r) => setImmediate(r));
-    await new Promise((r) => setImmediate(r));
-    await new Promise((r) => setImmediate(r));
     expect(states.slice(0, 5)).toEqual([
       "WaitingInput",
       "ExecutingMove",

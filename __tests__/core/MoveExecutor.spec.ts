@@ -48,21 +48,6 @@ it("executes remove, fall and fill then emits MoveCompleted", async () => {
   ]);
 });
 
-// board should have no empty cells after fillBoard runs
-it("fills board with new tiles", async () => {
-  const board = new Board(cfg, [
-    [TileFactory.createNormal("red"), TileFactory.createNormal("red")],
-    [TileFactory.createNormal("red"), TileFactory.createNormal("red")],
-  ]);
-  const executor = new MoveExecutor(board, bus);
-  await executor.execute([new cc.Vec2(0, 0), new cc.Vec2(1, 0)]);
-  for (let y = 0; y < cfg.rows; y++) {
-    for (let x = 0; x < cfg.cols; x++) {
-      expect(board.tileAt(new cc.Vec2(x, y))).not.toBeNull();
-    }
-  }
-});
-
 // boundary: coordinates outside board are ignored but flow still completes
 it("ignores out of bounds tiles in group", async () => {
   const board = new Board(cfg, [

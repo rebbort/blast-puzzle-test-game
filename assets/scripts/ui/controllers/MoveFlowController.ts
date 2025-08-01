@@ -29,7 +29,6 @@ export default class MoveFlowController extends cc.Component {
     // Listen for core events signalling board updates
     bus.on(EventNames.RemoveStarted, this.onRemove, this);
     bus.on(EventNames.FallDone, this.onFall, this);
-    bus.on(EventNames.FillDone, this.onFill, this);
   }
 
   /**
@@ -90,20 +89,7 @@ export default class MoveFlowController extends cc.Component {
   }
 
   /**
-   * Refreshes the local tile view matrix after new tiles were spawned.
-   * Filling is separate from falling because new pieces appear only
-   * after all existing ones settle. We simply sync references so the
-   * next fall step moves the correct nodes.
-   */
-  private onFill(): void {
-    this.tileViews = this.boardCtrl.tileViews;
-  }
-
-  /**
    * Compute tile position exactly like in GameBoardController.
-   * Board uses column/row with origin at the top-left whereas Cocos
-   * positions are centred. Keeping the math identical ensures that
-   * UI nodes line up with the model.
    */
   private computePos(col: number, row: number): cc.Vec2 {
     const cfg = loadBoardConfig();

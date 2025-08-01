@@ -12,12 +12,11 @@ export type GameState =
 import { InfrastructureEventBus } from "../../infrastructure/InfrastructureEventBus";
 import { Board } from "../board/Board";
 import { BoardSolver } from "../board/BoardSolver";
-import { MoveExecutor, fillBoard } from "../board/MoveExecutor";
+import { MoveExecutor } from "../board/MoveExecutor";
 import { ScoreStrategy } from "../rules/ScoreStrategy";
 import { TurnManager } from "../rules/TurnManager";
 import { BoardConfig } from "../../config/ConfigLoader";
 import { EventNames } from "../events/EventNames";
-import { FallCommand } from "../board/commands/FallCommand";
 
 /**
  * Finite state machine orchestrating a single game session.
@@ -52,7 +51,7 @@ export class GameStateMachine {
     this.bus.on(EventNames.BoosterActivated, () => this.onBoosterActivated());
     this.bus.on(EventNames.BoosterConsumed, () => this.onBoosterConsumed());
     this.bus.on(EventNames.BoosterCancelled, () => this.onBoosterCancelled());
-    this.bus.on(EventNames.MoveCompleted, () => void this.onMoveCompleted());
+    this.bus.on(EventNames.MoveCompleted, () => this.onMoveCompleted());
     console.debug(
       "Listeners for GroupSelected:",
       this.bus.getListenerCount(EventNames.GroupSelected),
@@ -122,60 +121,14 @@ export class GameStateMachine {
    * Triggered when MoveExecutor signals completion of tile removal/fall/fill.
    * Advances through remaining states and evaluates win/lose conditions.
    */
-  private async onMoveCompleted(): Promise<void> {
+  private onMoveCompleted(): void {
     if (this.state !== "ExecutingMove") return;
-
-    // Falling is performed before filling so existing tiles settle
-    // and new ones never move right after spawning. The FSM waits
-    // for the FallDone and FillDone signals to keep the sequence
-    // deterministic and to detect missing events via timeouts.
-
-    // Determine columns that contain empty cells after the move
-    const dirtyCols = this.collectDirtyColumns();
-
-    if (dirtyCols.length > 0) {
-      this.changeState("TilesFalling");
-      const fallDone = this.wait(EventNames.FallDone, 500);
-      new FallCommand(this.board, this.bus, dirtyCols).execute();
-      const fallRes = await fallDone;
-      if (fallRes) {
-        console.debug("FSM: FallDone received, triggering fill");
-      }
-    } else {
-      this.changeState("TilesFalling");
-    }
-
-    // After falling, fill the board if any slots remain empty
-    const remainingCols = this.collectDirtyColumns();
-    if (remainingCols.length > 0) {
-      this.changeState("Filling");
-      const fillDone = this.wait(EventNames.FillDone, 500);
-      fillBoard(this.board, this.bus);
-      const fillRes = await fillDone;
-      if (fillRes) {
-        console.debug("FSM: FillDone received, evaluating next move");
-      } else {
-        console.warn(
-          "FSM: Fill step timed out — possible missing fillBoard call",
-        );
-      }
-    } else {
-      this.changeState("Filling");
-    }
-
-    // After the board is filled we may get new groups automatically.
-    // The solver checks and if a group exists the executor runs
-    // another remove → fall → fill cycle to mimic chain reactions.
+    // Transition through remaining post-move phases
+    this.changeState("TilesFalling");
+    this.changeState("Filling");
     this.changeState("CheckEnd");
     this.evaluateEnd();
-    const autoGroup = this.findRemovableGroup();
-    // Prevent endless loops on mono-colored boards by requiring
-    // the found group to occupy less than the whole board.
-    const total = this.board.cols * this.board.rows;
-    if (autoGroup.length >= 2 && autoGroup.length < total) {
-      await this.executor.execute(autoGroup);
-      return;
-    }
+    // notify HUD about updated score
     this.bus.emit(EventNames.TurnEnded, { score: this.score });
   }
 
@@ -261,43 +214,5 @@ export class GameStateMachine {
         this.board.setTile(new cc.Vec2(x, y), tiles[idx++] ?? null);
       }
     }
-  }
-
-  /**
-   * Returns column indices that currently contain empty cells.
-   */
-  private collectDirtyColumns(): number[] {
-    const cols = new Set<number>();
-    for (let y = 0; y < this.board.rows; y++) {
-      for (let x = 0; x < this.board.cols; x++) {
-        if (!this.board.tileAt(new cc.Vec2(x, y))) cols.add(x);
-      }
-    }
-    return Array.from(cols);
-  }
-
-  /** Waits for an event or resolves null after timeout. */
-  private wait(event: string, ms: number): Promise<unknown[] | null> {
-    return new Promise((resolve) => {
-      const timer = setTimeout(() => resolve(null), ms);
-      this.bus.once(event, (...args: unknown[]) => {
-        clearTimeout(timer);
-        resolve(args);
-      });
-    });
-  }
-
-  /** Searches the board for any removable group. */
-  private findRemovableGroup(): cc.Vec2[] {
-    for (let y = 0; y < this.board.rows; y++) {
-      for (let x = 0; x < this.board.cols; x++) {
-        const pos = new cc.Vec2(x, y);
-        const tile = this.board.tileAt(pos);
-        if (!tile) continue;
-        const group = this.solver.findGroup(pos);
-        if (group.length >= 2) return group;
-      }
-    }
-    return [];
   }
 }

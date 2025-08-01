@@ -8,14 +8,12 @@ import { GameStateMachine } from "../assets/scripts/core/game/GameStateMachine";
 import { EventBus } from "../assets/scripts/core/EventBus";
 import { EventNames } from "../assets/scripts/core/events/EventNames";
 import { DefaultBoard } from "../assets/scripts/config/ConfigLoader";
-import { MoveSequenceLogger } from "../assets/scripts/core/diagnostics/MoveSequenceLogger";
 
 const board: Board = new BoardGenerator().generate(DefaultBoard);
 const solver = new BoardSolver(board);
 const executor = new MoveExecutor(board, EventBus);
 const score = new ScoreStrategyQuadratic(1);
 const turns = new TurnManager(5, EventBus);
-new MoveSequenceLogger(EventBus, board);
 const fsm = new GameStateMachine(
   EventBus,
   board,
