@@ -91,13 +91,43 @@ export default class TileView extends cc.Component {
 
   /** Анимация отклика на нажатие. */
   pressFeedback(): void {
-    const target = this.visualRoot || this.node;
+    const target = this.node;
+    // cc.Node in tests lacks getPosition, fallback to position field
+    const prevPos =
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      typeof (target as any).getPosition === "function"
+        ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (target as any).getPosition()
+        : target.position;
+    const prevAnchor =
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      typeof (target as any).getAnchorPoint === "function"
+        ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (target as any).getAnchorPoint()
+        : cc.v2(0, 1);
+    const width = (target as unknown as { width?: number }).width ?? 0;
+    const height = (target as unknown as { height?: number }).height ?? 0;
+
+    const offset = cc.v2(
+      width * (0.5 - prevAnchor.x),
+      height * (0.5 - prevAnchor.y),
+    );
+    target.setAnchorPoint(cc.v2(0.5, 0.5));
+    target.setPosition(prevPos.x + offset.x, prevPos.y + offset.y);
+
     const maybe = target as unknown as { stopAllActions?: () => void };
     if (typeof maybe.stopAllActions === "function") maybe.stopAllActions();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     target.runAction(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (cc.sequence as any)(cc.scaleTo(0.08, 0.9), cc.scaleTo(0.1, 1.0)),
+      (cc.sequence as any)(
+        cc.scaleTo(0.08, 0.9),
+        cc.scaleTo(0.1, 1.0),
+        cc.callFunc(() => {
+          target.setAnchorPoint(prevAnchor);
+          target.setPosition(prevPos);
+        }),
+      ),
     );
   }
 

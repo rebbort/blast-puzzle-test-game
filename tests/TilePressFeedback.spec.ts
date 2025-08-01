@@ -16,6 +16,9 @@ beforeEach(() => {
   (cc as unknown as { sequence: (...a: unknown[]) => unknown }).sequence = (
     ...acts: unknown[]
   ) => ({ type: "seq", acts });
+  (cc as unknown as { callFunc: (fn: () => void) => unknown }).callFunc = (
+    fn: () => void,
+  ) => ({ type: "call", fn });
 });
 
 test("TilePressFeedback forwards TilePressed to view", () => {
