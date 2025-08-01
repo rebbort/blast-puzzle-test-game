@@ -97,6 +97,14 @@ export default class MoveFlowController extends cc.Component {
       const target = this.computePos(p.x, p.y);
       const dist = Math.abs(view.node.y - target.y);
       const dur = dist / 1400;
+      if (
+        typeof (view.node as unknown as { stopAllActions?: () => void })
+          .stopAllActions === "function"
+      ) {
+        (
+          view.node as unknown as { stopAllActions: () => void }
+        ).stopAllActions();
+      }
       view.node.runAction(cc.moveTo(dur, target.x, target.y));
       view.node.zIndex = this.board.rows - p.y - 1;
       updated[p.y][p.x] = view;

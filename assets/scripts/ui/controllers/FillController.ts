@@ -67,6 +67,14 @@ export default class FillController extends cc.Component {
       view.node.setPosition(start);
       const end = this.computePos(p.x, p.y);
       const dur = Math.abs(start.y - end.y) / 1400;
+      if (
+        typeof (view.node as unknown as { stopAllActions?: () => void })
+          .stopAllActions === "function"
+      ) {
+        (
+          view.node as unknown as { stopAllActions: () => void }
+        ).stopAllActions();
+      }
       view.node.runAction(cc.moveTo(dur, end));
       view.node.zIndex = this.board.rows - p.y - 1;
       this.tileViews[p.y][p.x] = view;
