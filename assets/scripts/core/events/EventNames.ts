@@ -34,4 +34,8 @@ export const EventNames = {
   SwapDone: "SwapDone",
   RemoveStarted: "RemoveStarted",
   SuperTileCreated: "SuperTileCreated",
+  /** Игрок нажал на тайл (всегда). */
+  TilePressed: "TilePressed",
+  /** Нажатие не считается ходом (группа < 2). */
+  InvalidTap: "InvalidTap",
 } as const;

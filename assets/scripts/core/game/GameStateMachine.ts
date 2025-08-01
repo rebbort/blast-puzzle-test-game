@@ -17,6 +17,7 @@ import { ScoreStrategy } from "../rules/ScoreStrategy";
 import { TurnManager } from "../rules/TurnManager";
 import { BoardConfig } from "../../config/ConfigLoader";
 import { EventNames } from "../events/EventNames";
+import { TileKind } from "../board/Tile";
 
 /**
  * Finite state machine orchestrating a single game session.
@@ -76,6 +77,7 @@ export class GameStateMachine {
    */
   private onGroupSelected(start: cc.Vec2): void {
     console.info("FSM received GroupSelected at", start);
+    this.bus.emit(EventNames.TilePressed, start);
     if (this.state !== "WaitingInput") {
       console.info(
         `Ignored GroupSelected because current state is ${this.state}`,
@@ -86,7 +88,16 @@ export class GameStateMachine {
 
     // Determine group of connected tiles and calculate score
     const group = this.solver.findGroup(start);
+    const tile = this.board.tileAt(start);
+    if (group.length < 2 && tile && tile.kind === TileKind.Normal) {
+      console.info(`Tap ignored as move: single tile at ${start.x},${start.y}`);
+      this.bus.emit(EventNames.InvalidTap, start);
+      return;
+    }
+
     if (group.length === 0) return;
+
+    console.info(`Tap accepted as move: group size ${group.length}`);
 
     this.turnManager.useTurn();
     this.score += this.scoreStrategy.calculate(group.length);

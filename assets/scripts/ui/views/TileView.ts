@@ -89,6 +89,18 @@ export default class TileView extends cc.Component {
     // Дополнительная индикация может быть добавлена здесь
   }
 
+  /** Анимация отклика на нажатие. */
+  pressFeedback(): void {
+    const target = this.visualRoot || this.node;
+    const maybe = target as unknown as { stopAllActions?: () => void };
+    if (typeof maybe.stopAllActions === "function") maybe.stopAllActions();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    target.runAction(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (cc.sequence as any)(cc.scaleTo(0.08, 0.9), cc.scaleTo(0.1, 1.0)),
+    );
+  }
+
   /** Возвращает индекс цвета в массиве нормальных вариантов. */
   private colorIndex(color: TileColor): number {
     const order: TileColor[] = ["red", "blue", "green", "yellow", "purple"];

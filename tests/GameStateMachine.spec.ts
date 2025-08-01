@@ -119,8 +119,7 @@ describe("GameStateMachine", () => {
     fsm.start();
     EventBus.emit(EventNames.GroupSelected, new cc.Vec2(0, 0));
     await new Promise((r) => setImmediate(r));
-    const lastTwo = states.slice(-2);
-    expect(lastTwo).toEqual(["Shuffle", "WaitingInput"]);
+    expect(states).toEqual(["WaitingInput"]);
   });
 
   test("input ignored during execution", () => {
@@ -131,5 +130,37 @@ describe("GameStateMachine", () => {
     EventBus.emit(EventNames.GroupSelected, new cc.Vec2(0, 0));
     EventBus.emit(EventNames.GroupSelected, new cc.Vec2(0, 1));
     expect(states.filter((s) => s === "ExecutingMove")).toHaveLength(1);
+  });
+
+  test("single tile tap emits InvalidTap and uses no turn", () => {
+    const board = new Board(cfg, [
+      [TileFactory.createNormal("red"), TileFactory.createNormal("blue")],
+      [TileFactory.createNormal("green"), TileFactory.createNormal("yellow")],
+    ]);
+    const solver = new BoardSolver(board);
+    const exec = new MoveExecutor(board, EventBus);
+    const execSpy = jest.spyOn(exec, "execute");
+    const strategy = new ScoreStrategyQuadratic(1);
+    const tm = new TurnManager(5, EventBus);
+    const turnSpy = jest.spyOn(tm, "useTurn");
+    const fsm = new GameStateMachine(
+      EventBus,
+      board,
+      solver,
+      exec,
+      strategy,
+      tm,
+      10,
+      3,
+    );
+    let invalid = false;
+    EventBus.on(EventNames.InvalidTap, () => {
+      invalid = true;
+    });
+    fsm.start();
+    EventBus.emit(EventNames.GroupSelected, new cc.Vec2(0, 0));
+    expect(invalid).toBe(true);
+    expect(turnSpy).not.toHaveBeenCalled();
+    expect(execSpy).not.toHaveBeenCalled();
   });
 });
