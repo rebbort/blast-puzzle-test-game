@@ -35,6 +35,10 @@ stateDiagram-v2
   WaitingInput --> BoosterInput: on 'BoosterActivated'
   BoosterInput --> ExecutingMove: on 'BoosterConsumed'
   BoosterInput --> WaitingInput: on 'BoosterCancelled'
+  ExecutingMove --> TilesFalling: on 'MoveCompleted'
+  TilesFalling --> Filling: on 'FallDone'
+  Filling --> ExecutingMove: on 'GroupFound'
+  Filling --> CheckEnd: on 'FillDone'
 ```
 
 After a move or booster action completes in `ExecutingMove` the machine
