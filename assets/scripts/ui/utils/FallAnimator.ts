@@ -1,3 +1,5 @@
+import TileView from "../views/TileView";
+
 export function runFallAnimation(
   node: cc.Node,
   end: cc.Vec2,
@@ -8,20 +10,28 @@ export function runFallAnimation(
   const dur = dist / 1400;
   const maybe = node as unknown as { stopAllActions?: () => void };
   if (typeof maybe.stopAllActions === "function") maybe.stopAllActions();
+
   const actions: unknown[] = [];
   if (delay > 0) actions.push(cc.delayTime(delay));
   actions.push(cc.moveTo(dur, end.x, end.y));
+
   if (dist > 0) {
     actions.push(
       cc.callFunc(() => {
+        const tileView = node.getComponent(TileView);
+        const target = tileView?.visualRoot ?? node;
+        const prev = target.getAnchorPoint();
+        target.setAnchorPoint(cc.v2(0.5, 0));
         const bump = cc.sequence(
-          cc.scaleTo(0.5, 0.5, 0.5),
-          cc.scaleTo(0.5, 1, 1),
+          cc.scaleTo(0.1, 1, 0.8),
+          cc.scaleTo(0.1, 1, 1),
+          cc.callFunc(() => target.setAnchorPoint(prev)),
         );
-        node.runAction(bump);
+        target.runAction(bump);
       }),
     );
   }
+
   if (onComplete) {
     actions.push(cc.callFunc(onComplete));
   }

@@ -79,15 +79,10 @@ export default class FillController extends cc.Component {
           view.node.active,
         );
 
-        // Устанавливаем anchorPoint на нижний центр для бамп эффекта
-        view.node.setAnchorPoint(cc.v2(0.5, 0));
-
         const start = this.computePos(p.x, -1);
         view.node.setPosition(start);
         const end = this.computePos(p.x, p.y);
-        runFallAnimation(view.node, end, index * delayStep, () => {
-          view.node.setAnchorPoint(cc.v2(0, 1));
-        });
+        runFallAnimation(view.node, end, index * delayStep);
 
         view.node.zIndex = this.board.rows - p.y - 1;
         this.tileViews[p.y][p.x] = view;
