@@ -19,11 +19,13 @@ declare namespace cc {
   }
 
   function tween(target: unknown): {
+    delay(duration: number): ReturnType<typeof tween>;
     to(
       duration: number,
       props: Record<string, unknown>,
       opts?: { easing?: string },
     ): ReturnType<typeof tween>;
+    call(fn: () => void): ReturnType<typeof tween>;
     start(): void;
   };
 

@@ -29,7 +29,7 @@ export default class TileView extends cc.Component {
   private activateFx: cc.Prefab | null = null;
 
   /** Кэш модели тайла для возможных обновлений. */
-  private tile!: Tile;
+  public tile!: Tile;
 
   /**
    * Подставляет нужный визуальный префаб под данные тайла.

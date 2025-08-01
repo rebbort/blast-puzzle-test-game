@@ -33,4 +33,5 @@ export const EventNames = {
   SwapCancelled: "SwapCancelled",
   SwapDone: "SwapDone",
   RemoveStarted: "RemoveStarted",
+  SuperTileCreated: "SuperTileCreated",
 } as const;

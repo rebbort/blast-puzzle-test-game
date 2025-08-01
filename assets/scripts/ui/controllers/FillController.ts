@@ -45,30 +45,70 @@ export default class FillController extends cc.Component {
       !!this.tileNodePrefab,
     );
 
+    const byCol: { [key: number]: cc.Vec2[] } = {};
     for (let i = 0; i < slots.length; i++) {
       const p = slots[i];
-      const view = cc
-        .instantiate(this.tileNodePrefab)
-        .getComponent(TileView) as TileView;
+      if (!byCol[p.x]) byCol[p.x] = [];
+      byCol[p.x].push(p);
+    }
 
-      console.log(
-        "FillController: Created view for position",
-        p,
-        "view:",
-        view,
-      );
+    const delayStep = 0.15;
 
-      view.node.parent = this.tilesLayer;
-      console.log("FillController: Set parent, node active:", view.node.active);
+    for (const colStr of Object.keys(byCol)) {
+      const list = byCol[parseInt(colStr, 10)];
+      list.sort((a, b) => b.y - a.y); // bottom first
+      for (let index = 0; index < list.length; index++) {
+        const p = list[index];
+        const view = cc
+          .instantiate(this.tileNodePrefab)
+          .getComponent(TileView) as TileView;
 
-      view.node.setAnchorPoint(cc.v2(0, 1));
-      const start = this.computePos(p.x, -1);
-      view.node.setPosition(start);
-      const end = this.computePos(p.x, p.y);
-      const dur = Math.abs(start.y - end.y) / 1400;
-      view.node.runAction(cc.moveTo(dur, end));
-      view.node.zIndex = this.board.rows - p.y - 1;
-      this.tileViews[p.y][p.x] = view;
+        console.log(
+          "FillController: Created view for position",
+          p,
+          "view:",
+          view,
+        );
+
+        view.node.parent = this.tilesLayer;
+        view.node.active = true;
+        view.node.opacity = 255;
+        console.log(
+          "FillController: Set parent, node active:",
+          view.node.active,
+        );
+
+        // Устанавливаем anchorPoint на нижний центр для бамп эффекта
+        view.node.setAnchorPoint(cc.v2(0.5, 0));
+
+        const start = this.computePos(p.x, -1);
+        view.node.setPosition(start);
+        const end = this.computePos(p.x, p.y);
+        const dur = Math.abs(start.y - end.y) / 1400;
+        const maybe = view.node as unknown as { stopAllActions?: () => void };
+        if (typeof maybe.stopAllActions === "function") maybe.stopAllActions();
+        const action = cc.sequence(
+          cc.delayTime(index * delayStep),
+          cc.moveTo(dur, end.x, end.y),
+          cc.callFunc(() => {
+            // Бамп эффект
+            const bumpAction = cc.sequence(
+              cc.scaleTo(0.5, 0.5, 0.5),
+              cc.scaleTo(0.5, 1, 1),
+            );
+            view.node.runAction(bumpAction);
+          }),
+          cc.callFunc(() => {
+            // Возвращаем anchorPoint обратно на верхний левый угол
+            view.node.setAnchorPoint(cc.v2(0, 1));
+          }),
+        );
+
+        view.node.runAction(action);
+
+        view.node.zIndex = this.board.rows - p.y - 1;
+        this.tileViews[p.y][p.x] = view;
+      }
     }
   }
 

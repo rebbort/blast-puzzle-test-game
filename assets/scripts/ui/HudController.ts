@@ -6,14 +6,10 @@ interface NodeUtils {
   getChildByName(name: string): NodeUtils | null;
   getComponent(name: string): unknown;
   on(event: string, cb: () => void): void;
-  runAction?(action: unknown): void;
   node?: NodeUtils;
 }
 
-// Placeholder animations used with runAction. In the real game these would be
-// cc.Action objects describing the shake/pulse behaviour.
-const shake = {};
-const pulse = {};
+// Simple animation helpers built with cc.tween for runtime usage.
 
 /**
  * Controls the Heads Up Display of the GameScene.
@@ -110,11 +106,18 @@ export class HudController extends cc.Component {
    */
   private onTurnUsed(left: number): void {
     if (this.lblMoves) this.lblMoves.string = String(left);
-    const moveNode = this.lblMoves?.node as NodeUtils | undefined;
-    if (left <= 3 && moveNode?.runAction) {
+    const moveNode = this.lblMoves?.node as unknown as cc.Node | undefined;
+    if (left <= 3 && moveNode) {
       EventBus.emit(EventNames.AnimationStarted, "moves-shake");
-      moveNode.runAction(shake);
-      EventBus.emit(EventNames.AnimationEnded, "moves-shake");
+      cc.tween(moveNode)
+        .to(0.05, { position: new cc.Vec3(-5, 0, 0) })
+        .to(0.05, { position: new cc.Vec3(5, 0, 0) })
+        .to(0.05, { position: new cc.Vec3(0, 0, 0) })
+        .start();
+      setTimeout(
+        () => EventBus.emit(EventNames.AnimationEnded, "moves-shake"),
+        150,
+      );
     }
   }
 
@@ -168,10 +171,16 @@ export class HudController extends cc.Component {
   private onBoosterActivated(name: string): void {
     const btn =
       name === "bomb" ? this.btnBomb : name === "swap" ? this.btnSwap : null;
-    if (btn?.node?.runAction) {
+    if (btn?.node) {
       EventBus.emit(EventNames.AnimationStarted, "booster-pulse");
-      btn.node.runAction(pulse);
-      EventBus.emit(EventNames.AnimationEnded, "booster-pulse");
+      cc.tween(btn.node as unknown as cc.Node)
+        .to(0.1, { scale: new cc.Vec3(1.2, 1.2, 1) })
+        .to(0.1, { scale: new cc.Vec3(1, 1, 1) })
+        .start();
+      setTimeout(
+        () => EventBus.emit(EventNames.AnimationEnded, "booster-pulse"),
+        200,
+      );
     }
   }
 

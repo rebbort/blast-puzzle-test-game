@@ -36,7 +36,7 @@ export default class GameScene extends cc.Component {
       executor,
       scoreStrategy,
       turns,
-      100,
+      800,
       3,
     );
     this.fsm.start();

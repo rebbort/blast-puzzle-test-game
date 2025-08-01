@@ -3,7 +3,7 @@ import { InfrastructureEventBus } from "../../infrastructure/InfrastructureEvent
 import { RemoveCommand } from "./commands/RemoveCommand";
 import { FallCommand } from "./commands/FallCommand";
 import { FillCommand } from "./commands/FillCommand";
-import { TileFactory } from "./Tile";
+import { TileFactory, TileKind } from "./Tile";
 import { SuperTileFactory } from "../boosters/SuperTileFactory";
 import { EventNames } from "../events/EventNames";
 
@@ -26,6 +26,10 @@ export class MoveExecutor {
     const cfg = this.board.config;
     const start = group[0];
     const startTile = this.board.tileAt(start);
+    const hasSuper = group.some((p) => {
+      const t = this.board.tileAt(p);
+      return t !== null && t.kind !== TileKind.Normal;
+    });
 
     // 1. Remove tiles and wait for completion
     const removeDone = this.wait(EventNames.TilesRemoved);
@@ -34,11 +38,12 @@ export class MoveExecutor {
 
     // Если размер группы превышает порог, в исходной клетке
     // появляется супер-тайл выбранного вида.
-    if (startTile && group.length >= cfg.superThreshold) {
+    if (startTile && group.length >= cfg.superThreshold && !hasSuper) {
       const kind = new SuperTileFactory(cfg).make();
       const tile = TileFactory.createNormal(startTile.color);
       tile.kind = kind;
       this.board.setTile(start, tile);
+      this.bus.emit(EventNames.SuperTileCreated, start, tile);
     }
 
     // 2. Let tiles fall in affected columns

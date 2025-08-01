@@ -30,6 +30,7 @@ export default class MoveFlowController extends cc.Component {
     bus.on(EventNames.RemoveStarted, this.onRemove, this);
     bus.on(EventNames.FallDone, this.onFall, this);
     bus.on(EventNames.FillDone, this.onFill, this);
+    bus.on(EventNames.SuperTileCreated, this.onSuperTileCreated, this);
   }
 
   /**
@@ -68,7 +69,7 @@ export default class MoveFlowController extends cc.Component {
       for (let colIndex = 0; colIndex < row.length; colIndex++) {
         const v = row[colIndex];
         if (!v) continue;
-        map.set((v as unknown as { tile: unknown }).tile, v);
+        map.set(v.tile, v);
       }
     }
 
@@ -96,7 +97,16 @@ export default class MoveFlowController extends cc.Component {
       const target = this.computePos(p.x, p.y);
       const dist = Math.abs(view.node.y - target.y);
       const dur = dist / 1400;
+      if (
+        typeof (view.node as unknown as { stopAllActions?: () => void })
+          .stopAllActions === "function"
+      ) {
+        (
+          view.node as unknown as { stopAllActions: () => void }
+        ).stopAllActions();
+      }
       view.node.runAction(cc.moveTo(dur, target.x, target.y));
+      view.node.zIndex = this.board.rows - p.y - 1;
       updated[p.y][p.x] = view;
     }
 
@@ -108,6 +118,15 @@ export default class MoveFlowController extends cc.Component {
    * Updates local references after new tiles were spawned.
    */
   private onFill(): void {
+    this.tileViews = this.boardCtrl.tileViews;
+  }
+
+  /**
+   * Spawns a view for a newly created super tile.
+   */
+  private onSuperTileCreated(pos: cc.Vec2): void {
+    const view = this.boardCtrl.spawn(pos);
+    view.apply(this.board.tileAt(pos)!);
     this.tileViews = this.boardCtrl.tileViews;
   }
 
