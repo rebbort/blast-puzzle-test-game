@@ -5,8 +5,8 @@ import { EventNames } from "../../core/events/EventNames";
 import GameBoardController from "./GameBoardController";
 import TileView from "../views/TileView";
 import type { Board } from "../../core/board/Board";
-import { loadBoardConfig } from "../../config/ConfigLoader";
 import { runFallAnimation } from "../utils/FallAnimator";
+import { computeTilePosition } from "../utils/PositionUtils";
 
 @ccclass("FillController")
 export default class FillController extends cc.Component {
@@ -79,13 +79,12 @@ export default class FillController extends cc.Component {
           view.node.active,
         );
 
-        const start = this.computePos(p.x, -1);
+        const start = computeTilePosition(p.x, -1, this.board);
         view.node.setPosition(start);
-        const end = this.computePos(p.x, p.y);
+        const end = computeTilePosition(p.x, p.y, this.board);
         runFallAnimation(view.node, end, index * delayStep);
 
         view.node.zIndex = this.board.rows - p.y - 1;
-        view.boardPos = cc.v2(p.x, p.y);
         this.tileViews[p.y][p.x] = view;
       }
     }
@@ -100,17 +99,5 @@ export default class FillController extends cc.Component {
       }
     }
     this.pending = [];
-  }
-
-  /**
-   * Computes tile position exactly like GameBoardController.
-   */
-  private computePos(col: number, row: number): cc.Vec2 {
-    const cfg = loadBoardConfig();
-    const x = (col - this.board.cols / 2) * cfg.tileWidth;
-    const y =
-      (this.board.rows / 2 - row) * cfg.tileHeight -
-      GameBoardController.VERTICAL_OFFSET;
-    return cc.v2(x, y);
   }
 }

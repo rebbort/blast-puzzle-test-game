@@ -5,8 +5,8 @@ import { EventNames } from "../../core/events/EventNames";
 import GameBoardController from "./GameBoardController";
 import TileView from "../views/TileView";
 import type { Board } from "../../core/board/Board";
-import { loadBoardConfig } from "../../config/ConfigLoader";
 import { runFallAnimation } from "../utils/FallAnimator";
+import { computeTilePosition } from "../utils/PositionUtils";
 
 @ccclass()
 export default class MoveFlowController extends cc.Component {
@@ -99,7 +99,7 @@ export default class MoveFlowController extends cc.Component {
         continue;
       }
 
-      const target = this.computePos(p.x, p.y);
+      const target = computeTilePosition(p.x, p.y, this.board);
       const dist = Math.floor(Math.abs(view.node.y - target.y));
 
       if (dist > 0) {
@@ -129,17 +129,5 @@ export default class MoveFlowController extends cc.Component {
     const view = this.boardCtrl.spawn(pos);
     view.apply(this.board.tileAt(pos)!);
     this.tileViews = this.boardCtrl.tileViews;
-  }
-
-  /**
-   * Compute tile position exactly like in GameBoardController.
-   */
-  private computePos(col: number, row: number): cc.Vec2 {
-    const cfg = loadBoardConfig();
-    const x = (col - this.board.cols / 2) * cfg.tileWidth;
-    const y =
-      (this.board.rows / 2 - row) * cfg.tileHeight -
-      GameBoardController.VERTICAL_OFFSET;
-    return cc.v2(x, y);
   }
 }

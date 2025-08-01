@@ -6,12 +6,10 @@ import { loadBoardConfig } from "../../config/ConfigLoader";
 import TileView from "../views/TileView";
 import MoveFlowController from "./MoveFlowController";
 import FillController from "./FillController";
+import { computeTilePosition } from "../utils/PositionUtils";
 
 @ccclass()
 export default class GameBoardController extends cc.Component {
-  /** Vertical offset for tile positioning. */
-  static readonly VERTICAL_OFFSET = 12;
-
   /** Базовый префаб узла тайла. */
   @property(cc.Prefab)
   tileNodePrefab!: cc.Prefab;
@@ -49,7 +47,7 @@ export default class GameBoardController extends cc.Component {
     fill.tileNodePrefab = this.tileNodePrefab;
     fill.tilesLayer = this.tilesLayer;
     // 4) Создаем дебаг сетку
-    this.createDebugGrid();
+    // this.createDebugGrid();
   }
 
   /**
@@ -65,7 +63,7 @@ export default class GameBoardController extends cc.Component {
         // устанавливаем anchorPoint на (0, 1) для origin (0, 1)
         node.setAnchorPoint(cc.v2(0, 1));
         // позиционируем точно как в Core
-        node.setPosition(this.computePos(c, r));
+        node.setPosition(computeTilePosition(c, r, this.board));
         // устанавливаем z-index: каждый следующий слой ниже
         node.zIndex = this.board.rows - r - 1;
         // сохраняем TileView для обновлений
@@ -85,26 +83,13 @@ export default class GameBoardController extends cc.Component {
     const node = cc.instantiate(this.tileNodePrefab);
     node.parent = this.tilesLayer;
     node.setAnchorPoint(cc.v2(0, 1));
-    node.setPosition(this.computePos(pos.x, pos.y));
+    node.setPosition(computeTilePosition(pos.x, pos.y, this.board));
     node.zIndex = this.board.rows - pos.y - 1;
     const view = node.getComponent(TileView) as TileView;
     view.apply(tileData);
     view.boardPos = cc.v2(pos.x, pos.y);
     this.tileViews[pos.y][pos.x] = view;
     return view;
-  }
-
-  /**
-   * Computes node position from column and row indices.
-   * Uses board size and configured tile size to match the core model.
-   */
-  private computePos(col: number, row: number): cc.Vec2 {
-    const cfg = loadBoardConfig();
-    const x = (col - this.board.cols / 2) * cfg.tileWidth;
-    const y =
-      (this.board.rows / 2 - row) * cfg.tileHeight -
-      GameBoardController.VERTICAL_OFFSET;
-    return cc.v2(x, y);
   }
 
   /**
@@ -128,12 +113,8 @@ export default class GameBoardController extends cc.Component {
       graphics.strokeColor = cc.Color.RED;
 
       const startX = (c - this.board.cols / 2) * cfg.tileWidth;
-      const startY =
-        (this.board.rows / 2) * cfg.tileHeight -
-        GameBoardController.VERTICAL_OFFSET;
-      const endY =
-        (-this.board.rows / 2) * cfg.tileHeight -
-        GameBoardController.VERTICAL_OFFSET;
+      const startY = (this.board.rows / 2) * cfg.tileHeight;
+      const endY = (-this.board.rows / 2) * cfg.tileHeight;
 
       graphics.moveTo(startX, startY);
       graphics.lineTo(startX, endY);
@@ -149,9 +130,7 @@ export default class GameBoardController extends cc.Component {
       graphics.lineWidth = 2;
       graphics.strokeColor = cc.Color.BLUE;
 
-      const startY =
-        (this.board.rows / 2 - r) * cfg.tileHeight -
-        GameBoardController.VERTICAL_OFFSET;
+      const startY = (this.board.rows / 2 - r) * cfg.tileHeight;
       const startX = (-this.board.cols / 2) * cfg.tileWidth;
       const endX = (this.board.cols / 2) * cfg.tileWidth;
 
@@ -171,7 +150,7 @@ export default class GameBoardController extends cc.Component {
         text.fontSize = 16;
         text.node.color = cc.Color.YELLOW;
 
-        const pos = this.computePos(c, r);
+        const pos = computeTilePosition(c, r, this.board);
         label.setPosition(
           pos.x + cfg.tileWidth / 2,
           pos.y - cfg.tileHeight / 2,

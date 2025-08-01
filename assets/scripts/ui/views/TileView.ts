@@ -86,7 +86,8 @@ export default class TileView extends cc.Component {
     const node = cc.instantiate(prefab);
     node.parent = this.visualRoot;
     this.currentVisual = node;
-    node.setPosition(node.width / 2, -node.height / 2);
+    // node.setPosition(node.width / 2, -node.height / 2);
+    // this.node.setAnchorPoint(cc.v2(0, 1));
 
     // 4. Читаем конфиг визуального префаба и запускаем эффекты
     const cfg = node.getComponent(TileAppearanceConfig);
