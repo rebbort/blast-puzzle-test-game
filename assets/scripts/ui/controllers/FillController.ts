@@ -55,8 +55,7 @@ export default class FillController extends cc.Component {
     const delayStep = 0.05;
 
     Object.keys(byCol).forEach((colStr) => {
-      const col = parseInt(colStr, 10);
-      const list = byCol[col];
+      const list = byCol[parseInt(colStr, 10)];
       list.sort((a, b) => b.y - a.y); // bottom first
       for (let index = 0; index < list.length; index++) {
         const p = list[index];
@@ -86,20 +85,16 @@ export default class FillController extends cc.Component {
         const maybe = view.node as unknown as { stopAllActions?: () => void };
         if (typeof maybe.stopAllActions === "function") maybe.stopAllActions();
 
-        setTimeout(
-          () => {
-            cc.tween(view.node as unknown as { position: cc.Vec3 })
-              .to(dur, { position: new cc.Vec3(end.x, end.y, 0) })
+        cc.tween(view.node as unknown as cc.Node)
+          .delay(index * delayStep)
+          .to(dur, { position: new cc.Vec3(end.x, end.y, 0) })
+          .call(() => {
+            cc.tween(view.node as unknown as cc.Node)
+              .to(0.05, { scale: new cc.Vec3(1.1, 1.1, 1) })
+              .to(0.05, { scale: new cc.Vec3(1, 1, 1) })
               .start();
-            setTimeout(() => {
-              cc.tween(view.node as unknown as { scale: cc.Vec3 })
-                .to(0.05, { scale: new cc.Vec3(1.1, 1.1, 1) })
-                .to(0.05, { scale: new cc.Vec3(1, 1, 1) })
-                .start();
-            }, dur * 1000);
-          },
-          index * delayStep * 1000,
-        );
+          })
+          .start();
 
         view.node.zIndex = this.board.rows - p.y - 1;
         this.tileViews[p.y][p.x] = view;
