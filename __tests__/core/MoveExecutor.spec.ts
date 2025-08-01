@@ -94,3 +94,49 @@ it("emits SuperTileCreated when a super tile is spawned", async () => {
     expect.objectContaining({ kind: expect.any(Number) }),
   );
 });
+
+// super tiles in the group should not spawn another one
+it("skips super tile creation when group contains a super tile", async () => {
+  const board = new Board(cfg, [
+    [TileFactory.createNormal("red"), TileFactory.createNormal("red")],
+    [TileFactory.createNormal("red"), TileFactory.createNormal("red")],
+  ]);
+  const boosterTile = board.tileAt(new cc.Vec2(1, 0))!;
+  boosterTile.kind = TileKind.SuperRow;
+  const executor = new MoveExecutor(board, bus);
+  const group = [new cc.Vec2(1, 0), new cc.Vec2(0, 0), new cc.Vec2(0, 1)];
+  await executor.execute(group);
+  const calls = emitSpy.mock.calls.filter(
+    (c) => c[0] === EventNames.SuperTileCreated,
+  );
+  expect(calls.length).toBe(0);
+});
+
+// fill command should create only removedCount - 1 slots when super tile appears
+it("fills group size minus one slots when super tile spawns", async () => {
+  const board = new Board(
+    {
+      ...cfg,
+      rows: 3,
+    },
+    [
+      [TileFactory.createNormal("red"), TileFactory.createNormal("red")],
+      [TileFactory.createNormal("red"), TileFactory.createNormal("red")],
+      [TileFactory.createNormal("red"), TileFactory.createNormal("red")],
+    ],
+  );
+  const executor = new MoveExecutor(board, bus);
+  const group = [
+    new cc.Vec2(0, 0),
+    new cc.Vec2(1, 0),
+    new cc.Vec2(0, 1),
+    new cc.Vec2(1, 1),
+    new cc.Vec2(0, 2),
+  ];
+  let slots: cc.Vec2[] = [];
+  bus.once(EventNames.FillStarted, (s: cc.Vec2[]) => {
+    slots = s;
+  });
+  await executor.execute(group);
+  expect(slots).toHaveLength(group.length - 1);
+});
