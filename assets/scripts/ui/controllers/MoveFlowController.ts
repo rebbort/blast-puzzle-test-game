@@ -29,6 +29,7 @@ export default class MoveFlowController extends cc.Component {
     // Listen for core events signalling board updates
     bus.on(EventNames.RemoveStarted, this.onRemove, this);
     bus.on(EventNames.FallDone, this.onFall, this);
+    bus.on(EventNames.FillDone, this.onFill, this);
   }
 
   /**
@@ -86,6 +87,13 @@ export default class MoveFlowController extends cc.Component {
 
     this.tileViews = updated as TileView[][];
     this.boardCtrl.tileViews = this.tileViews;
+  }
+
+  /**
+   * Updates local references after new tiles were spawned.
+   */
+  private onFill(): void {
+    this.tileViews = this.boardCtrl.tileViews;
   }
 
   /**
