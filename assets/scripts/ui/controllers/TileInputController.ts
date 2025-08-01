@@ -1,4 +1,4 @@
-const { ccclass } = cc._decorator;
+const { ccclass, property } = cc._decorator;
 
 import { loadBoardConfig } from "../../config/ConfigLoader";
 import { EventBus as bus } from "../../core/EventBus";
@@ -8,28 +8,32 @@ import TileView from "../views/TileView";
 
 @ccclass()
 export default class TileInputController extends cc.Component {
+  @property(cc.Node)
+  tilesLayer!: cc.Node;
+
   private boardCtrl!: GameBoardController;
 
   onLoad(): void {
     this.boardCtrl = this.getComponent(GameBoardController)!;
-    if (this.node.width === 0 || this.node.height === 0) {
+    console.log("TileInputController onLoad", this.boardCtrl);
+    if (this.tilesLayer.width === 0 || this.tilesLayer.height === 0) {
       const cfg = loadBoardConfig();
-      this.node.width = cfg.cols * cfg.tileWidth;
-      this.node.height = cfg.rows * cfg.tileHeight;
+      this.tilesLayer.width = cfg.cols * cfg.tileWidth;
+      this.tilesLayer.height = cfg.rows * cfg.tileHeight;
     }
 
     // Attach a single click listener on the tilesLayer node
-    this.node.on(
+    this.tilesLayer.on(
       cc.Node.EventType.TOUCH_END,
       (e: cc.Event.EventTouch) => {
         const worldPos = e.getLocation();
-        const local = this.node.convertToNodeSpaceAR(worldPos);
+        const local = this.tilesLayer.convertToNodeSpaceAR(worldPos);
         // convert node-space coordinates to column/row using tile size
         const col = Math.floor(
-          (local.x + this.node.width / 2) / loadBoardConfig().tileWidth,
+          (local.x + this.tilesLayer.width / 2) / loadBoardConfig().tileWidth,
         );
         const row = Math.floor(
-          (this.node.height / 2 - (local.y - 12)) /
+          (this.tilesLayer.height / 2 - (local.y - 12)) /
             loadBoardConfig().tileHeight,
         );
         this.handleTap(col, row);
