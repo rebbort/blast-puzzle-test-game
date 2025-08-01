@@ -6,6 +6,7 @@ import GameBoardController from "./GameBoardController";
 import TileView from "../views/TileView";
 import type { Board } from "../../core/board/Board";
 import { loadBoardConfig } from "../../config/ConfigLoader";
+import { runFallAnimation } from "../utils/FallAnimator";
 
 @ccclass("FillController")
 export default class FillController extends cc.Component {
@@ -78,33 +79,10 @@ export default class FillController extends cc.Component {
           view.node.active,
         );
 
-        // Устанавливаем anchorPoint на нижний центр для бамп эффекта
-        view.node.setAnchorPoint(cc.v2(0.5, 0));
-
         const start = this.computePos(p.x, -1);
         view.node.setPosition(start);
         const end = this.computePos(p.x, p.y);
-        const dur = Math.abs(start.y - end.y) / 1400;
-        const maybe = view.node as unknown as { stopAllActions?: () => void };
-        if (typeof maybe.stopAllActions === "function") maybe.stopAllActions();
-        const action = cc.sequence(
-          cc.delayTime(index * delayStep),
-          cc.moveTo(dur, end.x, end.y),
-          cc.callFunc(() => {
-            // Бамп эффект
-            const bumpAction = cc.sequence(
-              cc.scaleTo(0.5, 0.5, 0.5),
-              cc.scaleTo(0.5, 1, 1),
-            );
-            view.node.runAction(bumpAction);
-          }),
-          cc.callFunc(() => {
-            // Возвращаем anchorPoint обратно на верхний левый угол
-            view.node.setAnchorPoint(cc.v2(0, 1));
-          }),
-        );
-
-        view.node.runAction(action);
+        runFallAnimation(view.node, end, index * delayStep);
 
         view.node.zIndex = this.board.rows - p.y - 1;
         this.tileViews[p.y][p.x] = view;

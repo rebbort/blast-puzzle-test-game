@@ -6,6 +6,7 @@ import GameBoardController from "./GameBoardController";
 import TileView from "../views/TileView";
 import type { Board } from "../../core/board/Board";
 import { loadBoardConfig } from "../../config/ConfigLoader";
+import { runFallAnimation } from "../utils/FallAnimator";
 
 @ccclass()
 export default class MoveFlowController extends cc.Component {
@@ -93,19 +94,18 @@ export default class MoveFlowController extends cc.Component {
       const p = positions[i];
       const t = tiles[i];
       const view = map.get(t);
-      if (!view) continue;
-      const target = this.computePos(p.x, p.y);
-      const dist = Math.abs(view.node.y - target.y);
-      const dur = dist / 1400;
-      if (
-        typeof (view.node as unknown as { stopAllActions?: () => void })
-          .stopAllActions === "function"
-      ) {
-        (
-          view.node as unknown as { stopAllActions: () => void }
-        ).stopAllActions();
+
+      if (!view) {
+        continue;
       }
-      view.node.runAction(cc.moveTo(dur, target.x, target.y));
+
+      const target = this.computePos(p.x, p.y);
+      const dist = Math.floor(Math.abs(view.node.y - target.y));
+
+      if (dist > 0) {
+        runFallAnimation(view.node, target);
+      }
+
       view.node.zIndex = this.board.rows - p.y - 1;
       updated[p.y][p.x] = view;
     }
