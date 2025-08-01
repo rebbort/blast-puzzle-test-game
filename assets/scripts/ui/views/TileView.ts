@@ -31,6 +31,29 @@ export default class TileView extends cc.Component {
   /** Кэш модели тайла для возможных обновлений. */
   public tile!: Tile;
 
+  /** Позиция тайла на доске для логирования и событий. */
+  public boardPos: cc.Vec2 = cc.v2(0, 0);
+
+  /** Тайл в состоянии падения. */
+  private isFalling = false;
+  /** Тайл проигрывает feedback-анимацию. */
+  private isFeedbackActive = false;
+
+  /** Возвращает true, если тайл готов реагировать на ввод. */
+  isInteractive(): boolean {
+    return !this.isFalling && !this.isFeedbackActive;
+  }
+
+  /** Вызывается перед запуском анимации падения. */
+  startFall(): void {
+    this.isFalling = true;
+  }
+
+  /** Завершает состояние падения. */
+  endFall(): void {
+    this.isFalling = false;
+  }
+
   /**
    * Подставляет нужный визуальный префаб под данные тайла.
    * Старый визуальный узел удаляется, затем инстанцируется новый в visualRoot.
@@ -91,6 +114,7 @@ export default class TileView extends cc.Component {
 
   /** Анимация отклика на нажатие. */
   pressFeedback(): void {
+    this.isFeedbackActive = true;
     const target = this.node;
     // const width = (target as unknown as { width?: number }).width ?? 0;
     // const height = (target as unknown as { height?: number }).height ?? 0;
@@ -142,6 +166,7 @@ export default class TileView extends cc.Component {
         cc.callFunc(() => {
           target.setAnchorPoint(defaultAnchor);
           // target.setPosition(basePos);
+          this.isFeedbackActive = false;
         }),
       ),
     );

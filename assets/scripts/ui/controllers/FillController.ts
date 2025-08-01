@@ -85,6 +85,7 @@ export default class FillController extends cc.Component {
         runFallAnimation(view.node, end, index * delayStep);
 
         view.node.zIndex = this.board.rows - p.y - 1;
+        view.boardPos = cc.v2(p.x, p.y);
         this.tileViews[p.y][p.x] = view;
       }
     }
