@@ -59,6 +59,7 @@ export default class FillController extends cc.Component {
       );
 
       view.node.parent = this.tilesLayer;
+      view.node.active = true;
       console.log("FillController: Set parent, node active:", view.node.active);
 
       view.node.setAnchorPoint(cc.v2(0, 1));
