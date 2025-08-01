@@ -5,6 +5,7 @@ import { BoardGenerator } from "../../core/board/BoardGenerator";
 import { loadBoardConfig } from "../../config/ConfigLoader";
 import TileView from "../views/TileView";
 import MoveFlowController from "./MoveFlowController";
+import FillController from "./FillController";
 
 @ccclass()
 export default class GameBoardController extends cc.Component {
@@ -44,6 +45,9 @@ export default class GameBoardController extends cc.Component {
     // Attach MoveFlowController on the same node for animation handling
     const flow = this.node.addComponent(MoveFlowController);
     flow.tilesLayer = this.tilesLayer;
+    // Also attach FillController so new tiles are spawned when board fills
+    const fill = this.node.addComponent(FillController);
+    fill.tileNodePrefab = this.tileNodePrefab;
     // 4) Создаем дебаг сетку
     this.createDebugGrid();
   }
