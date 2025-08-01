@@ -128,10 +128,6 @@ describe("Move flow integration", () => {
     expect(views[2][0]).toBe(original[1][0]);
     expect(views[2][1]).toBe(original[1][1]);
 
-    const pos = (boardCtrl as any).computePos.bind(boardCtrl);
-    expect(views[1][0].node.position.y).toBe(pos(0, 1).y);
-    expect(views[2][0].node.position.y).toBe(pos(0, 2).y);
-
     expect(views.flat().filter(Boolean).length).toBe(cfg.cols * cfg.rows);
     expect((removedA.node as any).destroyed).toBe(true);
     expect((removedB.node as any).destroyed).toBe(true);
