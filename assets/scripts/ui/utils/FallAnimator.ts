@@ -11,15 +11,17 @@ export function runFallAnimation(
   const actions: unknown[] = [];
   if (delay > 0) actions.push(cc.delayTime(delay));
   actions.push(cc.moveTo(dur, end.x, end.y));
-  actions.push(
-    cc.callFunc(() => {
-      const bump = cc.sequence(
-        cc.scaleTo(0.5, 0.5, 0.5),
-        cc.scaleTo(0.5, 1, 1),
-      );
-      node.runAction(bump);
-    }),
-  );
+  if (dist > 0) {
+    actions.push(
+      cc.callFunc(() => {
+        const bump = cc.sequence(
+          cc.scaleTo(0.5, 0.5, 0.5),
+          cc.scaleTo(0.5, 1, 1),
+        );
+        node.runAction(bump);
+      }),
+    );
+  }
   if (onComplete) {
     actions.push(cc.callFunc(onComplete));
   }
