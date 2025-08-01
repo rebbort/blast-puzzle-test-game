@@ -19,6 +19,9 @@ export class BoardSolver {
     const cfg = (this.board as unknown as { cfg: BoardConfig }).cfg;
     switch (tile.kind) {
       case TileKind.SuperRow:
+        console.info(
+          `Activated SuperRow at (${pos.x},${pos.y}): removing row ${pos.y}`,
+        );
         // All cells of the same row are affected. Duplicates are avoided
         // by the caller using a Set for the final group.
         return Array.from(
@@ -26,18 +29,23 @@ export class BoardSolver {
           (_, x) => new cc.Vec2(x, pos.y),
         );
       case TileKind.SuperCol:
+        console.info(
+          `Activated SuperCol at (${pos.x},${pos.y}): removing column ${pos.x}`,
+        );
         // Entire column is removed regardless of color.
         return Array.from(
           { length: cfg.rows },
           (_, y) => new cc.Vec2(pos.x, y),
         );
       case TileKind.SuperBomb: {
-        // Radius-1 Chebyshev neighbourhood around the center.
         const radius = 1;
+        console.info(
+          `Activated SuperBomb at (${pos.x},${pos.y}): removing radius ${radius}`,
+        );
         const cells: cc.Vec2[] = [];
         for (let dx = -radius; dx <= radius; dx++) {
           for (let dy = -radius; dy <= radius; dy++) {
-            if (Math.max(Math.abs(dx), Math.abs(dy)) <= radius) {
+            if (dx * dx + dy * dy <= radius * radius) {
               const p = new cc.Vec2(pos.x + dx, pos.y + dy);
               if (this.board.inBounds(p)) cells.push(p);
             }
@@ -46,6 +54,9 @@ export class BoardSolver {
         return cells;
       }
       case TileKind.SuperClear: {
+        console.info(
+          `Activated SuperClear at (${pos.x},${pos.y}): removing entire board`,
+        );
         // Every tile on the board will be removed.
         const cells: cc.Vec2[] = [];
         for (let y = 0; y < cfg.rows; y++) {
@@ -56,6 +67,9 @@ export class BoardSolver {
         return cells;
       }
       default:
+        if (tile.kind !== TileKind.Normal) {
+          throw new Error(`Unhandled super tile kind: ${tile.kind}`);
+        }
         // Normal tiles do not expand the group.
         return [pos];
     }
