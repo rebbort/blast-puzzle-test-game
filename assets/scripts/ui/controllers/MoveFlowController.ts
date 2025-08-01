@@ -5,6 +5,7 @@ import { EventNames } from "../../core/events/EventNames";
 import GameBoardController from "./GameBoardController";
 import TileView from "../views/TileView";
 import type { Board } from "../../core/board/Board";
+import { TileKind } from "../../core/board/Tile";
 import { runFallAnimation } from "../utils/FallAnimator";
 import { computeTilePosition } from "../utils/PositionUtils";
 
@@ -45,6 +46,10 @@ export default class MoveFlowController extends cc.Component {
       const p = positions[i];
       const view = this.tileViews[p.y]?.[p.x];
       if (!view) continue;
+      // Trigger special effect when removing a super tile
+      if (view.tile.kind !== TileKind.Normal) {
+        view.activateSuper();
+      }
       view.node.runAction(
         cc.sequence(
           cc.spawn(cc.scaleTo(0.15, 0), cc.fadeOut(0.15)),
