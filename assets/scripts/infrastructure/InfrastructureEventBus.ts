@@ -79,13 +79,19 @@ export class InfrastructureEventBus {
       const set = this.registry.get(eventName);
       if (set) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        set.forEach((h) => this.target.off(eventName, h));
+        set.forEach((h) => {
+          // console.log("off", eventName, h);
+          this.target.off(eventName, h);
+        });
       }
       this.registry.delete(eventName);
     } else {
       this.registry.forEach((handlers, evt) => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        handlers.forEach((h) => this.target.off(evt, h));
+        handlers.forEach((h) => {
+          // console.log("off", evt, h);
+          this.target.off(evt, h);
+        });
       });
       this.registry.clear();
     }

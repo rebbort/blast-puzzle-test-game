@@ -39,9 +39,10 @@ export default class MoveFlowController extends cc.Component {
   private onRemove(positions: cc.Vec2[]): void {
     // Refresh local reference in case another controller replaced it
     this.tileViews = this.boardCtrl.tileViews;
-    positions.forEach((p) => {
+    for (let i = 0; i < positions.length; i++) {
+      const p = positions[i];
       const view = this.tileViews[p.y]?.[p.x];
-      if (!view) return;
+      if (!view) continue;
       view.node.runAction(
         cc.sequence(
           cc.spawn(cc.scaleTo(0.15, 0), cc.fadeOut(0.15)),
@@ -50,7 +51,7 @@ export default class MoveFlowController extends cc.Component {
       );
       this.tileViews[p.y][p.x] = undefined as unknown as TileView;
       this.boardCtrl.tileViews[p.y][p.x] = undefined as unknown as TileView;
-    });
+    }
   }
 
   /**
@@ -62,12 +63,14 @@ export default class MoveFlowController extends cc.Component {
   private onFall(): void {
     // Build mapping from tile model instances to their views
     const map = new Map<unknown, TileView>();
-    this.tileViews.forEach((row) =>
-      row.forEach((v) => {
-        if (!v) return;
+    for (let rowIndex = 0; rowIndex < this.tileViews.length; rowIndex++) {
+      const row = this.tileViews[rowIndex];
+      for (let colIndex = 0; colIndex < row.length; colIndex++) {
+        const v = row[colIndex];
+        if (!v) continue;
         map.set((v as unknown as { tile: unknown }).tile, v);
-      }),
-    );
+      }
+    }
 
     // Reconstruct matrix according to board state and move views
     const updated: (TileView | undefined)[][] = [];
@@ -75,15 +78,27 @@ export default class MoveFlowController extends cc.Component {
       updated[r] = new Array(this.board.cols);
     }
 
+    // Получаем все позиции и тайлы из board
+    const positions: cc.Vec2[] = [];
+    const tiles: unknown[] = [];
+
     this.board.forEach((p, t) => {
+      positions.push(p);
+      tiles.push(t);
+    });
+
+    // Обрабатываем каждую позицию
+    for (let i = 0; i < positions.length; i++) {
+      const p = positions[i];
+      const t = tiles[i];
       const view = map.get(t);
-      if (!view) return;
+      if (!view) continue;
       const target = this.computePos(p.x, p.y);
       const dist = Math.abs(view.node.y - target.y);
       const dur = dist / 1400;
       view.node.runAction(cc.moveTo(dur, target.x, target.y));
       updated[p.y][p.x] = view;
-    });
+    }
 
     this.tileViews = updated as TileView[][];
     this.boardCtrl.tileViews = this.tileViews;

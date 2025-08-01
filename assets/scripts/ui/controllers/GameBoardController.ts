@@ -47,6 +47,7 @@ export default class GameBoardController extends cc.Component {
     flow.tilesLayer = this.tilesLayer;
     const fill = this.node.addComponent(FillController);
     fill.tileNodePrefab = this.tileNodePrefab;
+    fill.tilesLayer = this.tilesLayer;
     // 4) Создаем дебаг сетку
     this.createDebugGrid();
   }

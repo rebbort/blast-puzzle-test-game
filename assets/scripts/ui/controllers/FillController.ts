@@ -13,8 +13,10 @@ export default class FillController extends cc.Component {
   @property(cc.Prefab)
   tileNodePrefab!: cc.Prefab;
 
+  @property(cc.Node)
+  tilesLayer!: cc.Node;
+
   private board!: Board;
-  private tilesLayer!: cc.Node;
   private tileViews!: TileView[][];
   /** Slots that are being filled awaiting FillDone */
   private pending: cc.Vec2[] = [];
@@ -36,11 +38,29 @@ export default class FillController extends cc.Component {
   private onFillStarted(slots: cc.Vec2[]): void {
     this.tileViews = this.getComponent(GameBoardController)!.tileViews;
     this.pending = slots;
-    slots.forEach((p) => {
+
+    console.log("FillController: tilesLayer exists?", !!this.tilesLayer);
+    console.log(
+      "FillController: tileNodePrefab exists?",
+      !!this.tileNodePrefab,
+    );
+
+    for (let i = 0; i < slots.length; i++) {
+      const p = slots[i];
       const view = cc
         .instantiate(this.tileNodePrefab)
         .getComponent(TileView) as TileView;
+
+      console.log(
+        "FillController: Created view for position",
+        p,
+        "view:",
+        view,
+      );
+
       view.node.parent = this.tilesLayer;
+      console.log("FillController: Set parent, node active:", view.node.active);
+
       view.node.setAnchorPoint(cc.v2(0, 1));
       const start = this.computePos(p.x, -1);
       view.node.setPosition(start);
@@ -49,16 +69,17 @@ export default class FillController extends cc.Component {
       view.node.runAction(cc.moveTo(dur, end));
       view.node.zIndex = this.board.rows - p.y - 1;
       this.tileViews[p.y][p.x] = view;
-    });
+    }
   }
 
   private onFillDone(): void {
-    this.pending.forEach((p) => {
+    for (let i = 0; i < this.pending.length; i++) {
+      const p = this.pending[i];
       const view = this.tileViews[p.y][p.x];
       if (view) {
         view.apply(this.board.tileAt(p)!);
       }
-    });
+    }
     this.pending = [];
   }
 
