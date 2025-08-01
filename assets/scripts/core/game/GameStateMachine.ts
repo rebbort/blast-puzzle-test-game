@@ -181,8 +181,23 @@ export class GameStateMachine {
    */
   private hasAvailableMoves(): boolean {
     let found = false;
+
+    // Получаем все позиции и тайлы
+    const positions: cc.Vec2[] = [];
+    const tiles: ReturnType<typeof this.board.tileAt>[] = [];
+
+    // Собираем все позиции и тайлы
     this.board.forEach((p, tile) => {
-      if (found) return;
+      positions.push(p);
+      tiles.push(tile);
+    });
+
+    // Проверяем каждую позицию
+    for (let i = 0; i < positions.length; i++) {
+      if (found) break;
+      const p = positions[i];
+      const tile = tiles[i];
+
       for (const n of this.board.neighbors4(p)) {
         const other = this.board.tileAt(n);
         if (other && other.color === tile.color) {
@@ -190,7 +205,8 @@ export class GameStateMachine {
           break;
         }
       }
-    });
+    }
+
     return found;
   }
 

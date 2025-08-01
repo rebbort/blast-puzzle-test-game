@@ -4,7 +4,6 @@ import { RemoveCommand } from "./commands/RemoveCommand";
 import { FallCommand } from "./commands/FallCommand";
 import { FillCommand } from "./commands/FillCommand";
 import { TileFactory } from "./Tile";
-import { BoardConfig } from "../../config/ConfigLoader";
 import { SuperTileFactory } from "../boosters/SuperTileFactory";
 import { EventNames } from "../events/EventNames";
 
@@ -24,7 +23,7 @@ export class MoveExecutor {
       throw new Error("MoveExecutor: group is empty");
     }
 
-    const cfg = (this.board as unknown as { cfg: BoardConfig }).cfg;
+    const cfg = this.board.config;
     const start = group[0];
     const startTile = this.board.tileAt(start);
 

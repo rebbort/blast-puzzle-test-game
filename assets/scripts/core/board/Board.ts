@@ -34,6 +34,10 @@ export class Board {
     }
   }
 
+  get config(): BoardConfig {
+    return this.cfg;
+  }
+
   /** Number of rows in the board. */
   public get rows(): number {
     return this.cfg.rows;
