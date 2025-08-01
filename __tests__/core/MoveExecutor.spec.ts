@@ -78,3 +78,19 @@ it("creates super tile in click cell when group large enough", async () => {
   const tile = board.tileAt(new cc.Vec2(0, 1));
   expect(tile?.kind).not.toBe(TileKind.Normal);
 });
+
+// event: SuperTileCreated emitted with position and tile
+it("emits SuperTileCreated when a super tile is spawned", async () => {
+  const board = new Board(cfg, [
+    [TileFactory.createNormal("red"), TileFactory.createNormal("red")],
+    [TileFactory.createNormal("red"), TileFactory.createNormal("red")],
+  ]);
+  const executor = new MoveExecutor(board, bus);
+  const group = [new cc.Vec2(0, 0), new cc.Vec2(1, 0), new cc.Vec2(0, 1)];
+  await executor.execute(group);
+  expect(emitSpy).toHaveBeenCalledWith(
+    EventNames.SuperTileCreated,
+    new cc.Vec2(0, 0),
+    expect.objectContaining({ kind: expect.any(Number) }),
+  );
+});

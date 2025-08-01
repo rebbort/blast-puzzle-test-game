@@ -30,6 +30,7 @@ export default class MoveFlowController extends cc.Component {
     bus.on(EventNames.RemoveStarted, this.onRemove, this);
     bus.on(EventNames.FallDone, this.onFall, this);
     bus.on(EventNames.FillDone, this.onFill, this);
+    bus.on(EventNames.SuperTileCreated, this.onSuperTileCreated, this);
   }
 
   /**
@@ -108,6 +109,15 @@ export default class MoveFlowController extends cc.Component {
    * Updates local references after new tiles were spawned.
    */
   private onFill(): void {
+    this.tileViews = this.boardCtrl.tileViews;
+  }
+
+  /**
+   * Spawns a view for a newly created super tile.
+   */
+  private onSuperTileCreated(pos: cc.Vec2): void {
+    const view = this.boardCtrl.spawn(pos);
+    view.apply(this.board.tileAt(pos)!);
     this.tileViews = this.boardCtrl.tileViews;
   }
 

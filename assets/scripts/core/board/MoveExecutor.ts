@@ -39,6 +39,7 @@ export class MoveExecutor {
       const tile = TileFactory.createNormal(startTile.color);
       tile.kind = kind;
       this.board.setTile(start, tile);
+      this.bus.emit(EventNames.SuperTileCreated, start, tile);
     }
 
     // 2. Let tiles fall in affected columns
