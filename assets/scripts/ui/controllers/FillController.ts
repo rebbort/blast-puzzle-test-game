@@ -54,7 +54,7 @@ export default class FillController extends cc.Component {
 
     const delayStep = 0.05;
 
-    Object.keys(byCol).forEach((colStr) => {
+    for (const colStr of Object.keys(byCol)) {
       const list = byCol[parseInt(colStr, 10)];
       list.sort((a, b) => b.y - a.y); // bottom first
       for (let index = 0; index < list.length; index++) {
@@ -72,6 +72,7 @@ export default class FillController extends cc.Component {
 
         view.node.parent = this.tilesLayer;
         view.node.active = true;
+        view.node.opacity = 255;
         console.log(
           "FillController: Set parent, node active:",
           view.node.active,
@@ -99,7 +100,7 @@ export default class FillController extends cc.Component {
         view.node.zIndex = this.board.rows - p.y - 1;
         this.tileViews[p.y][p.x] = view;
       }
-    });
+    }
   }
 
   private onFillDone(): void {
