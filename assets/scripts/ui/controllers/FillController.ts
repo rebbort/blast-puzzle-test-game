@@ -22,7 +22,11 @@ export default class FillController extends cc.Component {
     this.board = boardCtrl.getBoard();
     this.tilesLayer = this.node.getChildByName("TilesLayer")!;
     this.tileViews = boardCtrl.tileViews;
-    bus.on(EventNames.FillStarted, this.onFill, this);
+    // core triggers FillStarted before generating new tiles so UI can
+    // prepare animations. We mostly care about FillDone which carries
+    // final tile data, but subscribe to both for completeness.
+    bus.on(EventNames.FillStarted, () => {}, this);
+    bus.on(EventNames.FillDone, this.onFillDone, this);
   }
 
   /**
@@ -30,24 +34,27 @@ export default class FillController extends cc.Component {
    * Core.FillCommand updates the model before emitting FillStarted so the
    * board already contains new tiles when this handler runs.
    */
-  private onFill(slots: cc.Vec2[]): void {
-    // Refresh reference in case other controllers replaced the matrix
+  private onFillDone(newTiles: { pos: cc.Vec2; tile: unknown }[]): void {
+    // Keep matrix reference fresh in case MoveFlowController rebuilt it
     this.tileViews = this.getComponent(GameBoardController)!.tileViews;
-    slots.forEach((p) => {
+    newTiles.forEach(({ pos, tile }) => {
       const view = cc
         .instantiate(this.tileNodePrefab)
         .getComponent(TileView) as TileView;
       view.node.parent = this.tilesLayer;
-      const start = this.computePos(p.x, -1);
+      // Start slightly above the board so the tile visually falls in
+      const start = this.computePos(pos.x, -1);
       view.node.setPosition(start);
-      const end = this.computePos(p.x, p.y);
+      const end = this.computePos(pos.x, pos.y);
       const dur = Math.abs(start.y - end.y) / 1400;
-      view.node.runAction(cc.moveTo(dur, end));
-      this.tileViews[p.y][p.x] = view;
-      // apply tile data after FillCommand updates the board
-      setTimeout(() => {
-        view.apply(this.board.tileAt(p)!);
-      }, 0);
+      view.node.runAction(
+        cc.sequence(
+          cc.moveTo(dur, end),
+          cc.callFunc(() => bus.emit("TileFilledAnimationDone", pos)),
+        ),
+      );
+      view.apply(tile as TileView["tile"]);
+      this.tileViews[pos.y][pos.x] = view;
     });
   }
 
@@ -56,6 +63,9 @@ export default class FillController extends cc.Component {
    */
   private computePos(col: number, row: number): cc.Vec2 {
     const cfg = loadBoardConfig();
+    // Board coordinates start at top-left while Cocos origin is in the
+    // centre. Reuse the same math as GameBoardController so visuals and
+    // model stay aligned.
     const x = (col - this.board.cols / 2) * cfg.tileWidth;
     const y =
       (this.board.rows / 2 - row) * cfg.tileHeight -
