@@ -3,10 +3,15 @@ const { ccclass } = cc._decorator;
 import { loadBoardConfig } from "../../config/ConfigLoader";
 import { EventBus as bus } from "../../core/EventBus";
 import { EventNames } from "../../core/events/EventNames";
+import GameBoardController from "./GameBoardController";
+import TileView from "../views/TileView";
 
 @ccclass()
 export default class TileInputController extends cc.Component {
+  private boardCtrl!: GameBoardController;
+
   onLoad(): void {
+    this.boardCtrl = this.getComponent(GameBoardController)!;
     if (this.node.width === 0 || this.node.height === 0) {
       const cfg = loadBoardConfig();
       this.node.width = cfg.cols * cfg.tileWidth;
@@ -27,14 +32,21 @@ export default class TileInputController extends cc.Component {
           (this.node.height / 2 - (local.y - 12)) /
             loadBoardConfig().tileHeight,
         );
-        bus.emit(EventNames.GroupSelected, { x: col, y: row });
-        console.log("GroupSelected", { x: col, y: row });
-        console.debug(
-          "Listeners for GroupSelected:",
-          bus.getListenerCount(EventNames.GroupSelected),
-        );
+        this.handleTap(col, row);
       },
       this,
     );
+  }
+
+  handleTap(col: number, row: number): void {
+    const view: TileView | undefined = this.boardCtrl.tileViews[row]?.[col];
+    if (!view || !view.isInteractive()) {
+      console.debug(
+        `Tile tap ignored: falling=${view?.["isFalling"]} feedbackActive=${view?.["isFeedbackActive"]} at {${col},${row}}`,
+      );
+      return;
+    }
+    console.debug(`Tile tap feedback started at {${col},${row}}`);
+    bus.emit(EventNames.GroupSelected, new cc.Vec2(col, row));
   }
 }

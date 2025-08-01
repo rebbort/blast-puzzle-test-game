@@ -107,6 +107,7 @@ export default class MoveFlowController extends cc.Component {
       }
 
       view.node.zIndex = this.board.rows - p.y - 1;
+      view.boardPos = cc.v2(p.x, p.y);
       updated[p.y][p.x] = view;
     }
 

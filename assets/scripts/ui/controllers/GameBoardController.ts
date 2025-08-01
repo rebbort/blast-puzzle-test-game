@@ -71,6 +71,7 @@ export default class GameBoardController extends cc.Component {
         // сохраняем TileView для обновлений
         const view = node.getComponent(TileView) as TileView;
         view.apply(tileData);
+        view.boardPos = cc.v2(c, r);
         this.tileViews[r][c] = view;
       }
     }
@@ -88,6 +89,7 @@ export default class GameBoardController extends cc.Component {
     node.zIndex = this.board.rows - pos.y - 1;
     const view = node.getComponent(TileView) as TileView;
     view.apply(tileData);
+    view.boardPos = cc.v2(pos.x, pos.y);
     this.tileViews[pos.y][pos.x] = view;
     return view;
   }

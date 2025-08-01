@@ -11,6 +11,9 @@ export function runFallAnimation(
   const maybe = node as unknown as { stopAllActions?: () => void };
   if (typeof maybe.stopAllActions === "function") maybe.stopAllActions();
 
+  const tileView = node.getComponent(TileView);
+  tileView?.startFall();
+
   const actions: unknown[] = [];
   if (delay > 0) actions.push(cc.delayTime(delay));
   actions.push(cc.moveTo(dur, end.x, end.y));
@@ -33,8 +36,17 @@ export function runFallAnimation(
   }
 
   if (onComplete) {
-    actions.push(cc.callFunc(onComplete));
+    actions.push(
+      cc.callFunc(() => {
+        onComplete();
+      }),
+    );
   }
+  actions.push(
+    cc.callFunc(() => {
+      tileView?.endFall();
+    }),
+  );
   // cc.sequence expects variadic arguments but TypeScript complains when
   // spreading an array of `any`. Use apply to avoid the tuple requirement.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
