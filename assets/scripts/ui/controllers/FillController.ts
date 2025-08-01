@@ -86,16 +86,19 @@ export default class FillController extends cc.Component {
         const maybe = view.node as unknown as { stopAllActions?: () => void };
         if (typeof maybe.stopAllActions === "function") maybe.stopAllActions();
 
-        cc.tween(view.node as unknown as cc.Node)
-          .delay(index * delayStep)
-          .to(dur, { position: new cc.Vec3(end.x, end.y, 0) })
-          .call(() => {
+        const action = cc.sequence(
+          cc.delayTime(index * delayStep),
+          cc.moveTo(dur, end.x, end.y),
+          cc.callFunc(() => {
             cc.tween(view.node as unknown as cc.Node)
               .to(0.05, { scale: new cc.Vec3(1.1, 1.1, 1) })
               .to(0.05, { scale: new cc.Vec3(1, 1, 1) })
               .start();
-          })
-          .start();
+          }),
+        );
+        (
+          view.node as unknown as { runAction?: (a: unknown) => void }
+        ).runAction?.(action);
 
         view.node.zIndex = this.board.rows - p.y - 1;
         this.tileViews[p.y][p.x] = view;

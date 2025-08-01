@@ -30,6 +30,8 @@ beforeEach(() => {
       action.acts.forEach((a: any) => run.call(this, a));
     } else if (action.type === "callFunc") {
       action.fn();
+    } else if (action.type === "delayTime") {
+      /* no-op for tests */
     }
   };
   (cc as any).moveTo = (d: number, x: any, y?: number) => {
@@ -38,6 +40,7 @@ beforeEach(() => {
   };
   (cc as any).fadeOut = () => ({ type: "fadeOut" });
   (cc as any).scaleTo = () => ({ type: "scaleTo" });
+  (cc as any).delayTime = (d: number) => ({ type: "delayTime", d });
   (cc as any).tween = (target: any) => {
     const chain = {
       delay() {
