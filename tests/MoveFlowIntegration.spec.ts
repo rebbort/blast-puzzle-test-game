@@ -149,9 +149,6 @@ describe("Move flow integration", () => {
     const firstBottomA = boardCtrl.tileViews[2][0];
     const firstBottomB = boardCtrl.tileViews[2][1];
 
-    // Wait for FillController async callbacks
-    await new Promise((r) => setTimeout(r, 0));
-
     // Second move removes the new bottom row
     await executor.execute([new cc.Vec2(0, 2), new cc.Vec2(1, 2)]);
 

@@ -16,13 +16,16 @@ export default class FillController extends cc.Component {
   private board!: Board;
   private tilesLayer!: cc.Node;
   private tileViews!: TileView[][];
+  /** Slots that are being filled awaiting FillDone */
+  private pending: cc.Vec2[] = [];
 
   onLoad(): void {
     const boardCtrl = this.getComponent(GameBoardController)!;
     this.board = boardCtrl.getBoard();
     this.tilesLayer = this.node.getChildByName("TilesLayer")!;
     this.tileViews = boardCtrl.tileViews;
-    bus.on(EventNames.FillStarted, this.onFill, this);
+    bus.on(EventNames.FillStarted, this.onFillStarted, this);
+    bus.on(EventNames.FillDone, this.onFillDone, this);
   }
 
   /**
@@ -30,25 +33,33 @@ export default class FillController extends cc.Component {
    * Core.FillCommand updates the model before emitting FillStarted so the
    * board already contains new tiles when this handler runs.
    */
-  private onFill(slots: cc.Vec2[]): void {
-    // Refresh reference in case other controllers replaced the matrix
+  private onFillStarted(slots: cc.Vec2[]): void {
     this.tileViews = this.getComponent(GameBoardController)!.tileViews;
+    this.pending = slots;
     slots.forEach((p) => {
       const view = cc
         .instantiate(this.tileNodePrefab)
         .getComponent(TileView) as TileView;
       view.node.parent = this.tilesLayer;
+      view.node.setAnchorPoint(cc.v2(0, 1));
       const start = this.computePos(p.x, -1);
       view.node.setPosition(start);
       const end = this.computePos(p.x, p.y);
       const dur = Math.abs(start.y - end.y) / 1400;
       view.node.runAction(cc.moveTo(dur, end));
+      view.node.zIndex = this.board.rows - p.y - 1;
       this.tileViews[p.y][p.x] = view;
-      // apply tile data after FillCommand updates the board
-      setTimeout(() => {
-        view.apply(this.board.tileAt(p)!);
-      }, 0);
     });
+  }
+
+  private onFillDone(): void {
+    this.pending.forEach((p) => {
+      const view = this.tileViews[p.y][p.x];
+      if (view) {
+        view.apply(this.board.tileAt(p)!);
+      }
+    });
+    this.pending = [];
   }
 
   /**
