@@ -96,7 +96,12 @@ export default class MoveFlowController extends cc.Component {
       const view = map.get(t);
       if (!view) continue;
       const target = this.computePos(p.x, p.y);
-      runFallAnimation(view.node, target);
+      const dist = Math.abs(view.node.y - target.y);
+      if (dist > 0) {
+        runFallAnimation(view.node, target);
+      } else {
+        view.node.setPosition(target);
+      }
       view.node.zIndex = this.board.rows - p.y - 1;
       updated[p.y][p.x] = view;
     }
