@@ -177,17 +177,18 @@
       }
     ],
     "superVariants": [
+      null,
       {
-        "__uuid__": "1e06292f-7a42-44ae-86fa-b48a2f73e96d"
-      },
-      {
-        "__uuid__": "1b02b6c4-91f8-4f61-b771-d82ac5fe26ec"
+        "__uuid__": "54bb732e-a0d4-4a09-a782-88b9f54a3552"
       },
       {
         "__uuid__": "a13375d2-8d00-4a0f-a8a0-619aec847421"
       },
       {
-        "__uuid__": "54bb732e-a0d4-4a09-a782-88b9f54a3552"
+        "__uuid__": "1e06292f-7a42-44ae-86fa-b48a2f73e96d"
+      },
+      {
+        "__uuid__": "1b02b6c4-91f8-4f61-b771-d82ac5fe26ec"
       }
     ],
     "_id": ""

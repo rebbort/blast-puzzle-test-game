@@ -130,8 +130,8 @@ export default class TileView extends cc.Component {
     if (typeof maybe.stopAllActions === "function") maybe.stopAllActions();
     if (typeof maybe.setScale === "function") maybe.setScale(1, 1);
 
-    target.setAnchorPoint(cc.v2(0.5, 0.5));
-    target.setPosition(centerPos);
+    // target.setAnchorPoint(cc.v2(0.5, 0.5));
+    // target.setPosition(centerPos);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     target.runAction(
@@ -141,7 +141,7 @@ export default class TileView extends cc.Component {
         cc.scaleTo(0.1, 1.0),
         cc.callFunc(() => {
           target.setAnchorPoint(defaultAnchor);
-          target.setPosition(basePos);
+          // target.setPosition(basePos);
         }),
       ),
     );
