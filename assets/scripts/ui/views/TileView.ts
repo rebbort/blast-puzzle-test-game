@@ -8,7 +8,7 @@ import { TileAppearanceConfig } from "../../core/board/TileAppearanceConfig";
  * Представление игрового тайла. Содержит контейнер `visualRoot`, куда
  * подставляются разные префабы внешнего вида в зависимости от модели.
  */
-@ccclass("TileView")
+@ccclass()
 export default class TileView extends cc.Component {
   /** Узел, в который инстанцируются визуальные варианты тайла. */
   @property(cc.Node)

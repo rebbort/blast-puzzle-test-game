@@ -194,7 +194,9 @@
     "_enabled": true,
     "kind": 2,
     "spawnFx": null,
-    "activateFx": null,
+    "activateFx": {
+      "__uuid__": "c6f7c67a-bac7-4d67-848a-4578d9c31995"
+    },
     "_id": ""
   },
   {
