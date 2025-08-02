@@ -85,4 +85,14 @@ export class BoosterService {
     // Сообщаем слушателям, что активация прервана
     this.bus.emit(EventNames.BoosterCancelled);
   }
+
+  /**
+   * Возвращает текущее количество зарядов для бустера.
+   * @param id Идентификатор бустера
+   * @returns Число оставшихся зарядов или 0, если бустер не найден
+   */
+  getCharges(id: string): number {
+    const boost = this.boosters[id];
+    return boost ? boost.charges : 0;
+  }
 }

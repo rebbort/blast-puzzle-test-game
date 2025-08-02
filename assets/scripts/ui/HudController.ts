@@ -1,5 +1,6 @@
 import { EventBus } from "../core/EventBus";
 import { EventNames } from "../core/events/EventNames";
+import { boosterService } from "../core/boosters/BoosterSetup";
 const { ccclass, property } = cc._decorator;
 
 interface NodeUtils {
@@ -27,7 +28,15 @@ export class HudController extends cc.Component {
 
   private btnBomb: NodeUtils | null = null;
   private btnSwap: NodeUtils | null = null;
+  private btnSuperRow: NodeUtils | null = null;
+  private btnSuperCol: NodeUtils | null = null;
   private btnPause: NodeUtils | null = null;
+
+  private lblBombCharges: cc.Label | null = null;
+  private lblRowCharges: cc.Label | null = null;
+  private lblColCharges: cc.Label | null = null;
+
+  private activeBtn: NodeUtils | null = null;
 
   private turns: number = 0;
   private score: number = 0;
@@ -68,6 +77,12 @@ export class HudController extends cc.Component {
     this.btnBomb = panel
       ?.getChildByName("btnBomb")
       ?.getComponent("Button") as NodeUtils | null;
+    this.btnSuperRow = panel
+      ?.getChildByName("btnSuperRow")
+      ?.getComponent("Button") as NodeUtils | null;
+    this.btnSuperCol = panel
+      ?.getChildByName("btnSuperCol")
+      ?.getComponent("Button") as NodeUtils | null;
     this.btnSwap = panel
       ?.getChildByName("btnSwap")
       ?.getComponent("Button") as NodeUtils | null;
@@ -78,13 +93,32 @@ export class HudController extends cc.Component {
 
     // Booster and pause button interactions
     this.btnBomb?.node?.on("click", this.onBombClick.bind(this));
+    this.btnSuperRow?.node?.on("click", this.onSuperRowClick.bind(this));
+    this.btnSuperCol?.node?.on("click", this.onSuperColClick.bind(this));
     this.btnSwap?.node?.on("click", this.onSwapClick.bind(this));
     this.btnPause?.node?.on("click", this.onPauseClick.bind(this));
 
     EventBus.on(EventNames.BoosterActivated, this.onBoosterActivated, this);
+    EventBus.on(EventNames.BoosterConsumed, this.onBoosterConsumed, this);
+    EventBus.on(EventNames.BoosterCancelled, this.onBoosterCancelled, this);
 
     // Display current FSM state in the HUD
     EventBus.on(EventNames.StateChanged, this.onStateChanged, this);
+
+    // preload charge labels
+    this.lblBombCharges = this.btnBomb?.node
+      ?.getChildByName("lblCharges")
+      ?.getComponent("Label") as cc.Label | null;
+    this.lblRowCharges = this.btnSuperRow?.node
+      ?.getChildByName("lblCharges")
+      ?.getComponent("Label") as cc.Label | null;
+    this.lblColCharges = this.btnSuperCol?.node
+      ?.getChildByName("lblCharges")
+      ?.getComponent("Label") as cc.Label | null;
+
+    this.updateCharges("bomb");
+    this.updateCharges("superRow");
+    this.updateCharges("superCol");
   }
 
   private onTurnsInit(data: {
@@ -148,14 +182,22 @@ export class HudController extends cc.Component {
    * Handles bomb booster button click.
    */
   private onBombClick(): void {
-    EventBus.emit(EventNames.BoosterActivated, "bomb");
+    boosterService?.activate("bomb");
+  }
+
+  private onSuperRowClick(): void {
+    boosterService?.activate("superRow");
+  }
+
+  private onSuperColClick(): void {
+    boosterService?.activate("superCol");
   }
 
   /**
    * Handles swap booster button click.
    */
   private onSwapClick(): void {
-    EventBus.emit(EventNames.BoosterActivated, "swap");
+    boosterService?.activate("swap");
   }
 
   /**
@@ -169,11 +211,14 @@ export class HudController extends cc.Component {
    * Handles booster activation - shows pulse animation.
    */
   private onBoosterActivated(name: string): void {
-    const btn =
-      name === "bomb" ? this.btnBomb : name === "swap" ? this.btnSwap : null;
+    this.clearHighlight();
+    const btn = this.getButtonById(name);
     if (btn?.node) {
+      const node = btn.node as unknown as cc.Node;
+      node.color = cc.Color.YELLOW;
+      this.activeBtn = btn;
       EventBus.emit(EventNames.AnimationStarted, "booster-pulse");
-      cc.tween(btn.node as unknown as cc.Node)
+      cc.tween(node)
         .to(0.1, { scale: new cc.Vec3(1.2, 1.2, 1) })
         .to(0.1, { scale: new cc.Vec3(1, 1, 1) })
         .start();
@@ -182,6 +227,50 @@ export class HudController extends cc.Component {
         200,
       );
     }
+  }
+
+  private onBoosterConsumed(id: string): void {
+    this.updateCharges(id);
+    this.clearHighlight();
+  }
+
+  private onBoosterCancelled(): void {
+    this.clearHighlight();
+  }
+
+  private clearHighlight(): void {
+    if (this.activeBtn?.node) {
+      const node = this.activeBtn.node as unknown as cc.Node;
+      node.color = cc.Color.WHITE;
+    }
+    this.activeBtn = null;
+  }
+
+  private getButtonById(id: string): NodeUtils | null {
+    switch (id) {
+      case "bomb":
+        return this.btnBomb;
+      case "superRow":
+        return this.btnSuperRow;
+      case "superCol":
+        return this.btnSuperCol;
+      case "swap":
+        return this.btnSwap;
+      default:
+        return null;
+    }
+  }
+
+  private updateCharges(id: string): void {
+    const label =
+      id === "bomb"
+        ? this.lblBombCharges
+        : id === "superRow"
+          ? this.lblRowCharges
+          : id === "superCol"
+            ? this.lblColCharges
+            : null;
+    if (label) label.string = String(boosterService?.getCharges(id) ?? 0);
   }
 
   /**
