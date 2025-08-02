@@ -32,16 +32,12 @@ export default class BoosterPanelController extends cc.Component {
   private initializeSlots(): void {
     if (!this.boosterList) return;
     this.boosterSlots = [];
-    this.boosterList.children.forEach((child: cc.Node, index: number) => {
+    this.boosterList.children.forEach((child: cc.Node) => {
       const button = child.getComponent(cc.Button);
       const icon =
         child.getChildByName("Icon")?.getComponent(cc.Sprite) || null;
       const counterLabel =
         child.getChildByName("CounterLabel")?.getComponent(cc.Label) || null;
-
-      // Определяем бустер для слота (можно настроить в редакторе или через конфиг)
-      const boosterTypes = ["teleport", "bomb", "superRow", "superCol"];
-      const boosterId = boosterTypes[index] || "";
 
       const slot: BoosterSlot = {
         node: child,
@@ -49,20 +45,15 @@ export default class BoosterPanelController extends cc.Component {
         icon,
         counterLabel,
         highlight: null,
-        boosterId,
+        boosterId: "",
         charges: 0,
         isActive: false,
       };
       this.addHighlightToSlot(slot);
       this.setupSlotClickHandler(slot);
 
-      // Показываем слот с бустером
-      if (boosterId) {
-        this.setBoosterIcon(slot, boosterId);
-        if (slot.counterLabel) {
-          slot.counterLabel.string = "0";
-        }
-      }
+      // скрываем до получения выбранных бустеров
+      slot.node.active = false;
 
       this.boosterSlots.push(slot);
     });
@@ -76,21 +67,23 @@ export default class BoosterPanelController extends cc.Component {
 
   private onBoostersSelected(charges: Record<string, number>): void {
     this.selectedBoosters = charges;
-    this.populateBoosterSlots();
-  }
 
-  private populateBoosterSlots(): void {
-    // Обновляем количество зарядов для каждого бустера
-    this.boosterSlots.forEach((slot) => {
-      const charges = this.selectedBoosters[slot.boosterId] || 0;
-      slot.charges = charges;
+    const entries = Object.entries(charges).filter(([, c]) => c > 0);
 
-      if (slot.counterLabel) {
-        slot.counterLabel.string = String(charges);
+    this.boosterSlots.forEach((slot, index) => {
+      const entry = entries[index];
+      if (!entry) {
+        slot.boosterId = "";
+        slot.charges = 0;
+        slot.node.active = false;
+        return;
       }
-
-      // Показываем слот только если есть заряды
-      slot.node.active = charges > 0;
+      const [id, count] = entry as [string, number];
+      slot.boosterId = id;
+      slot.charges = count;
+      this.setBoosterIcon(slot, id);
+      if (slot.counterLabel) slot.counterLabel.string = String(count);
+      slot.node.active = true;
     });
   }
 
@@ -135,6 +128,7 @@ export default class BoosterPanelController extends cc.Component {
     this.clearActiveSlot();
     slot.isActive = true;
     slot.highlight?.setHighlight();
+    this.startPulse(slot.node);
     boosterService?.activate(slot.boosterId);
   }
 
@@ -143,7 +137,25 @@ export default class BoosterPanelController extends cc.Component {
     if (activeSlot) {
       activeSlot.isActive = false;
       activeSlot.highlight?.clearHighlight();
+      this.stopPulse(activeSlot.node);
     }
+  }
+
+  private startPulse(node: cc.Node): void {
+    node.stopAllActions();
+    const pulse = () => {
+      cc.tween(node)
+        .to(0.5, { scale: 1.1 })
+        .to(0.5, { scale: 1 })
+        .call(pulse)
+        .start();
+    };
+    pulse();
+  }
+
+  private stopPulse(node: cc.Node): void {
+    node.stopAllActions();
+    node.scale = 1;
   }
 
   private onBoosterConsumed(boosterId: string): void {
@@ -167,6 +179,7 @@ export default class BoosterPanelController extends cc.Component {
     slot.node.active = false;
     slot.isActive = false;
     slot.highlight?.clearHighlight();
+    this.stopPulse(slot.node);
   }
 
   onDestroy(): void {

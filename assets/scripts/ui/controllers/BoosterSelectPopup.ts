@@ -12,11 +12,13 @@ interface NodeUtils {
 }
 
 /**
- * Popup that lets the player choose up to 2 booster types and up to 10 charges
- * for each (defaults configurable via settings).
+ * Popup UI that lets the player choose boosters before entering the game.
+ * A separate service (`BoosterSelectionService`) enforces the rule that no
+ * more than two booster types can be selected and stores the number of
+ * charges for each type.
  */
 @ccclass()
-export default class BoosterSelectController extends cc.Component {
+export default class BoosterSelectPopup extends cc.Component {
   private labels: Record<string, cc.Label | null> = {};
 
   private animationController: BoosterSelectAnimationController = null;

@@ -8,7 +8,7 @@ import GameBoardController from "./ui/controllers/GameBoardController";
 import { MoveSequenceLogger } from "./core/diagnostics/MoveSequenceLogger";
 import { initBoosterService } from "./core/boosters/BoosterSetup";
 import { EventNames } from "./core/events/EventNames";
-import BoosterSelectController from "./ui/controllers/BoosterSelectController";
+import BoosterSelectPopup from "./ui/controllers/BoosterSelectPopup";
 import { boosterSelectionService } from "./ui/services/BoosterSelectionService";
 
 const { ccclass } = cc._decorator;
@@ -64,7 +64,7 @@ export default class GameScene extends cc.Component {
     );
 
     // Ensure booster selection popup is visible
-    const selector = this.getComponentInChildren(BoosterSelectController);
+    const selector = this.getComponentInChildren(BoosterSelectPopup);
     if (selector) {
       (selector.node as unknown as { active: boolean }).active = true;
     } else {
