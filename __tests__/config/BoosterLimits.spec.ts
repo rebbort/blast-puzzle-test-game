@@ -2,6 +2,7 @@ import {
   loadBoosterLimits,
   DefaultBoosterLimits,
 } from "../../assets/scripts/config/ConfigLoader";
+import { BoosterRegistry } from "../../assets/scripts/core/boosters/BoosterRegistry";
 
 describe("loadBoosterLimits", () => {
   beforeEach(() => {
@@ -26,14 +27,12 @@ describe("loadBoosterLimits", () => {
     ).localStorage = {
       getItem: () => JSON.stringify({ maxTypes: 3, maxPerType: { bomb: 5 } }),
     };
+    const expected = Object.fromEntries(
+      BoosterRegistry.map((b) => [b.id, b.id === "bomb" ? 5 : 10]),
+    );
     expect(loadBoosterLimits()).toEqual({
       maxTypes: 3,
-      maxPerType: {
-        teleport: 10,
-        superRow: 10,
-        superCol: 10,
-        bomb: 5,
-      },
+      maxPerType: expected,
     });
   });
 });

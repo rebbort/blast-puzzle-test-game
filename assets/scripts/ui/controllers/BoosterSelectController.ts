@@ -5,6 +5,7 @@ import {
   BoosterLimitConfig,
 } from "../../config/ConfigLoader";
 import BoosterSelectAnimationController from "./BoosterSelectAnimationController";
+import { BoosterRegistry } from "../../core/boosters/BoosterRegistry";
 
 const { ccclass } = cc._decorator;
 
@@ -22,19 +23,9 @@ interface NodeUtils {
 @ccclass()
 export default class BoosterSelectController extends cc.Component {
   private limits: BoosterLimitConfig = loadBoosterLimits();
-  private counts: Record<string, number> = {
-    teleport: 0,
-    superCol: 0,
-    superRow: 0,
-    bomb: 0,
-  };
+  private counts: Record<string, number> = {};
   private picked: Set<string> = new Set();
-  private labels: Record<string, cc.Label | null> = {
-    teleport: null,
-    superCol: null,
-    superRow: null,
-    bomb: null,
-  };
+  private labels: Record<string, cc.Label | null> = {};
 
   private animationController: BoosterSelectAnimationController = null;
 
@@ -45,14 +36,11 @@ export default class BoosterSelectController extends cc.Component {
     );
 
     const root = this.node as unknown as NodeUtils;
-    const map: Record<string, string> = {
-      teleport: "btnTeleport",
-      superCol: "btnSuperCol",
-      superRow: "btnSuperRow",
-      bomb: "btnBomb",
-    };
-    (Object.keys(map) as (keyof typeof map)[]).forEach((id) => {
-      const btn = root.getChildByName(map[id]);
+    BoosterRegistry.forEach((def) => {
+      const id = def.id;
+      this.counts[id] = 0;
+      const btnName = `btn${id.charAt(0).toUpperCase()}${id.slice(1)}`;
+      const btn = root.getChildByName(btnName);
       btn?.on(cc.Node.EventType.TOUCH_END, () => this.inc(id));
       const lbl = btn?.node
         ?.getChildByName("CounterLabel")
@@ -73,11 +61,11 @@ export default class BoosterSelectController extends cc.Component {
     }
   }
 
-  private inc(id: keyof BoosterSelectController["counts"]): void {
+  private inc(id: string): void {
     if (this.picked.size >= this.limits.maxTypes && this.counts[id] === 0) {
       return; // cannot pick more types
     }
-    const max = this.limits.maxPerType[id];
+    const max = this.limits.maxPerType[id] ?? 0;
     if (this.counts[id] >= max) return;
     this.counts[id]++;
     if (this.counts[id] === 1) this.picked.add(id);
