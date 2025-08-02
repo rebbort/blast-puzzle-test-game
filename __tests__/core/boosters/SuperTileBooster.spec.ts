@@ -19,7 +19,7 @@ describe("SuperTileBooster", () => {
 
   it("places super tile and consumes charge", () => {
     const bus = new InfrastructureEventBus();
-    const svc = new BoosterService(bus);
+    const svc = new BoosterService(bus, () => "WaitingInput");
     const board = new Board(cfg, [[TileFactory.createNormal("red")]]);
     const view = { apply: jest.fn() } as unknown as TileView;
     const views: TileView[][] = [[view]];

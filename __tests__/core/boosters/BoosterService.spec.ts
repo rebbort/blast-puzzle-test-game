@@ -1,7 +1,8 @@
-import { InfrastructureEventBus } from "../../assets/scripts/infrastructure/InfrastructureEventBus";
-import { BoosterService } from "../../assets/scripts/core/boosters/BoosterService";
-import type { Booster } from "../../assets/scripts/core/boosters/Booster";
-import { EventNames } from "../../assets/scripts/core/events/EventNames";
+import { InfrastructureEventBus } from "../../../assets/scripts/infrastructure/InfrastructureEventBus";
+import { BoosterService } from "../../../assets/scripts/core/boosters/BoosterService";
+import type { Booster } from "../../../assets/scripts/core/boosters/Booster";
+import { EventNames } from "../../../assets/scripts/core/events/EventNames";
+import type { GameState } from "../../../assets/scripts/core/game/GameStateMachine";
 
 describe("BoosterService", () => {
   const bus = new InfrastructureEventBus();
@@ -11,6 +12,10 @@ describe("BoosterService", () => {
     emitSpy.mockClear();
     bus.clear();
   });
+
+  function createSvc(state: GameState = "WaitingInput") {
+    return new BoosterService(bus, () => state);
+  }
 
   function createBooster(id: string, charges = 1, activatable = true) {
     let started = false;
@@ -31,7 +36,7 @@ describe("BoosterService", () => {
   }
 
   it("register stores booster by id", () => {
-    const svc = new BoosterService(bus);
+    const svc = createSvc();
     const { booster } = createBooster("bomb");
     svc.register(booster);
     // Access private field for testing via type cast
@@ -41,7 +46,7 @@ describe("BoosterService", () => {
   });
 
   it("activate emits and starts when allowed", () => {
-    const svc = new BoosterService(bus);
+    const svc = createSvc();
     const b = createBooster("bomb");
     svc.register(b.booster);
     svc.activate("bomb");
@@ -50,7 +55,7 @@ describe("BoosterService", () => {
   });
 
   it("activate does nothing when canActivate false", () => {
-    const svc = new BoosterService(bus);
+    const svc = createSvc();
     const b = createBooster("bomb", 1, false);
     svc.register(b.booster);
     svc.activate("bomb");
@@ -58,8 +63,17 @@ describe("BoosterService", () => {
     expect(emitSpy).not.toHaveBeenCalled();
   });
 
+  it("skips activation when state not WaitingInput", () => {
+    const svc = createSvc("ExecutingMove");
+    const b = createBooster("bomb");
+    svc.register(b.booster);
+    svc.activate("bomb");
+    expect(b.started).toBe(false);
+    expect(emitSpy).not.toHaveBeenCalled();
+  });
+
   it("consume decreases charges and emits", () => {
-    const svc = new BoosterService(bus);
+    const svc = createSvc();
     const { booster } = createBooster("bomb", 2);
     svc.register(booster);
     svc.consume("bomb");
@@ -68,7 +82,7 @@ describe("BoosterService", () => {
   });
 
   it("cancel emits BoosterCancelled", () => {
-    const svc = new BoosterService(bus);
+    const svc = createSvc();
     svc.cancel();
     expect(emitSpy).toHaveBeenCalledWith(EventNames.BoosterCancelled);
   });
