@@ -32,6 +32,7 @@ export default class BoosterSelectPopup extends cc.Component {
       BoosterSelectAnimationController,
     );
     boosterSelectionService.reset();
+    boosterSelectionService.confirm();
     this.createSlots();
   }
 
