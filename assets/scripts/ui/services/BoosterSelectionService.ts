@@ -4,8 +4,12 @@ import {
   loadBoosterLimits,
   BoosterLimitConfig,
 } from "../../config/ConfigLoader";
-import { BoosterRegistry } from "../../core/boosters/BoosterRegistry";
 
+/**
+ * Service that stores which boosters were chosen on the pre-game popup.
+ * Player can select up to `maxTypes` boosters. Selecting more will unselect
+ * the oldest choice.
+ */
 export class BoosterSelectionService {
   private static _instance: BoosterSelectionService | null = null;
 
@@ -17,46 +21,47 @@ export class BoosterSelectionService {
   }
 
   private limits: BoosterLimitConfig;
-  private counts: Record<string, number> = {};
-  private picked: Set<string> = new Set();
+  private selected: string[] = [];
 
   private constructor() {
     this.limits = loadBoosterLimits();
-    BoosterRegistry.forEach((def) => {
-      this.counts[def.id] = 0;
-    });
   }
 
   /**
-   * Increment count for booster `id` if within limits.
-   * @returns new count value
+   * Toggles selection for booster `id`.
+   * If selection exceeds the maximum allowed types, the oldest selection is
+   * removed.
+   * @returns current list of selected booster ids
    */
-  inc(id: string): number {
-    if (this.picked.size >= this.limits.maxTypes && this.counts[id] === 0) {
-      return this.counts[id];
+  toggle(id: string): string[] {
+    const idx = this.selected.indexOf(id);
+    if (idx !== -1) {
+      this.selected.splice(idx, 1);
+    } else {
+      if (this.selected.length >= this.limits.maxTypes) {
+        this.selected.shift();
+      }
+      this.selected.push(id);
     }
-    const max = this.limits.maxPerType[id] ?? 0;
-    if (this.counts[id] >= max) return this.counts[id];
-    this.counts[id]++;
-    if (this.counts[id] === 1) this.picked.add(id);
-    return this.counts[id];
+    return this.getSelected();
   }
 
-  getCount(id: string): number {
-    return this.counts[id] ?? 0;
+  getSelected(): string[] {
+    return [...this.selected];
   }
 
-  getCounts(): Record<string, number> {
-    return { ...this.counts };
-  }
-
+  /**
+   * Emits event with selected boosters and their charges.
+   * Currently each selected booster starts with one charge.
+   */
   confirm(): void {
-    EventBus.emit(EventNames.BoostersSelected, { ...this.counts });
+    const charges: Record<string, number> = {};
+    this.selected.forEach((id) => (charges[id] = 1));
+    EventBus.emit(EventNames.BoostersSelected, charges);
   }
 
   reset(): void {
-    Object.keys(this.counts).forEach((id) => (this.counts[id] = 0));
-    this.picked.clear();
+    this.selected = [];
   }
 }
 
