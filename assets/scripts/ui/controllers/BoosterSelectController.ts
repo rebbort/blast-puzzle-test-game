@@ -4,6 +4,7 @@ import {
   loadBoosterLimits,
   BoosterLimitConfig,
 } from "../../config/ConfigLoader";
+import BoosterSelectAnimationController from "./BoosterSelectAnimationController";
 
 const { ccclass } = cc._decorator;
 
@@ -35,7 +36,14 @@ export default class BoosterSelectController extends cc.Component {
     bomb: null,
   };
 
+  private animationController: BoosterSelectAnimationController = null;
+
   start(): void {
+    // Получаем анимационный контроллер
+    this.animationController = this.getComponent(
+      BoosterSelectAnimationController,
+    );
+
     const root = this.node as unknown as NodeUtils;
     const map: Record<string, string> = {
       teleport: "btnTeleport",
@@ -45,7 +53,7 @@ export default class BoosterSelectController extends cc.Component {
     };
     (Object.keys(map) as (keyof typeof map)[]).forEach((id) => {
       const btn = root.getChildByName(map[id]);
-      btn?.on("click", () => this.inc(id));
+      btn?.on(cc.Node.EventType.TOUCH_END, () => this.inc(id));
       const lbl = btn?.node
         ?.getChildByName("CounterLabel")
         ?.getComponent("Label") as cc.Label | null;
@@ -54,6 +62,15 @@ export default class BoosterSelectController extends cc.Component {
     });
 
     root.getChildByName("btnConfirm")?.on("click", () => this.confirm());
+
+    // Добавляем обработчик клика на PlayButton
+    const playButton = root.getChildByName("PlayButton");
+    playButton.on(cc.Node.EventType.TOUCH_END, () => this.startGame());
+
+    // Запускаем анимацию появления
+    if (this.animationController) {
+      this.animationController.playEntranceAnimation();
+    }
   }
 
   private inc(id: keyof BoosterSelectController["counts"]): void {
@@ -71,5 +88,35 @@ export default class BoosterSelectController extends cc.Component {
   private confirm(): void {
     EventBus.emit(EventNames.BoostersSelected, { ...this.counts });
     (this.node as unknown as { active: boolean }).active = false;
+  }
+
+  /**
+   * Запускает игру при клике на PlayButton
+   */
+  private startGame(): void {
+    console.log("🎮 PlayButton clicked - starting game...");
+    console.log("Current booster counts:", this.counts);
+
+    // Отправляем событие о запуске игры
+    EventBus.emit(EventNames.BoostersSelected, { ...this.counts });
+    console.log("✅ BoostersSelected event emitted");
+  }
+
+  /**
+   * Перезапускает анимацию появления
+   */
+  public replayAnimation(): void {
+    if (this.animationController) {
+      this.animationController.replayAnimation();
+    }
+  }
+
+  /**
+   * Показывает все элементы без анимации
+   */
+  public showImmediately(): void {
+    if (this.animationController) {
+      this.animationController.showAllImmediately();
+    }
   }
 }
