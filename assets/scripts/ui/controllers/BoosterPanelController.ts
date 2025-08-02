@@ -1,6 +1,7 @@
 import { EventBus } from "../../core/EventBus";
 import { EventNames } from "../../core/events/EventNames";
 import { boosterService } from "../../core/boosters/BoosterSetup";
+import { BoosterRegistry } from "../../core/boosters/BoosterRegistry";
 import SpriteHighlight from "../utils/SpriteHighlight";
 
 const { ccclass, property } = cc._decorator;
@@ -91,8 +92,9 @@ export default class BoosterPanelController extends cc.Component {
 
   private setBoosterIcon(slot: BoosterSlot, boosterId: string): void {
     if (!slot.icon) return;
-    const path = `ui/images/boosters/icon_booster_${boosterId}`;
-    cc.resources.load(path, cc.SpriteFrame, (err, spriteFrame) => {
+    const def = BoosterRegistry.find((b) => b.id === boosterId);
+    if (!def) return;
+    cc.resources.load(def.icon, cc.SpriteFrame, (err, spriteFrame) => {
       if (!err && spriteFrame && slot.icon) {
         slot.icon.spriteFrame = spriteFrame as cc.SpriteFrame;
       }

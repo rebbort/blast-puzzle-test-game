@@ -17,17 +17,21 @@ export interface BoosterFactoryParams {
 
 export interface BoosterDefinition {
   id: string;
+  /** Path to sprite used to represent booster in UI */
+  icon: string;
   factory: (params: BoosterFactoryParams) => Booster;
 }
 
 export const BoosterRegistry: BoosterDefinition[] = [
   {
     id: "teleport",
+    icon: "ui/images/boosters/icon_booster_teleport",
     factory: ({ board, bus, charges }) =>
       new TeleportBooster(board, bus, charges),
   },
   {
     id: "bomb",
+    icon: "ui/images/boosters/icon_booster_bomb",
     factory: ({ board, views, bus, boosterService, charges }) =>
       new SuperTileBooster(
         "bomb",
@@ -41,6 +45,7 @@ export const BoosterRegistry: BoosterDefinition[] = [
   },
   {
     id: "superRow",
+    icon: "ui/images/boosters/icon_booster_superRow",
     factory: ({ board, views, bus, boosterService, charges }) =>
       new SuperTileBooster(
         "superRow",
@@ -54,6 +59,7 @@ export const BoosterRegistry: BoosterDefinition[] = [
   },
   {
     id: "superCol",
+    icon: "ui/images/boosters/icon_booster_superCol",
     factory: ({ board, views, bus, boosterService, charges }) =>
       new SuperTileBooster(
         "superCol",
