@@ -131,6 +131,7 @@ export class GameStateMachine {
             }
           }
           const expanded = this.solver.expandBySupers(group);
+          this.score += this.scoreStrategy.calculate(expanded.length);
           void this.executor.execute(expanded);
           break;
         }

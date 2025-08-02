@@ -199,6 +199,7 @@ describe("super tile activation", () => {
     );
     const events: string[] = [];
     let removed: cc.Vec2[] = [];
+    let finalScore = 0;
     bus.on(EventNames.BoosterConfirmed, () =>
       events.push(EventNames.BoosterConfirmed),
     );
@@ -207,6 +208,7 @@ describe("super tile activation", () => {
     bus.on(EventNames.MoveCompleted, () =>
       events.push(EventNames.MoveCompleted),
     );
+    bus.on(EventNames.TurnEnded, ({ score }) => (finalScore = score));
     fsm.start();
     bus.emit(EventNames.GroupSelected, new cc.Vec2(1, 1));
     await new Promise((r) => setImmediate(r));
@@ -227,5 +229,6 @@ describe("super tile activation", () => {
       "2,1",
       "2,2",
     ]);
+    expect(finalScore).toBe(64);
   });
 });
