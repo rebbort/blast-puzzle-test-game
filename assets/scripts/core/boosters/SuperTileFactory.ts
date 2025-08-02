@@ -16,19 +16,33 @@ export class SuperTileFactory {
   }
 
   /**
-   * Создаёт тип супер‑тайла. Более слабые SuperRow/SuperCol
-   * появляются чаще остальных, поэтому им отведено 80% диапазона.
-   * Bomb и Clear встречаются реже, так как их эффект мощнее.
-   * Распределение следующее:
-   * < 0.5 → {@link TileKind.SuperRow},
-   * < 0.8 → {@link TileKind.SuperCol},
-   * < 0.95 → {@link TileKind.SuperBomb},
-   * иначе → {@link TileKind.SuperClear}.
+   * Создаёт тип супер‑тайла на основе настраиваемых шансов.
+   * Если шансы не настроены, используются значения по умолчанию:
+   * SuperRow: 50%, SuperCol: 30%, SuperBomb: 15%, SuperClear: 5%
    */
   make(kindSeed = this.rng()): TileKind {
-    if (kindSeed < 0.5) return TileKind.SuperRow;
-    if (kindSeed < 0.8) return TileKind.SuperCol;
-    if (kindSeed < 0.95) return TileKind.SuperBomb;
-    return TileKind.SuperClear;
+    const chances = this.cfg.superChances;
+
+    if (chances) {
+      // Используем настраиваемые шансы
+      let cumulative = 0;
+
+      cumulative += chances.row;
+      if (kindSeed < cumulative) return TileKind.SuperRow;
+
+      cumulative += chances.col;
+      if (kindSeed < cumulative) return TileKind.SuperCol;
+
+      cumulative += chances.bomb;
+      if (kindSeed < cumulative) return TileKind.SuperBomb;
+
+      return TileKind.SuperClear;
+    } else {
+      // Используем значения по умолчанию
+      if (kindSeed < 0.5) return TileKind.SuperRow;
+      if (kindSeed < 0.8) return TileKind.SuperCol;
+      if (kindSeed < 0.95) return TileKind.SuperBomb;
+      return TileKind.SuperClear;
+    }
   }
 }

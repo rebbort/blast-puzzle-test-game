@@ -2,6 +2,7 @@ import { Board } from "../Board";
 import { InfrastructureEventBus } from "../../../infrastructure/InfrastructureEventBus";
 import { ICommand } from "./ICommand";
 import { MoveExecutor } from "../MoveExecutor";
+import { BoardSolver } from "../BoardSolver";
 
 /**
  * Схлопывает все тайлы в радиусе R от center.
@@ -29,9 +30,12 @@ export class BombCommand implements ICommand {
       }
     }
 
+    // Расширяем группу, чтобы задетые супер-тайлы запустили свои эффекты.
+    const expanded = new BoardSolver(this.board).expandBySupers(group);
+
     // Выполняем стандартный пайплайн remove → fall → fill.
     // Используем MoveExecutor, чтобы после удаления тайлов остальные
     // упали и заполненные позиции заполнились новыми тайлами.
-    await new MoveExecutor(this.board, this.bus).execute(group);
+    await new MoveExecutor(this.board, this.bus).execute(expanded);
   }
 }

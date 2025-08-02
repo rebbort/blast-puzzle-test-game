@@ -76,6 +76,46 @@ export class BoardSolver {
   }
 
   /**
+   * Recursively expands a given group by activating any super tiles within.
+   *
+   * The algorithm mirrors the super-tile expansion portion of {@link findGroup}
+   * but works on an arbitrary set of coordinates. This allows callers that
+   * construct groups manually (e.g. row/column clears or bomb blasts) to reuse
+   * the same chain-reaction logic.
+   *
+   * @param group Initial coordinates to expand
+   * @returns New array including all tiles affected by triggered super tiles
+   */
+  expandBySupers(group: cc.Vec2[]): cc.Vec2[] {
+    const resultSet = new Set<string>(group.map((p) => `${p.x},${p.y}`));
+    const queue = group.filter((p) => {
+      const t = this.board.tileAt(p);
+      return t !== null && t.kind !== TileKind.Normal;
+    });
+
+    while (queue.length > 0) {
+      const p = queue.pop() as cc.Vec2;
+      const tile = this.board.tileAt(p);
+      if (!tile) continue;
+      for (const extra of this.expandGroupForSuper(tile, p)) {
+        const k = `${extra.x},${extra.y}`;
+        if (!resultSet.has(k)) {
+          resultSet.add(k);
+          const t = this.board.tileAt(extra);
+          if (t && t.kind !== TileKind.Normal) {
+            queue.push(extra);
+          }
+        }
+      }
+    }
+
+    return Array.from(resultSet).map((k) => {
+      const [x, y] = k.split(",").map(Number);
+      return new cc.Vec2(x, y);
+    });
+  }
+
+  /**
    * Finds all coordinates of tiles connected to the starting point
    * in four directions that share the same color.
    *
@@ -120,35 +160,7 @@ export class BoardSolver {
       }
     }
 
-    // Prepare final set and queue of super tiles to expand.
-    const resultSet = new Set<string>(baseGroup.map((p) => `${p.x},${p.y}`));
-    const superQueue = baseGroup.filter((p) => {
-      const t = this.board.tileAt(p);
-      return t !== null && t.kind !== TileKind.Normal;
-    });
-
-    // Process super tiles one by one adding their affected cells.
-    while (superQueue.length > 0) {
-      const p = superQueue.pop() as cc.Vec2;
-      const tile = this.board.tileAt(p);
-      if (!tile) continue;
-      for (const extra of this.expandGroupForSuper(tile, p)) {
-        const k = `${extra.x},${extra.y}`;
-        if (!resultSet.has(k)) {
-          resultSet.add(k);
-          const t = this.board.tileAt(extra);
-          if (t && t.kind !== TileKind.Normal) {
-            // Queue additional super tiles to trigger chain reactions.
-            superQueue.push(extra);
-          }
-        }
-      }
-    }
-
-    const result = Array.from(resultSet).map((k) => {
-      const [x, y] = k.split(",").map(Number);
-      return new cc.Vec2(x, y);
-    });
+    const result = this.expandBySupers(baseGroup);
 
     // Notify listeners that a group has been found
     EventBus.emit(EventNames.GroupFound, result);

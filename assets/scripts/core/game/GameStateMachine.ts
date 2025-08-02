@@ -106,19 +106,33 @@ export class GameStateMachine {
           void new BombCommand(this.board, start, 1, this.bus).execute();
           break;
         case TileKind.SuperRow: {
-          const group = Array.from(
+          let group = Array.from(
             { length: this.board.cols },
             (_, x) => new cc.Vec2(x, start.y),
           );
+          group = this.solver.expandBySupers(group);
           void this.executor.execute(group);
           break;
         }
         case TileKind.SuperCol: {
-          const group = Array.from(
+          let group = Array.from(
             { length: this.board.rows },
             (_, y) => new cc.Vec2(start.x, y),
           );
+          group = this.solver.expandBySupers(group);
           void this.executor.execute(group);
+          break;
+        }
+        case TileKind.SuperClear: {
+          const group: cc.Vec2[] = [];
+          for (let x = 0; x < this.board.cols; x++) {
+            for (let y = 0; y < this.board.rows; y++) {
+              group.push(new cc.Vec2(x, y));
+            }
+          }
+          const expanded = this.solver.expandBySupers(group);
+          this.score += this.scoreStrategy.calculate(expanded.length);
+          void this.executor.execute(expanded);
           break;
         }
         default:
