@@ -90,7 +90,7 @@ it("handles booster activate and cancel", () => {
   // activation now passes booster id
   bus.emit(EventNames.BoosterActivated, "bomb");
   bus.emit(EventNames.BoosterConsumed);
-  expect(states).toEqual(["WaitingInput", "BoosterInput", "ExecutingMove"]);
+  expect(states).toEqual(["WaitingInput", "BoosterInput", "WaitingInput"]);
 });
 
 it("cancels booster back to WaitingInput", () => {

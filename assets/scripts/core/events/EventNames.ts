@@ -34,6 +34,7 @@ export const EventNames = {
   SwapDone: "SwapDone",
   RemoveStarted: "RemoveStarted",
   SuperTileCreated: "SuperTileCreated",
+  SuperTilePlaced: "SuperTilePlaced",
   /** Игрок нажал на тайл (всегда). */
   TilePressed: "TilePressed",
   /** Нажатие не считается ходом (группа < 2). */

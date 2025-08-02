@@ -117,7 +117,7 @@ export class GameStateMachine {
   /** Consumes a booster and proceeds to executing it. */
   private onBoosterConsumed(): void {
     if (this.state === "BoosterInput") {
-      this.changeState("ExecutingMove");
+      this.changeState("WaitingInput");
     }
   }
 
