@@ -174,4 +174,58 @@ describe("super tile activation", () => {
       "3,4",
     ]);
   });
+
+  it("SuperClear clears entire board and triggers supers", async () => {
+    const tiles = Array.from({ length: 3 }, () =>
+      Array.from({ length: 3 }, () => TileFactory.createNormal("red")),
+    );
+    tiles[1][1].kind = TileKind.SuperClear;
+    tiles[0][0].kind = TileKind.SuperRow;
+    const board = new Board(cfg, tiles);
+    const bus = new InfrastructureEventBus();
+    const solver = new BoardSolver(board);
+    const exec = new MoveExecutor(board, bus);
+    const strategy = new ScoreStrategyQuadratic(1);
+    const tm = new TurnManager(5, bus);
+    const fsm = new GameStateMachine(
+      bus,
+      board,
+      solver,
+      exec,
+      strategy,
+      tm,
+      0,
+      0,
+    );
+    const events: string[] = [];
+    let removed: cc.Vec2[] = [];
+    bus.on(EventNames.BoosterConfirmed, () =>
+      events.push(EventNames.BoosterConfirmed),
+    );
+    bus.on(EventNames.RemoveStarted, (g: cc.Vec2[]) => (removed = g));
+    bus.on(EventNames.TilesRemoved, () => events.push(EventNames.TilesRemoved));
+    bus.on(EventNames.MoveCompleted, () =>
+      events.push(EventNames.MoveCompleted),
+    );
+    fsm.start();
+    bus.emit(EventNames.GroupSelected, new cc.Vec2(1, 1));
+    await new Promise((r) => setImmediate(r));
+    const coords = removed.map((p) => `${p.x},${p.y}`).sort();
+    expect(events).toEqual([
+      EventNames.BoosterConfirmed,
+      EventNames.TilesRemoved,
+      EventNames.MoveCompleted,
+    ]);
+    expect(coords).toEqual([
+      "0,0",
+      "0,1",
+      "0,2",
+      "1,0",
+      "1,1",
+      "1,2",
+      "2,0",
+      "2,1",
+      "2,2",
+    ]);
+  });
 });

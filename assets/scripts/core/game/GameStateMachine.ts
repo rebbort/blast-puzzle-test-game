@@ -123,6 +123,17 @@ export class GameStateMachine {
           void this.executor.execute(group);
           break;
         }
+        case TileKind.SuperClear: {
+          const group: cc.Vec2[] = [];
+          for (let x = 0; x < this.board.cols; x++) {
+            for (let y = 0; y < this.board.rows; y++) {
+              group.push(new cc.Vec2(x, y));
+            }
+          }
+          const expanded = this.solver.expandBySupers(group);
+          void this.executor.execute(expanded);
+          break;
+        }
         default:
           break;
       }
