@@ -32,25 +32,38 @@ export default class BoosterPanelController extends cc.Component {
   private initializeSlots(): void {
     if (!this.boosterList) return;
     this.boosterSlots = [];
-    this.boosterList.children.forEach((child: cc.Node) => {
+    this.boosterList.children.forEach((child: cc.Node, index: number) => {
       const button = child.getComponent(cc.Button);
       const icon =
         child.getChildByName("Icon")?.getComponent(cc.Sprite) || null;
       const counterLabel =
         child.getChildByName("CounterLabel")?.getComponent(cc.Label) || null;
+
+      // Определяем бустер для слота (можно настроить в редакторе или через конфиг)
+      const boosterTypes = ["teleport", "bomb", "superRow", "superCol"];
+      const boosterId = boosterTypes[index] || "";
+
       const slot: BoosterSlot = {
         node: child,
         button,
         icon,
         counterLabel,
         highlight: null,
-        boosterId: "",
+        boosterId,
         charges: 0,
         isActive: false,
       };
       this.addHighlightToSlot(slot);
       this.setupSlotClickHandler(slot);
-      child.active = false;
+
+      // Показываем слот с бустером
+      if (boosterId) {
+        this.setBoosterIcon(slot, boosterId);
+        if (slot.counterLabel) {
+          slot.counterLabel.string = "0";
+        }
+      }
+
       this.boosterSlots.push(slot);
     });
   }
@@ -67,39 +80,21 @@ export default class BoosterPanelController extends cc.Component {
   }
 
   private populateBoosterSlots(): void {
-    const activeBoosters = Object.entries(this.selectedBoosters).filter(
-      ([, count]) => count > 0,
-    );
-    this.boosterSlots.forEach((slot, index) => {
-      const boosterData = activeBoosters[index];
-      if (boosterData) {
-        const [boosterId, charges] = boosterData;
-        this.setupBoosterSlot(slot, boosterId, charges);
-      } else {
-        this.hideBoosterSlot(slot);
+    // Обновляем количество зарядов для каждого бустера
+    this.boosterSlots.forEach((slot) => {
+      const charges = this.selectedBoosters[slot.boosterId] || 0;
+      slot.charges = charges;
+
+      if (slot.counterLabel) {
+        slot.counterLabel.string = String(charges);
       }
+
+      // Показываем слот только если есть заряды
+      slot.node.active = charges > 0;
     });
   }
 
-  private setupBoosterSlot(
-    slot: BoosterSlot,
-    boosterId: string,
-    charges: number,
-  ): void {
-    slot.boosterId = boosterId;
-    slot.charges = charges;
-    slot.isActive = false;
-
-    this.setBoosterIcon(slot, boosterId);
-
-    if (slot.counterLabel) {
-      slot.counterLabel.string = String(charges);
-    }
-
-    slot.node.active = true;
-
-    this.setupSlotClickHandler(slot);
-  }
+  // Метод setupBoosterSlot больше не нужен - бустеры настраиваются при инициализации
 
   private setBoosterIcon(slot: BoosterSlot, boosterId: string): void {
     if (!slot.icon) return;
