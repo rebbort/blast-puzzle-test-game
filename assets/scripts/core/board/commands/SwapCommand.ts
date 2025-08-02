@@ -22,6 +22,7 @@ export class SwapCommand implements ICommand {
     const tB = this.board.tileAt(this.b);
     this.board.setTile(this.a, tB);
     this.board.setTile(this.b, tA);
-    this.bus.emit(EventNames.SwapDone);
+    // Notify listeners with coordinates so UI can animate the swap
+    this.bus.emit(EventNames.SwapDone, this.a, this.b);
   }
 }

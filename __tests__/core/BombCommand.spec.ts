@@ -31,22 +31,25 @@ describe("BombCommand", () => {
     const board = new Board(cfg, tiles);
     const cmd = new BombCommand(board, new cc.Vec2(1, 1), 1, bus);
     const seq: string[] = [];
+    let removed: cc.Vec2[] = [];
+    bus.on(EventNames.RemoveStarted, (g: cc.Vec2[]) => (removed = g));
     bus.on(EventNames.TilesRemoved, () => seq.push(EventNames.TilesRemoved));
     bus.on(EventNames.MoveCompleted, () => seq.push(EventNames.MoveCompleted));
 
     await cmd.execute();
 
     expect(seq).toEqual([EventNames.TilesRemoved, EventNames.MoveCompleted]);
-    // center tile remains, остальные восемь должны быть пустыми
-    for (let x = 0; x < 3; x++) {
-      for (let y = 0; y < 3; y++) {
-        const p = new cc.Vec2(x, y);
-        if (x === 1 && y === 1) {
-          expect(board.tileAt(p)).not.toBeNull();
-        } else {
-          expect(board.tileAt(p)).toBeNull();
-        }
-      }
-    }
+    const coords = removed.map((p) => `${p.x},${p.y}`).sort();
+    expect(coords).toEqual([
+      "0,0",
+      "0,1",
+      "0,2",
+      "1,0",
+      "1,1",
+      "1,2",
+      "2,0",
+      "2,1",
+      "2,2",
+    ]);
   });
 });

@@ -1,6 +1,7 @@
 import { InfrastructureEventBus } from "../../infrastructure/InfrastructureEventBus";
 import type { Booster } from "./Booster";
 import { EventNames } from "../events/EventNames";
+import type { GameState } from "../game/GameStateMachine";
 
 /**
  * Хранит все доступные бустеры,
@@ -10,7 +11,11 @@ export class BoosterService {
   /** Коллекция зарегистрированных бустеров по их id. */
   private boosters: Record<string, Booster> = {};
 
-  constructor(private bus: InfrastructureEventBus) {}
+  constructor(
+    private bus: InfrastructureEventBus,
+    /** Provides the current FSM state to guard activation. */
+    private getState: () => GameState,
+  ) {}
 
   /**
    * Регистрирует новый бустер.
@@ -30,6 +35,11 @@ export class BoosterService {
     const boost = this.boosters[id];
     if (!boost) {
       // Неизвестный бустер — ничего не делаем
+      return;
+    }
+
+    // Разрешаем активацию только в состоянии ожидания ввода
+    if (this.getState() !== "WaitingInput") {
       return;
     }
 
@@ -74,5 +84,15 @@ export class BoosterService {
   cancel(): void {
     // Сообщаем слушателям, что активация прервана
     this.bus.emit(EventNames.BoosterCancelled);
+  }
+
+  /**
+   * Возвращает текущее количество зарядов для бустера.
+   * @param id Идентификатор бустера
+   * @returns Число оставшихся зарядов или 0, если бустер не найден
+   */
+  getCharges(id: string): number {
+    const boost = this.boosters[id];
+    return boost ? boost.charges : 0;
   }
 }

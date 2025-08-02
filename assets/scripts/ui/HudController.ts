@@ -1,12 +1,14 @@
 import { EventBus } from "../core/EventBus";
 import { EventNames } from "../core/events/EventNames";
+import { boosterService } from "../core/boosters/BoosterSetup";
 const { ccclass, property } = cc._decorator;
 
 interface NodeUtils {
   getChildByName(name: string): NodeUtils | null;
   getComponent(name: string): unknown;
   on(event: string, cb: () => void): void;
-  node?: NodeUtils;
+  off?(event: string, cb?: () => void): void;
+  node?: NodeUtils & { color?: cc.Color; active?: boolean };
 }
 
 // Simple animation helpers built with cc.tween for runtime usage.
@@ -25,9 +27,14 @@ export class HudController extends cc.Component {
   @property(cc.Label)
   lblState!: cc.Label;
 
-  private btnBomb: NodeUtils | null = null;
-  private btnSwap: NodeUtils | null = null;
+  private slots: {
+    id: string;
+    btn: NodeUtils | null;
+    label: cc.Label | null;
+  }[] = [];
   private btnPause: NodeUtils | null = null;
+
+  private activeBtn: NodeUtils | null = null;
 
   private turns: number = 0;
   private score: number = 0;
@@ -65,23 +72,28 @@ export class HudController extends cc.Component {
     }
 
     const panel = root.getChildByName("BoosterPanel") as NodeUtils | null;
-    this.btnBomb = panel
-      ?.getChildByName("btnBomb")
-      ?.getComponent("Button") as NodeUtils | null;
-    this.btnSwap = panel
-      ?.getChildByName("btnSwap")
-      ?.getComponent("Button") as NodeUtils | null;
+    if (panel) {
+      for (let i = 0; i < 2; i++) {
+        const btn = panel
+          .getChildByName(`Slot${i}`)
+          ?.getComponent("Button") as NodeUtils | null;
+        const label = btn?.node
+          ?.getChildByName("CounterLabel")
+          ?.getComponent("Label") as cc.Label | null;
+        this.slots.push({ id: "", btn, label });
+      }
+    }
 
     this.btnPause = root
       .getChildByName("btnPause")
       ?.getComponent("Button") as NodeUtils | null;
 
-    // Booster and pause button interactions
-    this.btnBomb?.node?.on("click", this.onBombClick.bind(this));
-    this.btnSwap?.node?.on("click", this.onSwapClick.bind(this));
     this.btnPause?.node?.on("click", this.onPauseClick.bind(this));
 
+    EventBus.on(EventNames.BoostersSelected, this.onBoostersSelected, this);
     EventBus.on(EventNames.BoosterActivated, this.onBoosterActivated, this);
+    EventBus.on(EventNames.BoosterConsumed, this.onBoosterConsumed, this);
+    EventBus.on(EventNames.BoosterCancelled, this.onBoosterCancelled, this);
 
     // Display current FSM state in the HUD
     EventBus.on(EventNames.StateChanged, this.onStateChanged, this);
@@ -145,20 +157,6 @@ export class HudController extends cc.Component {
   }
 
   /**
-   * Handles bomb booster button click.
-   */
-  private onBombClick(): void {
-    EventBus.emit(EventNames.BoosterActivated, "bomb");
-  }
-
-  /**
-   * Handles swap booster button click.
-   */
-  private onSwapClick(): void {
-    EventBus.emit(EventNames.BoosterActivated, "swap");
-  }
-
-  /**
    * Handles pause button click.
    */
   private onPauseClick(): void {
@@ -166,14 +164,38 @@ export class HudController extends cc.Component {
   }
 
   /**
+   * Populates booster slots once the player selects boosters.
+   */
+  private onBoostersSelected(charges: Record<string, number>): void {
+    const entries = Object.entries(charges).filter(([, c]) => c > 0);
+    this.slots.forEach((slot, i) => {
+      const entry = entries[i];
+      if (!entry || !slot.btn?.node) {
+        if (slot.btn?.node) slot.btn.node.active = false;
+        slot.id = "";
+        return;
+      }
+      const [id, count] = entry as [string, number];
+      slot.id = id;
+      if (slot.label) slot.label.string = String(count);
+      slot.btn.node.active = true;
+      slot.btn.node.off?.("click");
+      slot.btn.node.on("click", () => boosterService?.activate(id));
+    });
+  }
+
+  /**
    * Handles booster activation - shows pulse animation.
    */
   private onBoosterActivated(name: string): void {
-    const btn =
-      name === "bomb" ? this.btnBomb : name === "swap" ? this.btnSwap : null;
-    if (btn?.node) {
+    this.clearHighlight();
+    const slot = this.slots.find((s) => s.id === name);
+    if (slot?.btn?.node) {
+      const node = slot.btn.node as unknown as cc.Node;
+      node.color = cc.Color.YELLOW;
+      this.activeBtn = slot.btn;
       EventBus.emit(EventNames.AnimationStarted, "booster-pulse");
-      cc.tween(btn.node as unknown as cc.Node)
+      cc.tween(node)
         .to(0.1, { scale: new cc.Vec3(1.2, 1.2, 1) })
         .to(0.1, { scale: new cc.Vec3(1, 1, 1) })
         .start();
@@ -182,6 +204,25 @@ export class HudController extends cc.Component {
         200,
       );
     }
+  }
+
+  private onBoosterConsumed(id: string): void {
+    const slot = this.slots.find((s) => s.id === id);
+    if (slot?.label)
+      slot.label.string = String(boosterService?.getCharges(id) ?? 0);
+    this.clearHighlight();
+  }
+
+  private onBoosterCancelled(): void {
+    this.clearHighlight();
+  }
+
+  private clearHighlight(): void {
+    if (this.activeBtn?.node) {
+      const node = this.activeBtn.node as unknown as cc.Node;
+      node.color = cc.Color.WHITE;
+    }
+    this.activeBtn = null;
   }
 
   /**

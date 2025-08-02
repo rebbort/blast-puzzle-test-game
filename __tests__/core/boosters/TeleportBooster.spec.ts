@@ -39,6 +39,9 @@ it("consumes charge on successful swap", async () => {
   ]);
   const booster = new TeleportBooster(board, bus, 1);
   const seq: string[] = [];
+  bus.on(EventNames.BoosterTargetSelected, ({ stage }) =>
+    seq.push(`select-${stage}`),
+  );
   bus.on(EventNames.SwapDone, () => seq.push(EventNames.SwapDone));
   bus.on(EventNames.BoosterConsumed, () =>
     seq.push(EventNames.BoosterConsumed),
@@ -50,7 +53,12 @@ it("consumes charge on successful swap", async () => {
   await new Promise((r) => setImmediate(r));
 
   expect(booster.charges).toBe(0);
-  expect(seq).toEqual([EventNames.SwapDone, EventNames.BoosterConsumed]);
+  expect(seq).toEqual([
+    "select-first",
+    "select-second",
+    EventNames.SwapDone,
+    EventNames.BoosterConsumed,
+  ]);
   expect(emitSpy).toHaveBeenCalledWith(EventNames.BoosterConsumed, "teleport");
   expect(board.colorAt(new cc.Vec2(1, 0))).toBe("red");
   expect(board.colorAt(new cc.Vec2(1, 1))).toBe("blue");
@@ -84,4 +92,58 @@ it("cancels swap when no moves available", async () => {
   expect(events).toEqual([EventNames.SwapCancelled]);
   expect(board.colorAt(new cc.Vec2(0, 0))).toBe("red");
   expect(board.colorAt(new cc.Vec2(1, 0))).toBe("blue");
+});
+
+// Второй тап по тому же тайлу отменяет выбор
+it("cancels when tapping the same tile twice", () => {
+  const bus = new InfrastructureEventBus();
+  const emitSpy = jest.spyOn(bus, "emit");
+  const board = new Board(cfg2x2, [
+    [TileFactory.createNormal("red"), TileFactory.createNormal("blue")],
+    [TileFactory.createNormal("blue"), TileFactory.createNormal("red")],
+  ]);
+  const booster = new TeleportBooster(board, bus, 1);
+
+  const seq: string[] = [];
+  bus.on(EventNames.BoosterTargetSelected, ({ stage }) =>
+    seq.push(`select-${stage}`),
+  );
+  bus.on(EventNames.BoosterCancelled, () =>
+    seq.push(EventNames.BoosterCancelled),
+  );
+
+  booster.start();
+  bus.emit(EventNames.GroupSelected, new cc.Vec2(0, 0));
+  bus.emit(EventNames.GroupSelected, new cc.Vec2(0, 0));
+
+  expect(booster.charges).toBe(1);
+  expect(seq).toEqual(["select-first", EventNames.BoosterCancelled]);
+  expect(emitSpy).toHaveBeenCalledWith(EventNames.BoosterCancelled);
+});
+
+// Тап вне поля до выбора второго тайла отменяет режим
+it("cancels when tapping outside after first selection", () => {
+  const bus = new InfrastructureEventBus();
+  const emitSpy = jest.spyOn(bus, "emit");
+  const board = new Board(cfg2x2, [
+    [TileFactory.createNormal("red"), TileFactory.createNormal("blue")],
+    [TileFactory.createNormal("blue"), TileFactory.createNormal("red")],
+  ]);
+  const booster = new TeleportBooster(board, bus, 1);
+
+  const seq: string[] = [];
+  bus.on(EventNames.BoosterTargetSelected, ({ stage }) =>
+    seq.push(`select-${stage}`),
+  );
+  bus.on(EventNames.BoosterCancelled, () =>
+    seq.push(EventNames.BoosterCancelled),
+  );
+
+  booster.start();
+  bus.emit(EventNames.GroupSelected, new cc.Vec2(0, 0));
+  bus.emit(EventNames.InvalidTap, new cc.Vec2(-1, -1));
+
+  expect(booster.charges).toBe(1);
+  expect(seq).toEqual(["select-first", EventNames.BoosterCancelled]);
+  expect(emitSpy).toHaveBeenCalledWith(EventNames.BoosterCancelled);
 });

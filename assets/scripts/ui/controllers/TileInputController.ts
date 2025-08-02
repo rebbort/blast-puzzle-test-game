@@ -48,6 +48,10 @@ export default class TileInputController extends cc.Component {
       console.debug(
         `Tile tap ignored: falling=${view?.["isFalling"]} feedbackActive=${view?.["isFeedbackActive"]} at {${col},${row}}`,
       );
+      // Тап по пустой области используется некоторыми бустерами (например, телепорт)
+      // как сигнал отмены. Публикуем InvalidTap, чтобы подписчики могли
+      // сбросить своё состояние.
+      bus.emit(EventNames.InvalidTap, new cc.Vec2(col, row));
       return;
     }
     console.debug(`Tile tap feedback started at {${col},${row}}`);

@@ -1,0 +1,59 @@
+import { EventBus } from "../EventBus";
+import { BoosterService } from "./BoosterService";
+import { SuperTileBooster } from "./SuperTileBooster";
+import { Board } from "../board/Board";
+import { TileKind } from "../board/Tile";
+import TileView from "../../ui/views/TileView";
+import type { GameState } from "../game/GameStateMachine";
+import { TeleportBooster } from "./TeleportBooster";
+
+export let boosterService: BoosterService | undefined;
+
+/**
+ * Initializes BoosterService and registers all super-tile boosters.
+ * Should be called during game bootstrap once board and views are ready.
+ */
+export function initBoosterService(
+  board: Board,
+  views: TileView[][],
+  getState: () => GameState,
+  charges: Record<string, number>,
+): void {
+  boosterService = new BoosterService(EventBus, getState);
+  boosterService.register(
+    new TeleportBooster(board, EventBus, charges.teleport ?? 0),
+  );
+  boosterService.register(
+    new SuperTileBooster(
+      "bomb",
+      board,
+      views,
+      EventBus,
+      boosterService,
+      charges.bomb ?? 0,
+      TileKind.SuperBomb,
+    ),
+  );
+  boosterService.register(
+    new SuperTileBooster(
+      "superRow",
+      board,
+      views,
+      EventBus,
+      boosterService,
+      charges.superRow ?? 0,
+      TileKind.SuperRow,
+    ),
+  );
+  boosterService.register(
+    new SuperTileBooster(
+      "superCol",
+      board,
+      views,
+      EventBus,
+      boosterService,
+      charges.superCol ?? 0,
+      TileKind.SuperCol,
+    ),
+  );
+}

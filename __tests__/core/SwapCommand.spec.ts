@@ -34,13 +34,15 @@ describe("SwapCommand", () => {
       new cc.Vec2(1, 0),
       bus,
     );
-    const seq: string[] = [];
-    bus.on(EventNames.SwapDone, () => seq.push(EventNames.SwapDone));
+    const received: cc.Vec2[] = [];
+    bus.on(EventNames.SwapDone, (a: cc.Vec2, b: cc.Vec2) => {
+      received.push(a, b);
+    });
 
     await cmd.execute();
 
     expect(board.tileAt(new cc.Vec2(0, 0))?.color).toBe("blue");
     expect(board.tileAt(new cc.Vec2(1, 0))?.color).toBe("red");
-    expect(seq).toEqual([EventNames.SwapDone]);
+    expect(received).toEqual([new cc.Vec2(0, 0), new cc.Vec2(1, 0)]);
   });
 });

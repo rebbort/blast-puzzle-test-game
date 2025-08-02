@@ -21,6 +21,9 @@ export const EventNames = {
   BoosterActivated: "BoosterActivated",
   BoosterConsumed: "BoosterConsumed",
   BoosterCancelled: "BoosterCancelled",
+  BoostersSelected: "BoostersSelected",
+  BoosterConfirmed: "BoosterConfirmed",
+  BoosterTargetSelected: "BoosterTargetSelected",
   StateChanged: "StateChanged",
   GamePaused: "GamePaused",
   GameResumed: "GameResumed",
@@ -34,6 +37,7 @@ export const EventNames = {
   SwapDone: "SwapDone",
   RemoveStarted: "RemoveStarted",
   SuperTileCreated: "SuperTileCreated",
+  SuperTilePlaced: "SuperTilePlaced",
   /** Игрок нажал на тайл (всегда). */
   TilePressed: "TilePressed",
   /** Нажатие не считается ходом (группа < 2). */
