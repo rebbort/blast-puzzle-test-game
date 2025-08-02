@@ -85,3 +85,39 @@ it("cancels swap when no moves available", async () => {
   expect(board.colorAt(new cc.Vec2(0, 0))).toBe("red");
   expect(board.colorAt(new cc.Vec2(1, 0))).toBe("blue");
 });
+
+// Второй тап по тому же тайлу отменяет выбор
+it("cancels when tapping the same tile twice", () => {
+  const bus = new InfrastructureEventBus();
+  const emitSpy = jest.spyOn(bus, "emit");
+  const board = new Board(cfg2x2, [
+    [TileFactory.createNormal("red"), TileFactory.createNormal("blue")],
+    [TileFactory.createNormal("blue"), TileFactory.createNormal("red")],
+  ]);
+  const booster = new TeleportBooster(board, bus, 1);
+
+  booster.start();
+  bus.emit(EventNames.GroupSelected, new cc.Vec2(0, 0));
+  bus.emit(EventNames.GroupSelected, new cc.Vec2(0, 0));
+
+  expect(booster.charges).toBe(1);
+  expect(emitSpy).toHaveBeenCalledWith(EventNames.BoosterCancelled);
+});
+
+// Тап вне поля до выбора второго тайла отменяет режим
+it("cancels when tapping outside after first selection", () => {
+  const bus = new InfrastructureEventBus();
+  const emitSpy = jest.spyOn(bus, "emit");
+  const board = new Board(cfg2x2, [
+    [TileFactory.createNormal("red"), TileFactory.createNormal("blue")],
+    [TileFactory.createNormal("blue"), TileFactory.createNormal("red")],
+  ]);
+  const booster = new TeleportBooster(board, bus, 1);
+
+  booster.start();
+  bus.emit(EventNames.GroupSelected, new cc.Vec2(0, 0));
+  bus.emit(EventNames.InvalidTap, new cc.Vec2(-1, -1));
+
+  expect(booster.charges).toBe(1);
+  expect(emitSpy).toHaveBeenCalledWith(EventNames.BoosterCancelled);
+});
