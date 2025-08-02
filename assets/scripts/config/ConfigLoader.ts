@@ -69,19 +69,25 @@ export const DefaultBoosterLimits: BoosterLimitConfig = {
 /** Загружает настройки лимитов бустеров из localStorage. */
 export function loadBoosterLimits(): BoosterLimitConfig {
   const raw = localStorage.getItem("booster-limits.json");
-  if (!raw) return DefaultBoosterLimits;
-  try {
-    const parsed = JSON.parse(raw) as Partial<BoosterLimitConfig>;
-    const maxPerType = Object.assign(
-      {},
-      DefaultBoosterLimits.maxPerType,
-      parsed.maxPerType,
-    );
-    return {
-      maxTypes: parsed.maxTypes ?? DefaultBoosterLimits.maxTypes,
-      maxPerType,
-    };
-  } catch {
-    return DefaultBoosterLimits;
+  let parsed: Partial<BoosterLimitConfig> = {};
+
+  if (raw) {
+    try {
+      parsed = JSON.parse(raw) as Partial<BoosterLimitConfig>;
+    } catch {
+      parsed = {};
+    }
   }
+
+  const maxPerType: Record<string, number> = {};
+  BoosterRegistry.forEach(({ id }) => {
+    const stored = parsed.maxPerType?.[id];
+    maxPerType[id] =
+      typeof stored === "number" ? stored : DefaultBoosterLimits.maxPerType[id];
+  });
+
+  return {
+    maxTypes: parsed.maxTypes ?? DefaultBoosterLimits.maxTypes,
+    maxPerType,
+  };
 }

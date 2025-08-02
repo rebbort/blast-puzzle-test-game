@@ -35,4 +35,22 @@ describe("loadBoosterLimits", () => {
       maxPerType: expected,
     });
   });
+
+  it("ignores unknown booster ids", () => {
+    (
+      globalThis as unknown as {
+        localStorage: { getItem: () => string | null };
+      }
+    ).localStorage = {
+      getItem: () =>
+        JSON.stringify({ maxPerType: { ghost: 7, bomb: 4 }, maxTypes: 5 }),
+    };
+    const expected = Object.fromEntries(
+      BoosterRegistry.map((b) => [b.id, b.id === "bomb" ? 4 : 10]),
+    );
+    expect(loadBoosterLimits()).toEqual({
+      maxTypes: 5,
+      maxPerType: expected,
+    });
+  });
 });
