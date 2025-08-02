@@ -49,3 +49,53 @@ export function loadBoardConfig(): BoardConfig {
     return DefaultBoard;
   }
 }
+
+/** Настройки выбора бустеров при старте. */
+export interface BoosterLimitConfig {
+  /** Максимальное число различных типов бустеров, которые можно взять. */
+  maxTypes: number;
+  /** Лимиты по каждому типу бустера. */
+  maxPerType: {
+    teleport: number;
+    superRow: number;
+    superCol: number;
+    bomb: number;
+  };
+}
+
+/** Значения по умолчанию для выбора бустеров. */
+export const DefaultBoosterLimits: BoosterLimitConfig = {
+  maxTypes: 2,
+  maxPerType: {
+    teleport: 10,
+    superRow: 10,
+    superCol: 10,
+    bomb: 10,
+  },
+};
+
+/** Загружает настройки лимитов бустеров из localStorage. */
+export function loadBoosterLimits(): BoosterLimitConfig {
+  const raw = localStorage.getItem("booster-limits.json");
+  if (!raw) return DefaultBoosterLimits;
+  try {
+    const parsed = JSON.parse(raw) as Partial<BoosterLimitConfig>;
+    return {
+      maxTypes: parsed.maxTypes ?? DefaultBoosterLimits.maxTypes,
+      maxPerType: {
+        teleport:
+          parsed.maxPerType?.teleport ??
+          DefaultBoosterLimits.maxPerType.teleport,
+        superRow:
+          parsed.maxPerType?.superRow ??
+          DefaultBoosterLimits.maxPerType.superRow,
+        superCol:
+          parsed.maxPerType?.superCol ??
+          DefaultBoosterLimits.maxPerType.superCol,
+        bomb: parsed.maxPerType?.bomb ?? DefaultBoosterLimits.maxPerType.bomb,
+      },
+    };
+  } catch {
+    return DefaultBoosterLimits;
+  }
+}

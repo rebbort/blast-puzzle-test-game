@@ -21,6 +21,7 @@ export const EventNames = {
   BoosterActivated: "BoosterActivated",
   BoosterConsumed: "BoosterConsumed",
   BoosterCancelled: "BoosterCancelled",
+  BoostersSelected: "BoostersSelected",
   BoosterConfirmed: "BoosterConfirmed",
   BoosterTargetSelected: "BoosterTargetSelected",
   StateChanged: "StateChanged",

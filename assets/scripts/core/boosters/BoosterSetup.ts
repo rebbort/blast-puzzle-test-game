@@ -5,6 +5,7 @@ import { Board } from "../board/Board";
 import { TileKind } from "../board/Tile";
 import TileView from "../../ui/views/TileView";
 import type { GameState } from "../game/GameStateMachine";
+import { TeleportBooster } from "./TeleportBooster";
 
 export let boosterService: BoosterService | undefined;
 
@@ -16,8 +17,12 @@ export function initBoosterService(
   board: Board,
   views: TileView[][],
   getState: () => GameState,
+  charges: Record<string, number>,
 ): void {
   boosterService = new BoosterService(EventBus, getState);
+  boosterService.register(
+    new TeleportBooster(board, EventBus, charges.teleport ?? 0),
+  );
   boosterService.register(
     new SuperTileBooster(
       "bomb",
@@ -25,7 +30,7 @@ export function initBoosterService(
       views,
       EventBus,
       boosterService,
-      1,
+      charges.bomb ?? 0,
       TileKind.SuperBomb,
     ),
   );
@@ -36,7 +41,7 @@ export function initBoosterService(
       views,
       EventBus,
       boosterService,
-      1,
+      charges.superRow ?? 0,
       TileKind.SuperRow,
     ),
   );
@@ -47,7 +52,7 @@ export function initBoosterService(
       views,
       EventBus,
       boosterService,
-      1,
+      charges.superCol ?? 0,
       TileKind.SuperCol,
     ),
   );
