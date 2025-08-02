@@ -42,14 +42,22 @@ export default class BoosterSelectPopup extends cc.Component {
   }
 
   private createSlots(): void {
-    if (!this.boosterSlotGrid || !this.boosterSlotPrefab) return;
+    if (!this.boosterSlotGrid || !this.boosterSlotPrefab) {
+      console.warn("Missing boosterSlotGrid or boosterSlotPrefab");
+      return;
+    }
     this.slots = [];
 
-    BoosterRegistry.forEach((def) => {
+    for (let i = 0; i < BoosterRegistry.length; i++) {
+      const def = BoosterRegistry[i];
       const node = cc.instantiate(this.boosterSlotPrefab);
       this.boosterSlotGrid.addChild(node);
 
-      const icon = node.getChildByName("Icon")?.getComponent(cc.Sprite) || null;
+      // Устанавливаем позицию для отладки
+      node.setPosition(0, 0, 0);
+
+      const icon =
+        node.getChildByName("BoosterIcon")?.getComponent(cc.Sprite) || null;
       if (icon) {
         cc.resources.load(def.icon, cc.SpriteFrame, (err, spriteFrame) => {
           if (!err && spriteFrame && icon) {
@@ -58,7 +66,8 @@ export default class BoosterSelectPopup extends cc.Component {
         });
       }
 
-      const highlight = node.addComponent(SpriteHighlight);
+      const highlightedNode = node.getChildByName("BoosterSlotBg");
+      const highlight = highlightedNode.addComponent(SpriteHighlight);
       highlight.highlightColor = cc.Color.YELLOW;
       highlight.highlightOpacity = 200;
 
@@ -66,12 +75,21 @@ export default class BoosterSelectPopup extends cc.Component {
         node,
         boosterId: def.id,
         highlight,
-        icon,
+        icon: null,
       };
 
       node.on(cc.Node.EventType.TOUCH_END, () => this.onSlotClick(slot));
+
+      node.active = true;
+
       this.slots.push(slot);
-    });
+    }
+
+    // Принудительно обновляем Layout
+    const layout = this.boosterSlotGrid.getComponent(cc.Layout);
+    if (layout) {
+      layout.updateLayout();
+    }
 
     if (this.animationController) {
       this.animationController.boosterSlots = this.slots.map((s) => s.node);

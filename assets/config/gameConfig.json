@@ -1,0 +1,31 @@
+{
+  "board": {
+    "cols": 9,
+    "rows": 10,
+    "tileWidth": 100,
+    "tileHeight": 100,
+    "colors": [
+      "red",
+      "blue",
+      "green",
+      "yellow",
+      "purple"
+    ],
+    "superThreshold": 5,
+    "superChances": {
+      "row": 0.5,
+      "col": 0.3,
+      "bomb": 0.15,
+      "clear": 0.05
+    }
+  },
+  "boosterLimits": {
+    "maxTypes": 2,
+    "maxPerType": {
+      "teleport": 10,
+      "bomb": 10,
+      "superRow": 10,
+      "superCol": 10
+    }
+  }
+}

@@ -18,28 +18,13 @@ function loadGameConfig(): {
     return gameConfigCache;
   }
 
-  try {
-    // Пытаемся загрузить из ресурсов Cocos Creator
-    const gameConfig = cc.resources.get("config/gameConfig");
-    if (gameConfig) {
-      const config = gameConfig as unknown as {
-        board: BoardConfig;
-        boosterLimits: BoosterLimitConfig;
-      };
+  // TODO: Добавить загрузку из JSON файла
+  // В Cocos Creator 2D можно использовать:
+  // - cc.resources.load с колбэком (асинхронно)
+  // - cc.loader.loadRes (если доступен)
+  // - require() (если настроен webpack)
 
-      // Кешируем результат
-      gameConfigCache = {
-        board: { ...DefaultBoard, ...config.board },
-        boosterLimits: { ...DefaultBoosterLimits, ...config.boosterLimits },
-      };
-
-      return gameConfigCache;
-    }
-  } catch (error) {
-    console.warn("Failed to load game config from resources:", error);
-  }
-
-  // Fallback на значения по умолчанию
+  // Пока используем значения по умолчанию
   gameConfigCache = {
     board: DefaultBoard,
     boosterLimits: DefaultBoosterLimits,
@@ -53,6 +38,43 @@ function loadGameConfig(): {
  */
 export function clearConfigCache(): void {
   gameConfigCache = null;
+}
+
+/**
+ * Асинхронно загружает конфигурацию из JSON файла
+ * Можно использовать для обновления конфигурации во время выполнения
+ */
+export function loadGameConfigAsync(): Promise<{
+  board: BoardConfig;
+  boosterLimits: BoosterLimitConfig;
+}> {
+  return new Promise((resolve) => {
+    cc.resources.load("config/gameConfig", cc.JsonAsset, (err, asset) => {
+      if (!err && asset) {
+        const config = asset.json as {
+          board: BoardConfig;
+          boosterLimits: BoosterLimitConfig;
+        };
+
+        const result = {
+          board: { ...DefaultBoard, ...config.board },
+          boosterLimits: { ...DefaultBoosterLimits, ...config.boosterLimits },
+        };
+
+        // Обновляем кеш
+        gameConfigCache = result;
+        resolve(result);
+      } else {
+        // Fallback на значения по умолчанию
+        const result = {
+          board: DefaultBoard,
+          boosterLimits: DefaultBoosterLimits,
+        };
+        gameConfigCache = result;
+        resolve(result);
+      }
+    });
+  });
 }
 
 /**
@@ -119,29 +141,28 @@ export const DefaultBoosterLimits: BoosterLimitConfig = {
 export function loadBoosterLimits(): BoosterLimitConfig {
   const config = loadGameConfig();
   const base = { ...config.boosterLimits };
-  const storage = (
-    globalThis as unknown as {
-      localStorage?: { getItem: (key: string) => string | null };
-    }
-  ).localStorage;
-  if (!storage) return base;
 
+  // Пытаемся загрузить из localStorage, если доступен
   try {
-    const raw = storage.getItem("boosterLimits");
-    if (!raw) return base;
-    const data = JSON.parse(raw) as Partial<BoosterLimitConfig>;
-    if (typeof data.maxTypes === "number") {
-      base.maxTypes = data.maxTypes;
-    }
-    if (data.maxPerType) {
-      Object.entries(data.maxPerType).forEach(([id, val]) => {
-        if (base.maxPerType[id] !== undefined) {
-          base.maxPerType[id] = val as number;
+    if (typeof window !== "undefined" && window.localStorage) {
+      const raw = window.localStorage.getItem("boosterLimits");
+      if (raw) {
+        const data = JSON.parse(raw) as Partial<BoosterLimitConfig>;
+        if (typeof data.maxTypes === "number") {
+          base.maxTypes = data.maxTypes;
         }
-      });
+        if (data.maxPerType) {
+          Object.entries(data.maxPerType).forEach(([id, val]) => {
+            if (base.maxPerType[id] !== undefined) {
+              base.maxPerType[id] = val as number;
+            }
+          });
+        }
+      }
     }
-    return base;
-  } catch {
-    return base;
+  } catch (error) {
+    console.warn("Failed to load booster limits from localStorage:", error);
   }
+
+  return base;
 }
