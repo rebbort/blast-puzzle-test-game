@@ -1,5 +1,60 @@
 import { BoosterRegistry } from "../core/boosters/BoosterRegistry";
 
+// Кеш для загруженной конфигурации
+let gameConfigCache: {
+  board: BoardConfig;
+  boosterLimits: BoosterLimitConfig;
+} | null = null;
+
+/**
+ * Загружает общую конфигурацию игры с кешированием
+ */
+function loadGameConfig(): {
+  board: BoardConfig;
+  boosterLimits: BoosterLimitConfig;
+} {
+  // Возвращаем кеш, если он уже загружен
+  if (gameConfigCache) {
+    return gameConfigCache;
+  }
+
+  try {
+    // Пытаемся загрузить из ресурсов Cocos Creator
+    const gameConfig = cc.resources.get("config/gameConfig");
+    if (gameConfig) {
+      const config = gameConfig as unknown as {
+        board: BoardConfig;
+        boosterLimits: BoosterLimitConfig;
+      };
+
+      // Кешируем результат
+      gameConfigCache = {
+        board: { ...DefaultBoard, ...config.board },
+        boosterLimits: { ...DefaultBoosterLimits, ...config.boosterLimits },
+      };
+
+      return gameConfigCache;
+    }
+  } catch (error) {
+    console.warn("Failed to load game config from resources:", error);
+  }
+
+  // Fallback на значения по умолчанию
+  gameConfigCache = {
+    board: DefaultBoard,
+    boosterLimits: DefaultBoosterLimits,
+  };
+
+  return gameConfigCache;
+}
+
+/**
+ * Очищает кеш конфигурации (для тестирования или перезагрузки)
+ */
+export function clearConfigCache(): void {
+  gameConfigCache = null;
+}
+
 /**
  * BoardConfig описывает параметры игрового поля: количество колонок и строк,
  * размер тайла, список возможных цветов и порог создания супер-тайла.
@@ -39,46 +94,11 @@ export const DefaultBoard: BoardConfig = {
 };
 
 /**
- * Пытается загрузить конфигурацию из ресурсов Cocos Creator,
- * иначе возвращает DefaultBoard.
+ * Загружает конфигурацию игрового поля.
  */
 export function loadBoardConfig(): BoardConfig {
-  try {
-    // Пытаемся загрузить из ресурсов Cocos Creator
-    const gameConfig = cc.resources.get("config/gameConfig");
-    if (gameConfig) {
-      const config = gameConfig as unknown as {
-        board: BoardConfig;
-        boosterLimits: BoosterLimitConfig;
-      };
-      return {
-        ...DefaultBoard,
-        ...config.board,
-      };
-    }
-  } catch (error) {
-    console.warn("Failed to load game config from resources:", error);
-  }
-
-  // Пытаемся загрузить из localStorage как fallback
-  const raw = localStorage.getItem("board-config.json");
-  if (!raw) {
-    return DefaultBoard;
-  }
-
-  try {
-    const parsed = JSON.parse(raw) as Partial<
-      BoardConfig & { tileSize?: number }
-    >;
-    const combined = Object.assign({}, DefaultBoard, parsed);
-    if (typeof parsed.tileSize === "number") {
-      combined.tileWidth = parsed.tileSize;
-      combined.tileHeight = parsed.tileSize;
-    }
-    return combined;
-  } catch {
-    return DefaultBoard;
-  }
+  const config = loadGameConfig();
+  return config.board;
 }
 
 /** Настройки выбора бустеров при старте. */
@@ -97,44 +117,6 @@ export const DefaultBoosterLimits: BoosterLimitConfig = {
 
 /** Загружает настройки лимитов бустеров. */
 export function loadBoosterLimits(): BoosterLimitConfig {
-  try {
-    // Пытаемся загрузить из ресурсов Cocos Creator
-    const gameConfig = cc.resources.get("config/gameConfig");
-    if (gameConfig) {
-      const config = gameConfig as unknown as {
-        board: BoardConfig;
-        boosterLimits: BoosterLimitConfig;
-      };
-      return {
-        ...DefaultBoosterLimits,
-        ...config.boosterLimits,
-      };
-    }
-  } catch (error) {
-    console.warn("Failed to load booster limits from resources:", error);
-  }
-
-  // Fallback на localStorage
-  const raw = localStorage.getItem("booster-limits.json");
-  let parsed: Partial<BoosterLimitConfig> = {};
-
-  if (raw) {
-    try {
-      parsed = JSON.parse(raw) as Partial<BoosterLimitConfig>;
-    } catch {
-      parsed = {};
-    }
-  }
-
-  const maxPerType: Record<string, number> = {};
-  BoosterRegistry.forEach(({ id }) => {
-    const stored = parsed.maxPerType?.[id];
-    maxPerType[id] =
-      typeof stored === "number" ? stored : DefaultBoosterLimits.maxPerType[id];
-  });
-
-  return {
-    maxTypes: parsed.maxTypes ?? DefaultBoosterLimits.maxTypes,
-    maxPerType,
-  };
+  const config = loadGameConfig();
+  return config.boosterLimits;
 }
