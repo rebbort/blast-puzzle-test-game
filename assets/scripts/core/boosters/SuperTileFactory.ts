@@ -1,5 +1,5 @@
 import * as seedrandom from "seedrandom";
-import { BoardConfig, DefaultBoard } from "../../config/ConfigLoader";
+import { BoardConfig } from "../../config/ConfigLoader";
 import { TileKind } from "../board/Tile";
 
 /**
@@ -16,17 +16,33 @@ export class SuperTileFactory {
   }
 
   /**
-   * Создаёт тип супер‑тайла на основе распределения из конфигурации.
-   * Значения интерпретируются как веса и суммируются слева направо.
+   * Создаёт тип супер‑тайла на основе настраиваемых шансов.
+   * Если шансы не настроены, используются значения по умолчанию:
+   * SuperRow: 50%, SuperCol: 30%, SuperBomb: 15%, SuperClear: 5%
    */
   make(kindSeed = this.rng()): TileKind {
-    const chances = this.cfg.superChances ?? DefaultBoard.superChances!;
-    const row = chances.row;
-    const col = row + chances.col;
-    const bomb = col + chances.bomb;
-    if (kindSeed < row) return TileKind.SuperRow;
-    if (kindSeed < col) return TileKind.SuperCol;
-    if (kindSeed < bomb) return TileKind.SuperBomb;
-    return TileKind.SuperClear;
+    const chances = this.cfg.superChances;
+
+    if (chances) {
+      // Используем настраиваемые шансы
+      let cumulative = 0;
+
+      cumulative += chances.row;
+      if (kindSeed < cumulative) return TileKind.SuperRow;
+
+      cumulative += chances.col;
+      if (kindSeed < cumulative) return TileKind.SuperCol;
+
+      cumulative += chances.bomb;
+      if (kindSeed < cumulative) return TileKind.SuperBomb;
+
+      return TileKind.SuperClear;
+    } else {
+      // Используем значения по умолчанию
+      if (kindSeed < 0.5) return TileKind.SuperRow;
+      if (kindSeed < 0.8) return TileKind.SuperCol;
+      if (kindSeed < 0.95) return TileKind.SuperBomb;
+      return TileKind.SuperClear;
+    }
   }
 }

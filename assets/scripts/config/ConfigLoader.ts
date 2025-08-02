@@ -1,11 +1,5 @@
 import { BoosterRegistry } from "../core/boosters/BoosterRegistry";
 
-// Загружаем все настройки из JSON, чтобы их можно было править без перекомпиляции
-const gameCfg: {
-  board: BoardConfig;
-  boosterLimits: BoosterLimitConfig;
-} = require("./gameConfig.json"); // eslint-disable-line @typescript-eslint/no-require-imports
-
 /**
  * BoardConfig описывает параметры игрового поля: количество колонок и строк,
  * размер тайла, список возможных цветов и порог создания супер-тайла.
@@ -29,21 +23,50 @@ export interface BoardConfig {
 }
 
 /** Значения по умолчанию для поля */
-export const DefaultBoard: BoardConfig = gameCfg.board;
+export const DefaultBoard: BoardConfig = {
+  cols: 9, // классическая ширина
+  rows: 10, // и высота
+  tileWidth: 100, // под размеры подготовленных спрайтов
+  tileHeight: 100,
+  colors: ["red", "blue", "green", "yellow", "purple"],
+  superThreshold: 5,
+  superChances: {
+    row: 0.5, // 50% шанс SuperRow
+    col: 0.3, // 30% шанс SuperCol
+    bomb: 0.15, // 15% шанс SuperBomb
+    clear: 0.05, // 5% шанс SuperClear
+  },
+};
 
 /**
- * Пытается парсить JSON из localStorage,
+ * Пытается загрузить конфигурацию из ресурсов Cocos Creator,
  * иначе возвращает DefaultBoard.
  */
 export function loadBoardConfig(): BoardConfig {
+  try {
+    // Пытаемся загрузить из ресурсов Cocos Creator
+    const gameConfig = cc.resources.get("config/gameConfig");
+    if (gameConfig) {
+      const config = gameConfig as unknown as {
+        board: BoardConfig;
+        boosterLimits: BoosterLimitConfig;
+      };
+      return {
+        ...DefaultBoard,
+        ...config.board,
+      };
+    }
+  } catch (error) {
+    console.warn("Failed to load game config from resources:", error);
+  }
+
+  // Пытаемся загрузить из localStorage как fallback
   const raw = localStorage.getItem("board-config.json");
   if (!raw) {
-    // ничего не сохранено — используем дефолт
     return DefaultBoard;
   }
+
   try {
-    // объединяем сохранённые поля с настройками по умолчанию
-    // поддерживая старое поле tileSize при наличии
     const parsed = JSON.parse(raw) as Partial<
       BoardConfig & { tileSize?: number }
     >;
@@ -54,7 +77,6 @@ export function loadBoardConfig(): BoardConfig {
     }
     return combined;
   } catch {
-    // если JSON битый, не ломаем игру
     return DefaultBoard;
   }
 }
@@ -68,10 +90,31 @@ export interface BoosterLimitConfig {
 }
 
 /** Значения по умолчанию для выбора бустеров. */
-export const DefaultBoosterLimits: BoosterLimitConfig = gameCfg.boosterLimits;
+export const DefaultBoosterLimits: BoosterLimitConfig = {
+  maxTypes: 2,
+  maxPerType: Object.fromEntries(BoosterRegistry.map((b) => [b.id, 10])),
+};
 
-/** Загружает настройки лимитов бустеров из localStorage. */
+/** Загружает настройки лимитов бустеров. */
 export function loadBoosterLimits(): BoosterLimitConfig {
+  try {
+    // Пытаемся загрузить из ресурсов Cocos Creator
+    const gameConfig = cc.resources.get("config/gameConfig");
+    if (gameConfig) {
+      const config = gameConfig as unknown as {
+        board: BoardConfig;
+        boosterLimits: BoosterLimitConfig;
+      };
+      return {
+        ...DefaultBoosterLimits,
+        ...config.boosterLimits,
+      };
+    }
+  } catch (error) {
+    console.warn("Failed to load booster limits from resources:", error);
+  }
+
+  // Fallback на localStorage
   const raw = localStorage.getItem("booster-limits.json");
   let parsed: Partial<BoosterLimitConfig> = {};
 
