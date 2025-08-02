@@ -28,6 +28,9 @@ export default class GameBoardController extends cc.Component {
   /** Matrix of view components mirroring board state. */
   tileViews: TileView[][] = [];
 
+  /** Selected tile highlight for teleport booster. */
+  private teleportSelected: TileView | null = null;
+
   /**
    * Generates the game board when this controller loads.
    *
@@ -49,6 +52,13 @@ export default class GameBoardController extends cc.Component {
     fill.tileNodePrefab = this.tileNodePrefab;
     fill.tilesLayer = this.tilesLayer;
     bus.on(EventNames.BoosterConfirmed, this.onBoosterConfirmed, this);
+    bus.on(
+      EventNames.BoosterTargetSelected,
+      this.onBoosterTargetSelected,
+      this,
+    );
+    bus.on(EventNames.BoosterCancelled, this.clearTeleportHighlight, this);
+    bus.on(EventNames.SwapDone, this.onSwapDone, this);
     // 4) Создаем дебаг сетку
     // this.createDebugGrid();
   }
@@ -98,6 +108,54 @@ export default class GameBoardController extends cc.Component {
   private onBoosterConfirmed({ position }: { position: cc.Vec2 }): void {
     const view = this.tileViews[position.y]?.[position.x];
     view?.activateSuper();
+  }
+
+  private onBoosterTargetSelected({
+    id,
+    stage,
+    pos,
+  }: {
+    id: string;
+    stage: string;
+    pos: cc.Vec2;
+  }): void {
+    if (id !== "teleport") return;
+    if (stage === "first") {
+      this.clearTeleportHighlight();
+      const view = this.tileViews[pos.y]?.[pos.x];
+      if (view) {
+        view.node.setScale(1.2, 1.2);
+        this.teleportSelected = view;
+      }
+    } else {
+      // second selection or completion clears highlight
+      this.clearTeleportHighlight();
+    }
+  }
+
+  private clearTeleportHighlight(): void {
+    if (this.teleportSelected) {
+      this.teleportSelected.node.setScale(1, 1);
+      this.teleportSelected = null;
+    }
+  }
+
+  private onSwapDone(a: cc.Vec2, b: cc.Vec2): void {
+    const viewA = this.tileViews[a.y]?.[a.x];
+    const viewB = this.tileViews[b.y]?.[b.x];
+    if (!viewA || !viewB) return;
+    const nodeA = viewA.node;
+    const nodeB = viewB.node;
+    cc.tween(nodeA)
+      .to(0.1, { scale: new cc.Vec3(0, 0, 1) })
+      .call(() => viewA.apply(this.board.tileAt(a)!))
+      .to(0.1, { scale: new cc.Vec3(1, 1, 1) })
+      .start();
+    cc.tween(nodeB)
+      .to(0.1, { scale: new cc.Vec3(0, 0, 1) })
+      .call(() => viewB.apply(this.board.tileAt(b)!))
+      .to(0.1, { scale: new cc.Vec3(1, 1, 1) })
+      .start();
   }
 
   /**
