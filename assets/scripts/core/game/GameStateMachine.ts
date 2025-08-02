@@ -13,6 +13,7 @@ import { InfrastructureEventBus } from "../../infrastructure/InfrastructureEvent
 import { Board } from "../board/Board";
 import { BoardSolver } from "../board/BoardSolver";
 import { MoveExecutor } from "../board/MoveExecutor";
+import { BombCommand } from "../board/commands/BombCommand";
 import { ScoreStrategy } from "../rules/ScoreStrategy";
 import { TurnManager } from "../rules/TurnManager";
 import { BoardConfig } from "../../config/ConfigLoader";
@@ -86,16 +87,53 @@ export class GameStateMachine {
       return;
     }
 
+    const tile = this.board.tileAt(start);
+    if (!tile) return;
+
+    // При повторном нажатии на уже установленный супер‑тайл запускается
+    // его эффект. Заряд бустера был списан в момент установки, поэтому
+    // активация выполняется без дополнительного расхода.
+    if (tile.kind !== TileKind.Normal) {
+      this.bus.emit(EventNames.BoosterConfirmed, {
+        kind: tile.kind,
+        position: start,
+      });
+      this.turnManager.useTurn();
+      this.changeState("ExecutingMove");
+
+      switch (tile.kind) {
+        case TileKind.SuperBomb:
+          void new BombCommand(this.board, start, 1, this.bus).execute();
+          break;
+        case TileKind.SuperRow: {
+          const group = Array.from(
+            { length: this.board.cols },
+            (_, x) => new cc.Vec2(x, start.y),
+          );
+          void this.executor.execute(group);
+          break;
+        }
+        case TileKind.SuperCol: {
+          const group = Array.from(
+            { length: this.board.rows },
+            (_, y) => new cc.Vec2(start.x, y),
+          );
+          void this.executor.execute(group);
+          break;
+        }
+        default:
+          break;
+      }
+      return;
+    }
+
     // Determine group of connected tiles and calculate score
     const group = this.solver.findGroup(start);
-    const tile = this.board.tileAt(start);
-    if (group.length < 2 && tile && tile.kind === TileKind.Normal) {
+    if (group.length < 2) {
       console.info(`Tap ignored as move: single tile at ${start.x},${start.y}`);
       this.bus.emit(EventNames.InvalidTap, start);
       return;
     }
-
-    if (group.length === 0) return;
 
     console.info(`Tap accepted as move: group size ${group.length}`);
 

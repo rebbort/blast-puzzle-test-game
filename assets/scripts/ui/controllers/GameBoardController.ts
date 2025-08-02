@@ -7,6 +7,8 @@ import TileView from "../views/TileView";
 import MoveFlowController from "./MoveFlowController";
 import FillController from "./FillController";
 import { computeTilePosition } from "../utils/PositionUtils";
+import { EventBus as bus } from "../../core/EventBus";
+import { EventNames } from "../../core/events/EventNames";
 
 @ccclass()
 export default class GameBoardController extends cc.Component {
@@ -46,6 +48,7 @@ export default class GameBoardController extends cc.Component {
     const fill = this.node.addComponent(FillController);
     fill.tileNodePrefab = this.tileNodePrefab;
     fill.tilesLayer = this.tilesLayer;
+    bus.on(EventNames.BoosterConfirmed, this.onBoosterConfirmed, this);
     // 4) Создаем дебаг сетку
     // this.createDebugGrid();
   }
@@ -90,6 +93,11 @@ export default class GameBoardController extends cc.Component {
     view.boardPos = cc.v2(pos.x, pos.y);
     this.tileViews[pos.y][pos.x] = view;
     return view;
+  }
+
+  private onBoosterConfirmed({ position }: { position: cc.Vec2 }): void {
+    const view = this.tileViews[position.y]?.[position.x];
+    view?.activateSuper();
   }
 
   /**
