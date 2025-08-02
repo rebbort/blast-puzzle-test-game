@@ -1,11 +1,13 @@
 import {
   loadBoosterLimits,
   DefaultBoosterLimits,
+  clearConfigCache,
 } from "../../assets/scripts/config/ConfigLoader";
 import { BoosterRegistry } from "../../assets/scripts/core/boosters/BoosterRegistry";
 
 describe("loadBoosterLimits", () => {
   beforeEach(() => {
+    clearConfigCache();
     (
       globalThis as unknown as {
         localStorage: { getItem: () => string | null };
