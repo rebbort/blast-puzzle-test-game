@@ -1,5 +1,5 @@
 import * as seedrandom from "seedrandom";
-import { BoardConfig } from "../../config/ConfigLoader";
+import { BoardConfig, DefaultBoard } from "../../config/ConfigLoader";
 import { TileKind } from "../board/Tile";
 
 /**
@@ -16,19 +16,17 @@ export class SuperTileFactory {
   }
 
   /**
-   * Создаёт тип супер‑тайла. Более слабые SuperRow/SuperCol
-   * появляются чаще остальных, поэтому им отведено 80% диапазона.
-   * Bomb и Clear встречаются реже, так как их эффект мощнее.
-   * Распределение следующее:
-   * < 0.5 → {@link TileKind.SuperRow},
-   * < 0.8 → {@link TileKind.SuperCol},
-   * < 0.95 → {@link TileKind.SuperBomb},
-   * иначе → {@link TileKind.SuperClear}.
+   * Создаёт тип супер‑тайла на основе распределения из конфигурации.
+   * Значения интерпретируются как веса и суммируются слева направо.
    */
   make(kindSeed = this.rng()): TileKind {
-    if (kindSeed < 0.5) return TileKind.SuperRow;
-    if (kindSeed < 0.8) return TileKind.SuperCol;
-    if (kindSeed < 0.95) return TileKind.SuperBomb;
+    const chances = this.cfg.superChances ?? DefaultBoard.superChances!;
+    const row = chances.row;
+    const col = row + chances.col;
+    const bomb = col + chances.bomb;
+    if (kindSeed < row) return TileKind.SuperRow;
+    if (kindSeed < col) return TileKind.SuperCol;
+    if (kindSeed < bomb) return TileKind.SuperBomb;
     return TileKind.SuperClear;
   }
 }

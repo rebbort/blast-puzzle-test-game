@@ -23,3 +23,14 @@ it("produces deterministic sequence with same seed", () => {
     expect(k).not.toBe(TileKind.Normal);
   }
 });
+
+it("respects super tile chances from config", () => {
+  const custom: BoardConfig = {
+    ...cfg,
+    superChances: { row: 0, col: 0, bomb: 1, clear: 0 },
+  };
+  const factory = new SuperTileFactory(custom);
+  expect(factory.make(0)).toBe(TileKind.SuperBomb);
+  expect(factory.make(0.5)).toBe(TileKind.SuperBomb);
+  expect(factory.make(0.99)).toBe(TileKind.SuperBomb);
+});

@@ -1,9 +1,22 @@
 import { BoosterRegistry } from "../core/boosters/BoosterRegistry";
 
+// Загружаем все настройки из JSON, чтобы их можно было править без перекомпиляции
+const gameCfg: {
+  board: BoardConfig;
+  boosterLimits: BoosterLimitConfig;
+} = require("./gameConfig.json"); // eslint-disable-line @typescript-eslint/no-require-imports
+
 /**
  * BoardConfig описывает параметры игрового поля: количество колонок и строк,
  * размер тайла, список возможных цветов и порог создания супер-тайла.
  */
+export interface SuperTileChances {
+  row: number;
+  col: number;
+  bomb: number;
+  clear: number;
+}
+
 export interface BoardConfig {
   cols: number; // сколько колонок на поле
   rows: number; // сколько строк на поле
@@ -12,17 +25,11 @@ export interface BoardConfig {
   colors: string[]; // допустимые цвета тайлов
   superThreshold: number; // размер группы для супер-тайла
   rngSeed?: string; // необязательно: фиксированный seed
+  superChances?: SuperTileChances; // шансы появления супер-тайлов
 }
 
 /** Значения по умолчанию для поля */
-export const DefaultBoard: BoardConfig = {
-  cols: 9, // классическая ширина
-  rows: 10, // и высота
-  tileWidth: 100, // под размеры подготовленных спрайтов
-  tileHeight: 100,
-  colors: ["red", "blue", "green", "yellow", "purple"],
-  superThreshold: 5,
-};
+export const DefaultBoard: BoardConfig = gameCfg.board;
 
 /**
  * Пытается парсить JSON из localStorage,
@@ -61,10 +68,7 @@ export interface BoosterLimitConfig {
 }
 
 /** Значения по умолчанию для выбора бустеров. */
-export const DefaultBoosterLimits: BoosterLimitConfig = {
-  maxTypes: 2,
-  maxPerType: Object.fromEntries(BoosterRegistry.map((b) => [b.id, 10])),
-};
+export const DefaultBoosterLimits: BoosterLimitConfig = gameCfg.boosterLimits;
 
 /** Загружает настройки лимитов бустеров из localStorage. */
 export function loadBoosterLimits(): BoosterLimitConfig {
