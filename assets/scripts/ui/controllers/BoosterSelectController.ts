@@ -1,11 +1,6 @@
-import { EventBus } from "../../core/EventBus";
-import { EventNames } from "../../core/events/EventNames";
-import {
-  loadBoosterLimits,
-  BoosterLimitConfig,
-} from "../../config/ConfigLoader";
 import BoosterSelectAnimationController from "./BoosterSelectAnimationController";
 import { BoosterRegistry } from "../../core/boosters/BoosterRegistry";
+import { boosterSelectionService } from "../services/BoosterSelectionService";
 
 const { ccclass } = cc._decorator;
 
@@ -22,9 +17,6 @@ interface NodeUtils {
  */
 @ccclass()
 export default class BoosterSelectController extends cc.Component {
-  private limits: BoosterLimitConfig = loadBoosterLimits();
-  private counts: Record<string, number> = {};
-  private picked: Set<string> = new Set();
   private labels: Record<string, cc.Label | null> = {};
 
   private animationController: BoosterSelectAnimationController = null;
@@ -36,9 +28,9 @@ export default class BoosterSelectController extends cc.Component {
     );
 
     const root = this.node as unknown as NodeUtils;
+    boosterSelectionService.reset();
     BoosterRegistry.forEach((def) => {
       const id = def.id;
-      this.counts[id] = 0;
       const btnName = `btn${id.charAt(0).toUpperCase()}${id.slice(1)}`;
       const btn = root.getChildByName(btnName);
       btn?.on(cc.Node.EventType.TOUCH_END, () => this.inc(id));
@@ -46,7 +38,7 @@ export default class BoosterSelectController extends cc.Component {
         ?.getChildByName("CounterLabel")
         ?.getComponent("Label") as cc.Label | null;
       this.labels[id] = lbl;
-      if (lbl) lbl.string = "0";
+      if (lbl) lbl.string = String(boosterSelectionService.getCount(id));
     });
 
     root.getChildByName("btnConfirm")?.on("click", () => this.confirm());
@@ -62,19 +54,13 @@ export default class BoosterSelectController extends cc.Component {
   }
 
   private inc(id: string): void {
-    if (this.picked.size >= this.limits.maxTypes && this.counts[id] === 0) {
-      return; // cannot pick more types
-    }
-    const max = this.limits.maxPerType[id] ?? 0;
-    if (this.counts[id] >= max) return;
-    this.counts[id]++;
-    if (this.counts[id] === 1) this.picked.add(id);
+    const count = boosterSelectionService.inc(id);
     const lbl = this.labels[id];
-    if (lbl) lbl.string = String(this.counts[id]);
+    if (lbl) lbl.string = String(count);
   }
 
   private confirm(): void {
-    EventBus.emit(EventNames.BoostersSelected, { ...this.counts });
+    boosterSelectionService.confirm();
     (this.node as unknown as { active: boolean }).active = false;
   }
 
@@ -83,10 +69,10 @@ export default class BoosterSelectController extends cc.Component {
    */
   private startGame(): void {
     console.log("🎮 PlayButton clicked - starting game...");
-    console.log("Current booster counts:", this.counts);
+    console.log("Current booster counts:", boosterSelectionService.getCounts());
 
     // Отправляем событие о запуске игры
-    EventBus.emit(EventNames.BoostersSelected, { ...this.counts });
+    this.confirm();
     console.log("✅ BoostersSelected event emitted");
   }
 
