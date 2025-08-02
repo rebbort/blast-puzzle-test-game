@@ -3,6 +3,7 @@ import { EventNames } from "../../core/events/EventNames";
 import { boosterService } from "../../core/boosters/BoosterSetup";
 import { BoosterRegistry } from "../../core/boosters/BoosterRegistry";
 import SpriteHighlight from "../utils/SpriteHighlight";
+import { boosterSelectionService } from "../services/BoosterSelectionService";
 
 const { ccclass, property } = cc._decorator;
 
@@ -28,6 +29,10 @@ export default class BoosterPanelController extends cc.Component {
   start(): void {
     this.initializeSlots();
     this.setupEventListeners();
+    const charges = boosterSelectionService.getConfirmedCharges();
+    if (Object.keys(charges).length > 0) {
+      this.onBoostersSelected(charges);
+    }
   }
 
   private initializeSlots(): void {

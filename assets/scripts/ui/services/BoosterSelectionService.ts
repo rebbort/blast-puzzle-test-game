@@ -22,6 +22,7 @@ export class BoosterSelectionService {
 
   private limits: BoosterLimitConfig;
   private selected: string[] = [];
+  private confirmedCharges: Record<string, number> = {};
 
   private constructor() {
     this.limits = loadBoosterLimits();
@@ -57,11 +58,17 @@ export class BoosterSelectionService {
   confirm(): void {
     const charges: Record<string, number> = {};
     this.selected.forEach((id) => (charges[id] = 1));
+    this.confirmedCharges = charges;
     EventBus.emit(EventNames.BoostersSelected, charges);
   }
 
   reset(): void {
     this.selected = [];
+    this.confirmedCharges = {};
+  }
+
+  getConfirmedCharges(): Record<string, number> {
+    return { ...this.confirmedCharges };
   }
 }
 

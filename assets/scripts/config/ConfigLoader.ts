@@ -144,8 +144,12 @@ export function loadBoosterLimits(): BoosterLimitConfig {
 
   // Пытаемся загрузить из localStorage, если доступен
   try {
-    if (typeof window !== "undefined" && window.localStorage) {
-      const raw = window.localStorage.getItem("boosterLimits");
+    const storage: Partial<Storage> | undefined =
+      (typeof window !== "undefined" && window.localStorage) ||
+      (globalThis as unknown as { localStorage?: Partial<Storage> })
+        .localStorage;
+    if (storage && typeof storage.getItem === "function") {
+      const raw = storage.getItem("boosterLimits");
       if (raw) {
         const data = JSON.parse(raw) as Partial<BoosterLimitConfig>;
         if (typeof data.maxTypes === "number") {
