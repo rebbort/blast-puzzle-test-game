@@ -9,6 +9,7 @@ import { MoveSequenceLogger } from "./core/diagnostics/MoveSequenceLogger";
 import { initBoosterService } from "./core/boosters/BoosterSetup";
 import { EventNames } from "./core/events/EventNames";
 import BoosterSelectController from "./ui/controllers/BoosterSelectController";
+import { BoosterRegistry } from "./core/boosters/BoosterRegistry";
 
 const { ccclass } = cc._decorator;
 
@@ -68,12 +69,8 @@ export default class GameScene extends cc.Component {
       (selector.node as unknown as { active: boolean }).active = true;
     } else {
       // If no selector exists, auto-select zero boosters to proceed
-      EventBus.emit(EventNames.BoostersSelected, {
-        teleport: 0,
-        superCol: 0,
-        superRow: 0,
-        bomb: 0,
-      });
+      const empty = Object.fromEntries(BoosterRegistry.map((b) => [b.id, 0]));
+      EventBus.emit(EventNames.BoostersSelected, empty);
     }
   }
 }

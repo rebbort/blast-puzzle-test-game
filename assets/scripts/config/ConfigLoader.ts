@@ -1,3 +1,5 @@
+import { BoosterRegistry } from "../core/boosters/BoosterRegistry";
+
 /**
  * BoardConfig описывает параметры игрового поля: количество колонок и строк,
  * размер тайла, список возможных цветов и порог создания супер-тайла.
@@ -55,23 +57,13 @@ export interface BoosterLimitConfig {
   /** Максимальное число различных типов бустеров, которые можно взять. */
   maxTypes: number;
   /** Лимиты по каждому типу бустера. */
-  maxPerType: {
-    teleport: number;
-    superRow: number;
-    superCol: number;
-    bomb: number;
-  };
+  maxPerType: Record<string, number>;
 }
 
 /** Значения по умолчанию для выбора бустеров. */
 export const DefaultBoosterLimits: BoosterLimitConfig = {
   maxTypes: 2,
-  maxPerType: {
-    teleport: 10,
-    superRow: 10,
-    superCol: 10,
-    bomb: 10,
-  },
+  maxPerType: Object.fromEntries(BoosterRegistry.map((b) => [b.id, 10])),
 };
 
 /** Загружает настройки лимитов бустеров из localStorage. */
@@ -80,20 +72,14 @@ export function loadBoosterLimits(): BoosterLimitConfig {
   if (!raw) return DefaultBoosterLimits;
   try {
     const parsed = JSON.parse(raw) as Partial<BoosterLimitConfig>;
+    const maxPerType = Object.assign(
+      {},
+      DefaultBoosterLimits.maxPerType,
+      parsed.maxPerType,
+    );
     return {
       maxTypes: parsed.maxTypes ?? DefaultBoosterLimits.maxTypes,
-      maxPerType: {
-        teleport:
-          parsed.maxPerType?.teleport ??
-          DefaultBoosterLimits.maxPerType.teleport,
-        superRow:
-          parsed.maxPerType?.superRow ??
-          DefaultBoosterLimits.maxPerType.superRow,
-        superCol:
-          parsed.maxPerType?.superCol ??
-          DefaultBoosterLimits.maxPerType.superCol,
-        bomb: parsed.maxPerType?.bomb ?? DefaultBoosterLimits.maxPerType.bomb,
-      },
+      maxPerType,
     };
   } catch {
     return DefaultBoosterLimits;

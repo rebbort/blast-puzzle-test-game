@@ -1,11 +1,9 @@
 import { EventBus } from "../EventBus";
 import { BoosterService } from "./BoosterService";
-import { SuperTileBooster } from "./SuperTileBooster";
 import { Board } from "../board/Board";
-import { TileKind } from "../board/Tile";
 import TileView from "../../ui/views/TileView";
 import type { GameState } from "../game/GameStateMachine";
-import { TeleportBooster } from "./TeleportBooster";
+import { BoosterRegistry } from "./BoosterRegistry";
 
 export let boosterService: BoosterService | undefined;
 
@@ -20,40 +18,14 @@ export function initBoosterService(
   charges: Record<string, number>,
 ): void {
   boosterService = new BoosterService(EventBus, getState);
-  boosterService.register(
-    new TeleportBooster(board, EventBus, charges.teleport ?? 0),
-  );
-  boosterService.register(
-    new SuperTileBooster(
-      "bomb",
+  BoosterRegistry.forEach((def) => {
+    const boost = def.factory({
       board,
       views,
-      EventBus,
+      bus: EventBus,
       boosterService,
-      charges.bomb ?? 0,
-      TileKind.SuperBomb,
-    ),
-  );
-  boosterService.register(
-    new SuperTileBooster(
-      "superRow",
-      board,
-      views,
-      EventBus,
-      boosterService,
-      charges.superRow ?? 0,
-      TileKind.SuperRow,
-    ),
-  );
-  boosterService.register(
-    new SuperTileBooster(
-      "superCol",
-      board,
-      views,
-      EventBus,
-      boosterService,
-      charges.superCol ?? 0,
-      TileKind.SuperCol,
-    ),
-  );
+      charges: charges[def.id] ?? 0,
+    });
+    boosterService.register(boost);
+  });
 }
