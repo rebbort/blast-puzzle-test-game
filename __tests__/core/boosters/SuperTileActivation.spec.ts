@@ -98,4 +98,80 @@ describe("super tile activation", () => {
       "2,2",
     ]);
   });
+
+  it("SuperRow triggers SuperCol in same row", async () => {
+    const tiles = Array.from({ length: 3 }, () =>
+      Array.from({ length: 3 }, () => TileFactory.createNormal("red")),
+    );
+    tiles[1][1].kind = TileKind.SuperRow;
+    tiles[1][2].kind = TileKind.SuperCol;
+    const board = new Board(cfg, tiles);
+    const bus = new InfrastructureEventBus();
+    const solver = new BoardSolver(board);
+    const exec = new MoveExecutor(board, bus);
+    const strategy = new ScoreStrategyQuadratic(1);
+    const tm = new TurnManager(5, bus);
+    const fsm = new GameStateMachine(
+      bus,
+      board,
+      solver,
+      exec,
+      strategy,
+      tm,
+      0,
+      0,
+    );
+    let removed: cc.Vec2[] = [];
+    bus.on(EventNames.RemoveStarted, (g: cc.Vec2[]) => (removed = g));
+    fsm.start();
+    bus.emit(EventNames.GroupSelected, new cc.Vec2(1, 1));
+    await new Promise((r) => setImmediate(r));
+    const coords = removed.map((p) => `${p.x},${p.y}`).sort();
+    expect(coords).toEqual(["0,1", "1,1", "2,0", "2,1", "2,2"]);
+  });
+
+  it("SuperBomb triggers touched super tiles", async () => {
+    const bigCfg: BoardConfig = { ...cfg, cols: 5, rows: 5 };
+    const tiles = Array.from({ length: 5 }, () =>
+      Array.from({ length: 5 }, () => TileFactory.createNormal("red")),
+    );
+    tiles[2][2].kind = TileKind.SuperBomb;
+    tiles[2][3].kind = TileKind.SuperCol;
+    const board = new Board(bigCfg, tiles);
+    const bus = new InfrastructureEventBus();
+    const solver = new BoardSolver(board);
+    const exec = new MoveExecutor(board, bus);
+    const strategy = new ScoreStrategyQuadratic(1);
+    const tm = new TurnManager(5, bus);
+    const fsm = new GameStateMachine(
+      bus,
+      board,
+      solver,
+      exec,
+      strategy,
+      tm,
+      0,
+      0,
+    );
+    let removed: cc.Vec2[] = [];
+    bus.on(EventNames.RemoveStarted, (g: cc.Vec2[]) => (removed = g));
+    fsm.start();
+    bus.emit(EventNames.GroupSelected, new cc.Vec2(2, 2));
+    await new Promise((r) => setImmediate(r));
+    const coords = removed.map((p) => `${p.x},${p.y}`).sort();
+    // bomb radius covers square [1,3]x[1,3]; SuperCol at x=3 adds cells (3,0) and (3,4)
+    expect(coords).toEqual([
+      "1,1",
+      "1,2",
+      "1,3",
+      "2,1",
+      "2,2",
+      "2,3",
+      "3,0",
+      "3,1",
+      "3,2",
+      "3,3",
+      "3,4",
+    ]);
+  });
 });

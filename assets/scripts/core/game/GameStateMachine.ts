@@ -106,18 +106,20 @@ export class GameStateMachine {
           void new BombCommand(this.board, start, 1, this.bus).execute();
           break;
         case TileKind.SuperRow: {
-          const group = Array.from(
+          let group = Array.from(
             { length: this.board.cols },
             (_, x) => new cc.Vec2(x, start.y),
           );
+          group = this.solver.expandBySupers(group);
           void this.executor.execute(group);
           break;
         }
         case TileKind.SuperCol: {
-          const group = Array.from(
+          let group = Array.from(
             { length: this.board.rows },
             (_, y) => new cc.Vec2(start.x, y),
           );
+          group = this.solver.expandBySupers(group);
           void this.executor.execute(group);
           break;
         }
