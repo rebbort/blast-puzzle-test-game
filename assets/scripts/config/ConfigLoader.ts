@@ -118,5 +118,30 @@ export const DefaultBoosterLimits: BoosterLimitConfig = {
 /** Загружает настройки лимитов бустеров. */
 export function loadBoosterLimits(): BoosterLimitConfig {
   const config = loadGameConfig();
-  return config.boosterLimits;
+  const base = { ...config.boosterLimits };
+  const storage = (
+    globalThis as unknown as {
+      localStorage?: { getItem: (key: string) => string | null };
+    }
+  ).localStorage;
+  if (!storage) return base;
+
+  try {
+    const raw = storage.getItem("boosterLimits");
+    if (!raw) return base;
+    const data = JSON.parse(raw) as Partial<BoosterLimitConfig>;
+    if (typeof data.maxTypes === "number") {
+      base.maxTypes = data.maxTypes;
+    }
+    if (data.maxPerType) {
+      Object.entries(data.maxPerType).forEach(([id, val]) => {
+        if (base.maxPerType[id] !== undefined) {
+          base.maxPerType[id] = val as number;
+        }
+      });
+    }
+    return base;
+  } catch {
+    return base;
+  }
 }
