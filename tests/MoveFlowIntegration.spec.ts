@@ -3,10 +3,11 @@ import MoveFlowController from "../assets/scripts/ui/controllers/MoveFlowControl
 import FillController from "../assets/scripts/ui/controllers/FillController";
 import TileView from "../assets/scripts/ui/views/TileView";
 import { Board } from "../assets/scripts/core/board/Board";
-import { TileFactory } from "../assets/scripts/core/board/Tile";
+import { TileFactory, TileKind } from "../assets/scripts/core/board/Tile";
 import { BoardConfig } from "../assets/scripts/config/ConfigLoader";
 import { MoveExecutor } from "../assets/scripts/core/board/MoveExecutor";
 import { EventBus } from "../assets/scripts/core/EventBus";
+import { EventNames } from "../assets/scripts/core/events/EventNames";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -180,5 +181,52 @@ describe("Move flow integration", () => {
     views.forEach((row) => row.forEach((v) => expect(v).toBeDefined()));
     expect((firstBottomA.node as any).destroyed).toBe(true);
     expect((firstBottomB.node as any).destroyed).toBe(true);
+  });
+
+  test("super tile activates effect when removed", () => {
+    const singleCfg: BoardConfig = {
+      cols: 1,
+      rows: 1,
+      tileWidth: 1,
+      tileHeight: 1,
+      colors: ["red"],
+      superThreshold: 3,
+    };
+    const tile = TileFactory.createNormal("red");
+    tile.kind = TileKind.SuperRow;
+    const board = new Board(singleCfg, [[tile]]);
+
+    const root = new cc.Node();
+    const layer = new cc.Node();
+    layer.name = "TilesLayer";
+    (root as any).children.push(layer);
+    (root as any).getChildByName = (n: string) =>
+      n === "TilesLayer" ? layer : null;
+
+    const boardCtrl = root.addComponent(GameBoardController);
+    (boardCtrl as any).board = board;
+    boardCtrl.tilesLayer = layer;
+    const prefab = new (cc.Prefab as any)("TileNode", TileView);
+    boardCtrl.tileNodePrefab = prefab;
+    (boardCtrl as any).spawnAllTiles();
+
+    const view = boardCtrl.tileViews[0][0];
+    const spy = jest.spyOn(view, "activateSuper");
+    view["activateFx"] = new (cc.Prefab as any)("fx", cc.Component);
+    const fxNode = new cc.Node();
+    const instSpy = jest
+      .spyOn(cc, "instantiate")
+      .mockImplementationOnce(() => fxNode);
+
+    const flow = root.addComponent(MoveFlowController);
+    flow.tilesLayer = layer;
+    (flow as any).onLoad();
+
+    EventBus.emit(EventNames.RemoveStarted, [new cc.Vec2(0, 0)]);
+
+    expect(fxNode.parent).toBe(layer);
+    instSpy.mockRestore();
+
+    expect(spy).toHaveBeenCalled();
   });
 });

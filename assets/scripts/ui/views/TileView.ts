@@ -108,7 +108,9 @@ export default class TileView extends cc.Component {
   activateSuper(): void {
     if (this.activateFx) {
       const fx = cc.instantiate(this.activateFx);
-      fx.parent = this.node;
+      // Position effect relative to tiles layer so it persists after tile node is destroyed
+      fx.parent = this.node.parent || this.node;
+      fx.setPosition(this.node.position);
     }
     // Дополнительная индикация может быть добавлена здесь
   }
