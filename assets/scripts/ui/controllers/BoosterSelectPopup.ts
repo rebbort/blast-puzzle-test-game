@@ -35,10 +35,15 @@ export default class BoosterSelectPopup extends cc.Component {
     this.createSlots();
   }
 
+  onEnable(): void {
+    boosterSelectionService.reset();
+    this.updateHighlights();
+    this.animationController?.replayAnimation();
+  }
+
   start(): void {
     const playButton = this.node.getChildByName("PlayButton");
     playButton?.on(cc.Node.EventType.TOUCH_END, () => this.startGame());
-    this.animationController?.replayAnimation();
   }
 
   private createSlots(): void {

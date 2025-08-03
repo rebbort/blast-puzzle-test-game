@@ -84,4 +84,9 @@ export default class GameStateController extends cc.Component {
       this.gameBoard.active = true;
     }
   }
+
+  onDestroy(): void {
+    EventBus.off(EventNames.BoostersSelected, this.onGameStart, this);
+    EventBus.off(EventNames.GameRestart, this.onGameRestart, this);
+  }
 }
