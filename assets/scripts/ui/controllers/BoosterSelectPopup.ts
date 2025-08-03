@@ -32,7 +32,6 @@ export default class BoosterSelectPopup extends cc.Component {
       BoosterSelectAnimationController,
     );
     boosterSelectionService.reset();
-    boosterSelectionService.confirm();
     this.createSlots();
   }
 
@@ -53,8 +52,6 @@ export default class BoosterSelectPopup extends cc.Component {
       const def = BoosterRegistry[i];
       const node = cc.instantiate(this.boosterSlotPrefab);
       this.boosterSlotGrid.addChild(node);
-
-      // Устанавливаем позицию для отладки
       node.setPosition(0, 0, 0);
 
       const icon =
@@ -114,7 +111,8 @@ export default class BoosterSelectPopup extends cc.Component {
   }
 
   private confirm(): void {
-    boosterSelectionService.confirm();
+    console.log("BoosterSelectPopup confirm() called");
+    boosterSelectionService.confirm(); // ← Событие эмитится здесь
     (this.node as unknown as { active: boolean }).active = false;
   }
 

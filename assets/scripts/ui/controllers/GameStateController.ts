@@ -16,6 +16,7 @@ export default class GameStateController extends cc.Component {
   gameBoard: cc.Node = null;
 
   start(): void {
+    console.log("GameStateController start() called");
     this.setupEventListeners();
     this.setInitialState();
   }
@@ -51,14 +52,14 @@ export default class GameStateController extends cc.Component {
   private onGameStart(charges: Record<string, number>): void {
     console.log("GameStateController: Starting game with charges:", charges);
 
+    // Активируем GameBoard
+    if (this.gameBoard) {
+      this.gameBoard.active = true;
+    }
+
     // Скрываем BoosterSelectPopup
     if (this.boosterSelectPopup) {
       this.boosterSelectPopup.active = false;
-    }
-
-    // Показываем GameBoard
-    if (this.gameBoard) {
-      this.gameBoard.active = true;
     }
   }
 

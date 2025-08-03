@@ -23,74 +23,93 @@ export default class BoosterPanelController extends cc.Component {
   @property(cc.Node)
   boosterList: cc.Node = null;
 
-  private selectedBoosters: Record<string, number> = {};
+  @property(cc.Prefab)
+  boosterSlotPrefab: cc.Prefab = null;
+
   private boosterSlots: BoosterSlot[] = [];
 
   start(): void {
-    this.initializeSlots();
     this.setupEventListeners();
     const charges = boosterSelectionService.getConfirmedCharges();
-    if (Object.keys(charges).length > 0) {
-      this.onBoostersSelected(charges);
-    }
+    this.createSlots(charges);
   }
 
-  private initializeSlots(): void {
-    if (!this.boosterList) return;
+  private createSlots(charges: Record<string, number>): void {
+    if (!this.boosterList || !this.boosterSlotPrefab) {
+      console.warn("Missing boosterList or boosterSlotPrefab");
+      return;
+    }
+
+    console.log("BoosterPanelController createSlots");
+
+    // Очищаем существующие слоты
+    this.boosterList.removeAllChildren();
     this.boosterSlots = [];
-    this.boosterList.children.forEach((child: cc.Node) => {
-      const button = child.getComponent(cc.Button);
-      const icon =
-        child.getChildByName("Icon")?.getComponent(cc.Sprite) || null;
+
+    const entries = Object.entries(charges).filter(([, c]) => c > 0);
+
+    for (let i = 0; i < entries.length; i++) {
+      const [boosterId, count] = entries[i];
+      const node = cc.instantiate(this.boosterSlotPrefab);
+      this.boosterList.addChild(node);
+      node.setPosition(0, 0, 0);
+
+      const button = node.getComponent(cc.Button);
       const counterLabel =
-        child.getChildByName("CounterLabel")?.getComponent(cc.Label) || null;
+        node
+          .getChildByName("BoosterCounter")
+          ?.getChildByName("CounterLabel")
+          ?.getComponent(cc.Label) || null;
+
+      const def = BoosterRegistry.find((b) => b.id === boosterId);
+      if (!def) return;
+
+      const icon =
+        node.getChildByName("BoosterIcon")?.getComponent(cc.Sprite) || null;
+      if (icon) {
+        cc.resources.load(def.icon, cc.SpriteFrame, (err, spriteFrame) => {
+          if (!err && spriteFrame && icon) {
+            icon.spriteFrame = spriteFrame as cc.SpriteFrame;
+          }
+        });
+      }
+      console.log("icon", icon);
 
       const slot: BoosterSlot = {
-        node: child,
+        node,
         button,
         icon,
         counterLabel,
         highlight: null,
-        boosterId: "",
-        charges: 0,
+        boosterId,
+        charges: count,
         isActive: false,
       };
+
+      console.log("slot", slot);
+
       this.addHighlightToSlot(slot);
       this.setupSlotClickHandler(slot);
+      this.setBoosterIcon(slot, boosterId);
 
-      // скрываем до получения выбранных бустеров
-      slot.node.active = false;
+      if (slot.counterLabel) {
+        slot.counterLabel.string = String(count);
+      }
 
+      slot.node.active = true;
       this.boosterSlots.push(slot);
-    });
+    }
+
+    // Принудительно обновляем Layout
+    const layout = this.boosterList.getComponent(cc.Layout);
+    if (layout) {
+      layout.updateLayout();
+    }
   }
 
   private setupEventListeners(): void {
-    EventBus.on(EventNames.BoostersSelected, this.onBoostersSelected, this);
     EventBus.on(EventNames.BoosterConsumed, this.onBoosterConsumed, this);
     EventBus.on(EventNames.BoosterCancelled, this.onBoosterCancelled, this);
-  }
-
-  private onBoostersSelected(charges: Record<string, number>): void {
-    this.selectedBoosters = charges;
-
-    const entries = Object.entries(charges).filter(([, c]) => c > 0);
-
-    this.boosterSlots.forEach((slot, index) => {
-      const entry = entries[index];
-      if (!entry) {
-        slot.boosterId = "";
-        slot.charges = 0;
-        slot.node.active = false;
-        return;
-      }
-      const [id, count] = entry as [string, number];
-      slot.boosterId = id;
-      slot.charges = count;
-      this.setBoosterIcon(slot, id);
-      if (slot.counterLabel) slot.counterLabel.string = String(count);
-      slot.node.active = true;
-    });
   }
 
   // Метод setupBoosterSlot больше не нужен - бустеры настраиваются при инициализации
@@ -190,7 +209,6 @@ export default class BoosterPanelController extends cc.Component {
   }
 
   onDestroy(): void {
-    EventBus.off(EventNames.BoostersSelected, this.onBoostersSelected, this);
     EventBus.off(EventNames.BoosterConsumed, this.onBoosterConsumed, this);
     EventBus.off(EventNames.BoosterCancelled, this.onBoosterCancelled, this);
   }
