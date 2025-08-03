@@ -1,10 +1,10 @@
 const { ccclass, property } = cc._decorator;
 
 /**
- * Контроллер для эффекта ракеты с двумя хвостами.
- * Управляет двумя частицами, которые разлетаются в противоположных направлениях.
+ * Controller for the rocket effect with two tails.
+ * Manages two particles that fly in opposite directions.
  */
-@ccclass("RocketVfxController")
+@ccclass()
 export class RocketVfxController extends cc.Component {
   @property(cc.ParticleSystem)
   leftTail: cc.ParticleSystem | null = null;
@@ -19,19 +19,19 @@ export class RocketVfxController extends cc.Component {
   duration: number = 1.0;
 
   @property({ type: cc.Float, range: [0, 360, 5] })
-  leftAngle: number = 135; // Влево-вверх
+  leftAngle: number = 135; // Left-up
 
   @property({ type: cc.Float, range: [0, 360, 5] })
-  rightAngle: number = 45; // Вправо-вверх
+  rightAngle: number = 45; // Right-up
 
   @property({ type: cc.Float, range: [0, 360, 5] })
-  movementAngle: number = 90; // Угол движения ноды (по умолчанию вверх)
+  movementAngle: number = 90; // Node movement angle (default up)
 
   private isPlaying = false;
 
   /**
-   * Запускает эффект ракеты с двумя хвостами.
-   * @returns Promise, который разрешается когда эффект завершен
+   * Starts the rocket effect with two tails.
+   * @returns Promise that resolves when the effect is finished
    */
   play(): Promise<void> {
     return new Promise((resolve) => {
@@ -40,39 +40,47 @@ export class RocketVfxController extends cc.Component {
         return;
       }
 
+      if (!this.node || !cc.isValid(this.node)) {
+        console.warn("Node is null or invalid");
+        resolve();
+        return;
+      }
+
       this.isPlaying = true;
 
-      // Настраиваем и запускаем левый хвост
+      // Configure and start the left tail
       if (this.leftTail) {
         this.setupTail(this.leftTail, this.leftAngle);
         this.leftTail.resetSystem();
       }
 
-      // Настраиваем и запускаем правый хвост
+      // Configure and start the right tail
       if (this.rightTail) {
         this.setupTail(this.rightTail, this.rightAngle);
         this.rightTail.resetSystem();
       }
 
-      // Анимируем движение ноды за пределы экрана
+      // Animate the node movement beyond the screen
       this.animateNodeMovement();
 
-      // Ждем завершения эффекта
+      // Wait for the effect to finish
       const finish = () => {
         this.isPlaying = false;
-        this.node.destroy();
+        if (this.node && cc.isValid(this.node)) {
+          this.node.destroy();
+        }
         resolve();
       };
 
-      // Подписываемся на завершение обоих хвостов
-      if (this.leftTail?.node) {
+      // Subscribe to the completion of both tails
+      if (this.leftTail?.node && cc.isValid(this.leftTail.node)) {
         this.leftTail.node.once("finished", finish);
       }
-      if (this.rightTail?.node) {
+      if (this.rightTail?.node && cc.isValid(this.rightTail.node)) {
         this.rightTail.node.once("finished", finish);
       }
 
-      // Fallback: если события не сработают, завершаем через duration
+      // Fallback: if the events don't work, finish through duration
       setTimeout(() => {
         if (this.isPlaying) {
           finish();
@@ -82,17 +90,17 @@ export class RocketVfxController extends cc.Component {
   }
 
   /**
-   * Анимирует движение нод с партиклами в разные стороны.
+   * Animates the node with particles in different directions.
    */
   private animateNodeMovement(): void {
-    // Получаем размеры экрана
+    // Get the screen size
     const visibleSize = cc.view.getVisibleSize();
     const screenWidth = visibleSize.width;
     const screenHeight = visibleSize.height;
-    const distance = Math.max(screenWidth, screenHeight) * 1.5; // 1.5x размер экрана
+    const distance = Math.max(screenWidth, screenHeight) * 1.5; // 1.5x screen size
 
-    // Анимируем левый хвост
-    if (this.leftTail?.node) {
+    // Animate the left tail
+    if (this.leftTail?.node && cc.isValid(this.leftTail.node)) {
       const leftAngleRad = (this.leftAngle * Math.PI) / 180;
       const leftDirectionX = Math.cos(leftAngleRad);
       const leftDirectionY = Math.sin(leftAngleRad);
@@ -104,8 +112,8 @@ export class RocketVfxController extends cc.Component {
       this.leftTail.node.runAction(leftMoveAction);
     }
 
-    // Анимируем правый хвост
-    if (this.rightTail?.node) {
+    // Animate the right tail
+    if (this.rightTail?.node && cc.isValid(this.rightTail.node)) {
       const rightAngleRad = (this.rightAngle * Math.PI) / 180;
       const rightDirectionX = Math.cos(rightAngleRad);
       const rightDirectionY = Math.sin(rightAngleRad);
@@ -119,49 +127,54 @@ export class RocketVfxController extends cc.Component {
   }
 
   /**
-   * Настраивает хвост ракеты с заданным углом.
+   * Configures the rocket tail with a given angle.
    */
   private setupTail(particleSystem: cc.ParticleSystem, angle: number): void {
-    // Отключаем автоматическое удаление
+    if (!particleSystem || !cc.isValid(particleSystem)) {
+      console.warn("ParticleSystem is null or invalid");
+      return;
+    }
+
+    // Disable automatic removal
     (
       particleSystem as unknown as { autoRemoveOnFinish?: boolean }
     ).autoRemoveOnFinish = false;
 
-    // Настраиваем параметры частиц
+    // Configure particle parameters
     particleSystem.duration = this.duration;
     particleSystem.life = this.duration * 0.8;
-    particleSystem.speed = this.speed * 30; // Еще меньше скорость частиц, так как ноды движутся
+    particleSystem.speed = this.speed * 30; // Even less particle speed because nodes move
     particleSystem.angle = angle;
-    particleSystem.angleVar = 0; // Небольшое отклонение
+    particleSystem.angleVar = 0; // Small deviation
 
-    // Настраиваем размер и цвет
+    // Configure size and color
     particleSystem.startSize = 250;
     particleSystem.endSize = 5;
     particleSystem.startSizeVar = 5;
     particleSystem.endSizeVar = 2;
 
-    // Настраиваем цвета (оранжево-красный хвост)
+    // Configure colors (orange-red tail)
     particleSystem.startColor = cc.color(255, 200, 100, 255);
     particleSystem.endColor = cc.color(255, 100, 50, 0);
     particleSystem.startColorVar = cc.color(50, 50, 50, 50);
     particleSystem.endColorVar = cc.color(30, 30, 30, 30);
 
-    // Настраиваем эмиссию
+    // Configure emission
     particleSystem.emissionRate = 200;
     particleSystem.totalParticles = 100;
 
-    // Настраиваем физику - убираем гравитацию для лучшего эффекта хвоста
+    // Configure physics - remove gravity for better tail effect
     particleSystem.gravity = cc.v2(0, 0);
     particleSystem.tangentialAccel = 0;
     particleSystem.radialAccel = 0;
     particleSystem.speedVar = 20;
 
-    // Настройки позиции
+    // Position settings
     particleSystem.sourcePos = cc.v2(0, 0);
     particleSystem.posVar = cc.v2(2, 2);
-    particleSystem.positionType = cc.ParticleSystem.PositionType.RELATIVE; // Относительно ноды
+    particleSystem.positionType = cc.ParticleSystem.PositionType.RELATIVE; // Relative to the node
 
-    // Настройки вращения
+    // Rotation settings
     particleSystem.startSpin = 0;
     particleSystem.endSpin = 0;
     particleSystem.startSpinVar = 180;
@@ -170,14 +183,14 @@ export class RocketVfxController extends cc.Component {
   }
 
   /**
-   * Останавливает эффект.
+   * Stops the effect.
    */
   stop(): void {
     this.isPlaying = false;
-    if (this.leftTail) {
+    if (this.leftTail && cc.isValid(this.leftTail)) {
       this.leftTail.stopSystem();
     }
-    if (this.rightTail) {
+    if (this.rightTail && cc.isValid(this.rightTail)) {
       this.rightTail.stopSystem();
     }
   }

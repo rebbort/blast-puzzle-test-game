@@ -1,51 +1,51 @@
 /**
- * Определения модели игрового тайла.
+ * Definitions of the game tile model.
  */
 
 /**
- * Допустимые цвета тайлов на поле.
+ * Possible colors of tiles on the board.
  */
 export type TileColor = "red" | "blue" | "green" | "yellow" | "purple";
 
 /**
- * Перечисление видов тайлов.
+ * Enumeration of tile types.
  */
 export enum TileKind {
-  /** обычный тайл */
+  /** normal tile */
   Normal,
-  /** супер‑тайл: сжигает строку */
+  /** super tile: burns a row */
   SuperRow,
-  /** супер‑тайл: сжигает столбец */
+  /** super tile: burns a column */
   SuperCol,
-  /** радиус R */
+  /** radius R */
   SuperBomb,
-  /** очищает всё поле */
+  /** clears the entire field */
   SuperClear,
 }
 
 /**
- * Интерфейс игрового тайла.
+ * Interface of the game tile.
  */
 export interface Tile {
-  /** уникальный идентификатор */
+  /** unique identifier */
   id: number;
-  /** цвет тайла */
+  /** color of the tile */
   color: TileColor;
-  /** тип тайла */
+  /** type of the tile */
   kind: TileKind;
 }
 
 /**
- * Фабрика для создания тайлов.
+ * Factory for creating tiles.
  */
 export class TileFactory {
-  /** счётчик идентификаторов */
+  /** counter of identifiers */
   private static nextId = 0;
 
   /**
-   * Создаёт обычный тайл заданного цвета.
-   * @param color Цвет тайла
-   * @returns Новый тайл с типом {@link TileKind.Normal}
+   * Creates a normal tile of the given color.
+   * @param color Color of the tile
+   * @returns New tile with type {@link TileKind.Normal}
    */
   public static createNormal(color: TileColor): Tile {
     return {

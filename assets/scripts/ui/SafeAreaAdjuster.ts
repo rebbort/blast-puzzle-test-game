@@ -25,7 +25,7 @@ interface NodeWithUITransform {
  * area offsets are then applied here at runtime so UI widgets avoid cutouts
  * on phones like iPhone X.
  */
-@ccclass("")
+@ccclass()
 export class SafeAreaAdjuster extends cc.Component {
   /** Reads screen.safeArea and applies it to the node's UITransform. */
   start(): void {

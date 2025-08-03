@@ -4,8 +4,8 @@ import { EventNames } from "../../core/events/EventNames";
 const { ccclass, property } = cc._decorator;
 
 /**
- * Контроллер для управления состоянием игры
- * Управляет переключением между экранами
+ * Controller for managing the game state
+ * Manages switching between screens
  */
 @ccclass()
 export default class GameStateController extends cc.Component {
@@ -22,7 +22,7 @@ export default class GameStateController extends cc.Component {
   }
 
   /**
-   * Устанавливает начальное состояние
+   * Sets the initial state
    */
   private setInitialState(): void {
     if (this.boosterSelectPopup) {
@@ -39,16 +39,16 @@ export default class GameStateController extends cc.Component {
   }
 
   /**
-   * Настраивает слушатели событий
+   * Sets event listeners
    */
   private setupEventListeners(): void {
-    // Слушаем событие запуска игры
+    // Listen to the game start event
     EventBus.on(EventNames.BoostersSelected, this.onGameStart, this);
     EventBus.on(EventNames.GameRestart, this.onGameRestart, this);
   }
 
   /**
-   * Обработчик запуска игры
+   * Game start handler
    */
   private onGameStart(charges: Record<string, number>): void {
     console.log("GameStateController: Starting game with charges:", charges);
@@ -60,7 +60,7 @@ export default class GameStateController extends cc.Component {
   }
 
   /**
-   * Переключает обратно к экрану выбора бустеров
+   * Switches back to the booster selection screen
    */
   public switchToBoosterSelection(): void {
     if (this.boosterSelectPopup) {
@@ -73,7 +73,7 @@ export default class GameStateController extends cc.Component {
   }
 
   /**
-   * Переключает к игровой доске
+   * Switches to the game board
    */
   public switchToGameBoard(): void {
     if (this.boosterSelectPopup) {

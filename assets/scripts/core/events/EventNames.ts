@@ -1,7 +1,6 @@
 /**
- * Единый источник истины для имен событий.
- * Используем строковые константы, потому что cc.EventTarget
- * ожидает строковые имена.
+ * Single source of truth for event names.
+ * We use string constants because cc.EventTarget expects string names.
  */
 export const EventNames = {
   GameStart: "GameStart",
@@ -40,8 +39,8 @@ export const EventNames = {
   SuperTileCreated: "SuperTileCreated",
   SuperTilePlaced: "SuperTilePlaced",
   SuperTileActivated: "SuperTileActivated",
-  /** Игрок нажал на тайл (всегда). */
+  /** Player pressed a tile (always). */
   TilePressed: "TilePressed",
-  /** Нажатие не считается ходом (группа < 2). */
+  /** Tap is not considered a move (group < 2). */
   InvalidTap: "InvalidTap",
 } as const;

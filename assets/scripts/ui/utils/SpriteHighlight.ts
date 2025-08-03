@@ -1,8 +1,8 @@
 const { ccclass, property } = cc._decorator;
 
 /**
- * Утилита для выделения спрайта тинтом.
- * Применяет цветовой тинт к спрайту для создания эффекта выделения.
+ * Utility for highlighting a sprite with a tint.
+ * Applies a color tint to the sprite to create a highlight effect.
  */
 @ccclass()
 export default class SpriteHighlight extends cc.Component {
@@ -20,14 +20,14 @@ export default class SpriteHighlight extends cc.Component {
   onLoad() {
     this.sprite = this.node.getComponent(cc.Sprite);
     if (this.sprite) {
-      // Сохраняем оригинальные значения
+      // Save the original values
       this.originalColor = this.node.color.clone();
       this.originalOpacity = this.node.opacity;
     }
   }
 
   /**
-   * Переключает состояние выделения
+   * Toggles the highlight state
    */
   public toggleHighlight(): void {
     if (this.isHighlighted) {
@@ -38,7 +38,7 @@ export default class SpriteHighlight extends cc.Component {
   }
 
   /**
-   * Устанавливает выделение
+   * Sets the highlight
    */
   public setHighlight(): void {
     if (!this.sprite) return;
@@ -49,7 +49,7 @@ export default class SpriteHighlight extends cc.Component {
   }
 
   /**
-   * Убирает выделение
+   * Removes the highlight
    */
   public clearHighlight(): void {
     if (!this.sprite) return;
@@ -60,14 +60,14 @@ export default class SpriteHighlight extends cc.Component {
   }
 
   /**
-   * Проверяет, выделен ли спрайт
+   * Checks if the sprite is highlighted
    */
   public isHighlightedState(): boolean {
     return this.isHighlighted;
   }
 
   /**
-   * Изменяет цвет выделения
+   * Changes the highlight color
    */
   public setHighlightColor(color: cc.Color): void {
     this.highlightColor = color;
@@ -77,7 +77,7 @@ export default class SpriteHighlight extends cc.Component {
   }
 
   /**
-   * Изменяет прозрачность выделения
+   * Changes the highlight opacity
    */
   public setHighlightOpacity(opacity: number): void {
     this.highlightOpacity = opacity;
@@ -87,7 +87,7 @@ export default class SpriteHighlight extends cc.Component {
   }
 
   /**
-   * Принудительно обновляет оригинальные значения (если спрайт изменился)
+   * Force updates the original values (if the sprite has changed)
    */
   public updateOriginalValues(): void {
     if (this.sprite) {
@@ -97,7 +97,7 @@ export default class SpriteHighlight extends cc.Component {
   }
 
   /**
-   * Сбрасывает к оригинальным значениям
+   * Resets to the original values
    */
   public resetToOriginal(): void {
     this.clearHighlight();
@@ -105,7 +105,7 @@ export default class SpriteHighlight extends cc.Component {
   }
 
   onDestroy() {
-    // Убираем выделение при уничтожении
+    // Remove the highlight when destroying
     this.clearHighlight();
   }
 }

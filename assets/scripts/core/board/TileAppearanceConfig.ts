@@ -4,13 +4,13 @@ import { TileKind } from "./Tile";
 import { FXController } from "../fx/FXController";
 
 /**
- * Метаданные для визуального префаба тайла.
- * Указывает, к какому kind относится и какие визуальные эффекты проигрывать.
+ * Metadata for the visual prefab of a tile.
+ * Specifies which kind it belongs to and which visual effects to play.
  */
 
-@ccclass("TileAppearanceConfig")
+@ccclass()
 export class TileAppearanceConfig extends cc.Component {
-  /** Тип супер-тайла (или Normal для обычного). */
+  /** Type of super tile (or Normal for normal). */
   private static readonly ccEnum = (
     cc as unknown as { Enum?: (e: object) => unknown }
   ).Enum;
@@ -22,21 +22,19 @@ export class TileAppearanceConfig extends cc.Component {
   kind: TileKind = TileKind.Normal;
 
   /**
-   * Префаб визуального эффекта, который воспроизводится при появлении
-   * данного тайла.
+   * Prefab of the visual effect that plays when the tile appears.
    */
   @property(cc.Prefab)
   spawnFx: cc.Prefab | null = null;
 
   /**
-   * Префаб визуального эффекта, который воспроизводится при активации
-   * (например, когда срабатывает супер‑тайл).
+   * Prefab of the visual effect that plays when the tile is activated
+   * (e.g. when a super tile is triggered).
    */
   @property(cc.Prefab)
   activateFx: cc.Prefab | null = null;
 
-  // Дополнительные параметры могут быть добавлены здесь (цветовые вспышки,
-  // множители и т. д.)
+  // Additional parameters can be added here (color flashes, multipliers, etc.)
 
   onLoad(): void {
     if (this.activateFx) {

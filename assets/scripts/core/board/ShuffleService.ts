@@ -15,52 +15,52 @@ export class ShuffleService {
   ) {}
 
   /**
-   * Проверяет наличие ходов и при их отсутствии:
-   * - если shuffleCount < maxShuffles:
-   *     эмит 'AutoShuffle', вызывает shuffle() и инкрементирует счётчик;
-   * - иначе эмит 'ShuffleLimitExceeded'.
+   * Checks if there are moves and if not:
+   * - if shuffleCount < maxShuffles:
+   *     emit 'AutoShuffle', call shuffle() and increment the counter;
+   * - otherwise emit 'ShuffleLimitExceeded'.
    */
   ensureMoves(): void {
     if (this.solver.hasMoves()) {
-      // Если ход есть, ничего не делаем.
+      // If there are moves, do nothing.
       return;
     }
 
     if (this.shuffleCount < this.maxShuffles) {
-      // Сообщаем, что будет автоматическая перетасовка.
+      // Notify that an automatic shuffle will happen.
       this.bus.emit(EventNames.AutoShuffle);
-      // Увеличиваем счётчик перед самой операцией.
+      // Increment the counter before the operation.
       this.shuffleCount++;
-      // Перемешиваем тайлы на поле.
+      // Shuffle the tiles on the board.
       this.shuffle();
     } else {
-      // Достигнут предел, больше тасовать нельзя.
+      // Reached the limit, no more shuffling allowed.
       this.bus.emit(EventNames.ShuffleLimitExceeded);
     }
   }
 
   /**
-   * Перемешивает все тайлы board в случайном порядке.
-   * После завершения эмитится 'ShuffleDone'.
+   * Shuffles all tiles on the board in random order.
+   * Emits 'ShuffleDone' after completion.
    */
   shuffle(): void {
     const cfg = (this.board as unknown as { cfg: BoardConfig }).cfg;
     const tiles: (Tile | null)[] = [];
 
-    // Считываем текущее состояние поля в плоский массив.
+    // Read the current state of the board into a flat array.
     for (let y = 0; y < cfg.rows; y++) {
       for (let x = 0; x < cfg.cols; x++) {
         tiles.push(this.board.tileAt(new cc.Vec2(x, y)));
       }
     }
 
-    // Алгоритм Фишера-Йетса для равномерного перемешивания.
+    // Fisher-Yates algorithm for uniform shuffling.
     for (let i = tiles.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [tiles[i], tiles[j]] = [tiles[j], tiles[i]];
     }
 
-    // Записываем тайлы обратно на поле, проходя по колонкам.
+    // Write tiles back to the board, iterating over columns.
     let idx = 0;
     for (let x = 0; x < cfg.cols; x++) {
       for (let y = 0; y < cfg.rows; y++) {
@@ -68,12 +68,12 @@ export class ShuffleService {
       }
     }
 
-    // Уведомляем слушателей об окончании перетасовки.
+    // Notify listeners that the shuffling is done.
     this.bus.emit(EventNames.ShuffleDone);
   }
 
   /**
-   * Сбрасывает счётчик использованных перетасовок.
+   * Resets the counter of used shuffles.
    */
   reset(): void {
     this.shuffleCount = 0;

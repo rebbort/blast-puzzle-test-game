@@ -5,7 +5,7 @@ import { MoveExecutor } from "../MoveExecutor";
 import { BoardSolver } from "../BoardSolver";
 
 /**
- * Схлопывает все тайлы в радиусе R от center.
+ * Collapses all tiles within radius R from the center.
  */
 export class BombCommand implements ICommand {
   constructor(
@@ -16,10 +16,10 @@ export class BombCommand implements ICommand {
   ) {}
 
   async execute(): Promise<void> {
-    // Собираем координаты вокруг центра, включая саму клетку.
-    // Перебираем квадрат [-R,R] и используем условие
-    // max(|dx|,|dy|) <= R, что соответствует радиусу по Чебышёву.
-    // Точки за границами поля игнорируются.
+    // Collect coordinates around the center, including the center cell itself.
+    // Iterate over the square [-R, R] and use the condition
+    // max(|dx|, |dy|) <= R, which corresponds to the Chebyshev radius.
+    // Ignore points that are out of board bounds.
     const group: cc.Vec2[] = [];
     for (let dx = -this.radius; dx <= this.radius; dx++) {
       for (let dy = -this.radius; dy <= this.radius; dy++) {
@@ -30,12 +30,12 @@ export class BombCommand implements ICommand {
       }
     }
 
-    // Расширяем группу, чтобы задетые супер-тайлы запустили свои эффекты.
+    // Expand the group to trigger the effects of any super tiles.
     const expanded = new BoardSolver(this.board).expandBySupers(group);
 
-    // Выполняем стандартный пайплайн remove → fall → fill.
-    // Используем MoveExecutor, чтобы после удаления тайлов остальные
-    // упали и заполненные позиции заполнились новыми тайлами.
+    // Execute the standard pipeline: remove → fall → fill.
+    // Use MoveExecutor to ensure that other tiles fall and empty positions
+    // are filled with new tiles.
     await new MoveExecutor(this.board, this.bus).execute(expanded);
   }
 }

@@ -1,5 +1,5 @@
-import { EventBus } from "../core/EventBus";
-import { EventNames } from "../core/events/EventNames";
+import { EventBus } from "../../core/EventBus";
+import { EventNames } from "../../core/events/EventNames";
 const { ccclass, property } = cc._decorator;
 
 /**
@@ -11,31 +11,31 @@ const { ccclass, property } = cc._decorator;
 export class PopupController extends cc.Component {
   /** ResultLine node that falls from above */
   @property(cc.Node)
-  resultLine!: cc.Node;
+  resultLine: cc.Node = null;
 
   /** Title label displaying Victory or Defeat text. */
   @property(cc.Label)
-  lblTitle!: cc.Label;
+  lblTitle: cc.Label = null;
 
   /** Label showing the final score amount. */
   @property(cc.Label)
-  lblFinalScore!: cc.Label;
+  lblFinalScore: cc.Label = null;
 
   /** Restart button node. */
   @property(cc.Button)
-  btnRestart!: cc.Button;
+  btnRestart: cc.Button = null;
 
   /** Original position of ResultLine for animation */
   private originalResultLinePosition: cc.Vec3 = cc.Vec3.ZERO;
 
   onLoad(): void {
-    // Сохраняем оригинальную позицию ResultLine
+    // Save the original position of ResultLine
     if (this.resultLine) {
       this.originalResultLinePosition = this.resultLine.position.clone();
       this.resultLine.active = false;
     }
 
-    // Скрываем RestartButton изначально
+    // Hide the RestartButton initially
     if (this.btnRestart) {
       this.btnRestart.node.active = false;
     }
@@ -69,21 +69,21 @@ export class PopupController extends cc.Component {
       this.lblFinalScore.string = String(score);
     }
 
-    // Скрываем RestartButton перед анимацией
+    // Hide the RestartButton before the animation
     if (this.btnRestart) {
       this.btnRestart.node.active = false;
     }
 
-    // Начинаем анимацию падения ResultLine
+    // Start the animation of the ResultLine falling
     this.animateResultLineFall();
   }
 
   private animateResultLineFall(): void {
     if (!this.resultLine) return;
 
-    // Устанавливаем ResultLine над экраном
+    // Set the ResultLine above the screen
     const startPosition = this.originalResultLinePosition.clone();
-    startPosition.y += 1000; // Над экраном
+    startPosition.y += 1000; // Above the screen
     this.resultLine.active = true;
     this.resultLine.setPosition(startPosition);
 
@@ -95,7 +95,7 @@ export class PopupController extends cc.Component {
         { easing: "backOut" },
       )
       .call(() => {
-        // После падения показываем RestartButton
+        // After falling, show the RestartButton
         this.showRestartButton();
       })
       .start();
@@ -104,20 +104,20 @@ export class PopupController extends cc.Component {
   private showRestartButton(): void {
     if (!this.btnRestart) return;
 
-    // Показываем кнопку
+    // Show the button
     this.btnRestart.node.active = true;
     this.btnRestart.node.scale = 0;
 
-    // Анимация появления с баунс эффектом
+    // Animation of appearance with bounce effect
     cc.tween(this.btnRestart.node)
       .to(0.4, { scale: 1 }, { easing: "backOut" })
       .start();
 
-    // Настраиваем обработчик клика
+    // Configure the click handler
     this.btnRestart.node.once("click", () => {
       console.log("Restart");
 
-      // Анимируем скрытие элементов
+      // Animate the hiding of elements
       this.hideElementsWithAnimation(() => {
         EventBus.emit(EventNames.GameRestart);
       });
@@ -127,7 +127,7 @@ export class PopupController extends cc.Component {
   }
 
   private hideElementsWithAnimation(callback: () => void): void {
-    // Сначала анимируем скрытие RestartButton
+    // First, animate the hiding of the RestartButton
     if (this.btnRestart) {
       cc.tween(this.btnRestart.node)
         .to(0.3, { scale: 0 }, { easing: "backIn" })
@@ -137,10 +137,10 @@ export class PopupController extends cc.Component {
         .start();
     }
 
-    // Затем анимируем улетание ResultLine вверх
+    // Then animate the ResultLine flying up
     if (this.resultLine) {
       const endPosition = this.originalResultLinePosition.clone();
-      endPosition.y += 1000; // Улетает вверх
+      endPosition.y += 1000; // It flies up
 
       cc.tween(this.resultLine)
         .to(0.6, { position: endPosition }, { easing: "backIn" })

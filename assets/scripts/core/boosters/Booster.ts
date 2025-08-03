@@ -1,29 +1,29 @@
 /**
- * Интерфейс бустера:
- * id       — уникальный идентификатор (например: 'bomb', 'swap'),
- * charges  — оставшееся количество использований,
- * canActivate — проверяет, можно ли активировать в текущем состоянии поля,
- * start    — переводит игру в режим выбора клетки(ок) для бустера.
+ * Interface of the booster:
+ * id       — unique identifier (e.g. 'bomb', 'swap'),
+ * charges  — remaining number of uses,
+ * canActivate — checks if the booster can be activated in the current state of the field,
+ * start    — switches the game to the mode of selecting cells (or cells) for the booster.
  */
 export interface Booster {
   /**
-   * Уникальный идентификатор бустера.
-   * Примеры: "bomb", "swap".
+   * Unique identifier of the booster.
+   * Examples: "bomb", "swap".
    */
   id: string;
 
-  /** Количество оставшихся применений бустера. */
+  /** Number of remaining uses of the booster. */
   charges: number;
 
   /**
-   * Проверяет, допустимо ли использовать бустер в текущем состоянии игры.
-   * @returns true, если активация разрешена
+   * Checks if the booster can be activated in the current state of the game.
+   * @returns true if activation is allowed
    */
   canActivate(): boolean;
 
   /**
-   * Переводит игру в режим выбора клетки или клеток,
-   * над которыми будет применён бустер.
+   * Switches the game to the mode of selecting cells (or cells)
+   * over which the booster will be applied.
    */
   start(): void;
 }

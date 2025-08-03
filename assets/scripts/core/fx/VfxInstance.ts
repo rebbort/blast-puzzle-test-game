@@ -3,7 +3,7 @@ const { ccclass, property } = cc._decorator;
 /**
  * Component that plays a VFX prefab and resolves when it finishes.
  */
-@ccclass("VfxInstance")
+@ccclass()
 export class VfxInstance extends cc.Component {
   @property([cc.ParticleSystem])
   particleSystems: cc.ParticleSystem[] = [];

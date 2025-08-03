@@ -6,69 +6,69 @@ import { TileAppearanceConfig } from "../../core/board/TileAppearanceConfig";
 import { VfxInstance } from "../../core/fx/VfxInstance";
 
 /**
- * Представление игрового тайла. Содержит контейнер `visualRoot`, куда
- * подставляются разные префабы внешнего вида в зависимости от модели.
+ * TileView represents a game tile. It contains a `visualRoot` container where
+ * different visual prefabs are substituted depending on the model.
  */
 @ccclass()
 export default class TileView extends cc.Component {
-  /** Узел, в который инстанцируются визуальные варианты тайла. */
+  /** Node where visual variants of the tile are instantiated. */
   @property(cc.Node)
-  visualRoot!: cc.Node;
+  visualRoot: cc.Node = null;
 
-  /** Префабы обычных тайлов (по цветам). Порядок соответствует перечислению цветов. */
+  /** Prefabs of normal tiles (by colors). The order corresponds to the enumeration of colors. */
   @property([cc.Prefab])
   normalVariants: cc.Prefab[] = [];
 
   /**
-   * Префабы супер‑тайлов по индексу {@link TileKind}.
-   * Индекс 1 → SuperRow, 2 → SuperCol, 3 → SuperBomb, 4 → SuperClear.
-   * Массив должен содержать заполнители для неиспользуемых видов, чтобы
-   * соответствовать значениям перечисления.
+   * Prefabs of super‑tiles by index {@link TileKind}.
+   * Index 1 → SuperRow, 2 → SuperCol, 3 → SuperBomb, 4 → SuperClear.
+   * The array must contain placeholders for unused types to
+   * correspond to the values of the enumeration.
    */
   @property([cc.Prefab])
   superVariants: cc.Prefab[] = new Array(TileKind.SuperClear + 1).fill(null!);
 
-  /** Текущий визуальный узел, размещённый в visualRoot. */
+  /** Current visual node placed in visualRoot. */
   private currentVisual: cc.Node | null = null;
 
-  /** Префаб эффекта активации, взятый из {@link TileAppearanceConfig}. */
+  /** Prefab of the activation effect taken from {@link TileAppearanceConfig}. */
   private activateFx: cc.Prefab | null = null;
 
-  /** Кэш модели тайла для возможных обновлений. */
+  /** Cache of the tile model for possible updates. */
   public tile!: Tile;
 
-  /** Позиция тайла на доске для логирования и событий. */
+  /** Position of the tile on the board for logging and events. */
   public boardPos: cc.Vec2 = cc.v2(0, 0);
 
-  /** Тайл в состоянии падения. */
+  /** Tile in the falling state. */
   private isFalling = false;
-  /** Тайл проигрывает feedback-анимацию. */
+  /** Tile plays the feedback animation. */
   private isFeedbackActive = false;
 
-  /** Возвращает true, если тайл готов реагировать на ввод. */
+  /** Returns true if the tile is ready to respond to input. */
   isInteractive(): boolean {
     return !this.isFalling && !this.isFeedbackActive;
   }
 
-  /** Вызывается перед запуском анимации падения. */
+  /** Called before the falling animation starts. */
   startFall(): void {
     this.isFalling = true;
   }
 
-  /** Завершает состояние падения. */
+  /** Ends the falling state. */
   endFall(): void {
     this.isFalling = false;
   }
 
   /**
-   * Подставляет нужный визуальный префаб под данные тайла.
-   * Старый визуальный узел удаляется, затем инстанцируется новый в visualRoot.
-   * При наличии {@link TileAppearanceConfig.spawnFx} воспроизводится VFX.
+   * Substitutes the appropriate visual prefab for the tile data.
+   * The old visual node is removed, then a new one is instantiated in visualRoot.
+   * If {@link TileAppearanceConfig.spawnFx} is present, the VFX is played.
    */
   apply(tile: Tile): void {
     this.tile = tile;
 
-    // 1. Выбираем нужный префаб по color/kind
+    // 1. Select the appropriate prefab by color/kind
     let prefab: cc.Prefab | undefined;
     if (tile.kind === TileKind.Normal) {
       const idx = this.colorIndex(tile.color);
@@ -78,9 +78,9 @@ export default class TileView extends cc.Component {
     }
     if (!prefab) return;
 
-    // 2. Удаляем предыдущую визуализацию
+    // 2. Remove the previous visualization
     if (this.currentVisual) {
-      // В тестовой среде destroy может отсутствовать
+      // In the test environment, destroy may be missing
       const maybe = this.currentVisual as unknown as { destroy?: () => void };
       if (typeof maybe.destroy === "function") {
         maybe.destroy();
@@ -88,14 +88,12 @@ export default class TileView extends cc.Component {
       this.currentVisual = null;
     }
 
-    // 3. Инстанцируем новую и помещаем в visualRoot
+    // 3. Instantiate a new one and place it in visualRoot
     const node = cc.instantiate(prefab);
     node.parent = this.visualRoot;
     this.currentVisual = node;
-    // node.setPosition(node.width / 2, -node.height / 2);
-    // this.node.setAnchorPoint(cc.v2(0, 1));
 
-    // 4. Читаем конфиг визуального префаба и запускаем эффекты
+    // 4. Read the visual prefab config and play the effects
     const cfg = node.getComponent(TileAppearanceConfig);
     if (cfg) {
       this.activateFx = cfg.activateFx;
@@ -109,7 +107,7 @@ export default class TileView extends cc.Component {
   }
 
   /**
-   * Активирует супер‑тайл, запуская эффект из {@link TileAppearanceConfig}.
+   * Activates a super‑tile, starting the effect from {@link TileAppearanceConfig}.
    */
   activateSuper(): void {
     if (this.activateFx) {
@@ -126,43 +124,15 @@ export default class TileView extends cc.Component {
       // Prevent repeated activation from triggering the effect again
       this.activateFx = null;
     }
-    // Дополнительная индикация может быть добавлена здесь
+    // Additional indication can be added here
   }
 
-  /** Анимация отклика на нажатие. */
+  /** Feedback animation. */
   pressFeedback(): void {
     this.isFeedbackActive = true;
     const target = this.node;
-    // const width = (target as unknown as { width?: number }).width ?? 0;
-    // const height = (target as unknown as { height?: number }).height ?? 0;
-
-    // // determine current pos/anchor and convert to default top-left origin
-    // const getPos =
-    //   (target as unknown as { getPosition?: () => cc.Vec2 }).getPosition?.bind(
-    //     target,
-    //   ) || (() => (target as unknown as { position: cc.Vec2 }).position);
-    // const getAnchor =
-    //   (
-    //     target as unknown as { getAnchorPoint?: () => cc.Vec2 }
-    //   ).getAnchorPoint?.bind(target) || (() => cc.v2(0, 1));
-
-    // const curPos: cc.Vec2 = getPos();
-    // const curAnchor: cc.Vec2 = getAnchor();
 
     const defaultAnchor = cc.v2(0, 1);
-    // const basePos = cc.v2(
-    //   curPos.x + width * (curAnchor.x - defaultAnchor.x),
-    //   curPos.y + height * (curAnchor.y - defaultAnchor.y),
-    // );
-
-    // const centerOffset = cc.v2(
-    //   width * (0.5 - defaultAnchor.x),
-    //   height * (0.5 - defaultAnchor.y),
-    // );
-    // const centerPos = cc.v2(
-    //   basePos.x + centerOffset.x,
-    //   basePos.y + centerOffset.y,
-    // );
 
     const maybe = target as unknown as {
       stopAllActions?: () => void;
@@ -170,9 +140,6 @@ export default class TileView extends cc.Component {
     };
     if (typeof maybe.stopAllActions === "function") maybe.stopAllActions();
     if (typeof maybe.setScale === "function") maybe.setScale(1, 1);
-
-    // target.setAnchorPoint(cc.v2(0.5, 0.5));
-    // target.setPosition(centerPos);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     target.runAction(
@@ -182,14 +149,13 @@ export default class TileView extends cc.Component {
         cc.scaleTo(0.1, 1.0),
         cc.callFunc(() => {
           target.setAnchorPoint(defaultAnchor);
-          // target.setPosition(basePos);
           this.isFeedbackActive = false;
         }),
       ),
     );
   }
 
-  /** Возвращает индекс цвета в массиве нормальных вариантов. */
+  /** Returns the index of the color in the array of normal variants. */
   private colorIndex(color: TileColor): number {
     const order: TileColor[] = ["red", "blue", "green", "yellow", "purple"];
     const idx = order.indexOf(color);

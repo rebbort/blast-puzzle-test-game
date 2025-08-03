@@ -2,10 +2,10 @@ const { ccclass, property } = cc._decorator;
 
 import { MoveSequenceLogger } from "../../core/diagnostics/MoveSequenceLogger";
 
-@ccclass("MoveSequenceBadge")
+@ccclass()
 export default class MoveSequenceBadge extends cc.Component {
   @property(cc.Label)
-  label!: cc.Label;
+  label: cc.Label = null;
 
   private logger!: MoveSequenceLogger;
 

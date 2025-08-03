@@ -1,5 +1,5 @@
-import { EventBus } from "../core/EventBus";
-import { EventNames } from "../core/events/EventNames";
+import { EventBus } from "../../core/EventBus";
+import { EventNames } from "../../core/events/EventNames";
 const { ccclass, property } = cc._decorator;
 
 interface NodeUtils {
@@ -17,14 +17,14 @@ interface NodeUtils {
  * Responsible for updating score/move counters and
  * dispatching events when HUD buttons are pressed.
  */
-@ccclass("")
+@ccclass()
 export class HudController extends cc.Component {
   @property(cc.Label)
-  lblScore!: cc.Label;
+  lblScore: cc.Label = null;
   @property(cc.Label)
-  lblMoves!: cc.Label;
+  lblMoves: cc.Label = null;
   @property(cc.Label)
-  lblState!: cc.Label;
+  lblState: cc.Label = null;
 
   private btnPause: NodeUtils | null = null;
 

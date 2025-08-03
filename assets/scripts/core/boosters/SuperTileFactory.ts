@@ -3,28 +3,28 @@ import { BoardConfig } from "../../config/ConfigLoader";
 import { TileKind } from "../board/Tile";
 
 /**
- * Возвращает тип супер‑тайла по генератору случайных чисел.
- * При одинаковом seed последовательность детерминирована.
+ * Returns the type of super tile based on the random number generator.
+ * With the same seed, the sequence is deterministic.
  */
 export class SuperTileFactory {
-  /** Генератор случайных чисел для выбора вида тайла. */
+  /** Random number generator for choosing the tile type. */
   private rng: () => number;
 
   constructor(private cfg: BoardConfig) {
-    // Если указан seed, используем его для детерминированного RNG
+    // If a seed is specified, use it for deterministic RNG
     this.rng = cfg.rngSeed ? seedrandom(cfg.rngSeed) : Math.random;
   }
 
   /**
-   * Создаёт тип супер‑тайла на основе настраиваемых шансов.
-   * Если шансы не настроены, используются значения по умолчанию:
+   * Creates the type of super tile based on customizable chances.
+   * If chances are not configured, the default values are used:
    * SuperRow: 50%, SuperCol: 30%, SuperBomb: 15%, SuperClear: 5%
    */
   make(kindSeed = this.rng()): TileKind {
     const chances = this.cfg.superChances;
 
     if (chances) {
-      // Используем настраиваемые шансы
+      // Use customizable chances
       let cumulative = 0;
 
       cumulative += chances.row;
@@ -38,7 +38,7 @@ export class SuperTileFactory {
 
       return TileKind.SuperClear;
     } else {
-      // Используем значения по умолчанию
+      // Use default values
       if (kindSeed < 0.5) return TileKind.SuperRow;
       if (kindSeed < 0.8) return TileKind.SuperCol;
       if (kindSeed < 0.95) return TileKind.SuperBomb;

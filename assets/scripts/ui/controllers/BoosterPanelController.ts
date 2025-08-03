@@ -18,6 +18,10 @@ interface BoosterSlot {
   isActive: boolean;
 }
 
+/**
+ * Controller for the booster panel.
+ * Manages the display and interaction of booster slots.
+ */
 @ccclass()
 export default class BoosterPanelController extends cc.Component {
   @property(cc.Node)
@@ -26,12 +30,19 @@ export default class BoosterPanelController extends cc.Component {
   @property(cc.Prefab)
   boosterSlotPrefab: cc.Prefab = null;
 
+  @property(cc.Node)
+  boosterLabel: cc.Node = null;
+
   private boosterSlots: BoosterSlot[] = [];
 
   start(): void {
     this.setupEventListeners();
     const charges = boosterSelectionService.getConfirmedCharges();
     this.createSlots(charges);
+
+    if (Object.keys(charges).length === 0) {
+      this.boosterLabel.active = false;
+    }
   }
 
   private createSlots(charges: Record<string, number>): void {
@@ -40,9 +51,7 @@ export default class BoosterPanelController extends cc.Component {
       return;
     }
 
-    console.log("BoosterPanelController createSlots");
-
-    // Очищаем существующие слоты
+    // Clear existing slots
     this.boosterList.removeAllChildren();
     this.boosterSlots = [];
 
@@ -86,8 +95,6 @@ export default class BoosterPanelController extends cc.Component {
         isActive: false,
       };
 
-      console.log("slot", slot);
-
       this.addHighlightToSlot(slot);
       this.setupSlotClickHandler(slot);
       this.setBoosterIcon(slot, boosterId);
@@ -100,7 +107,7 @@ export default class BoosterPanelController extends cc.Component {
       this.boosterSlots.push(slot);
     }
 
-    // Принудительно обновляем Layout
+    // Force update the layout
     const layout = this.boosterList.getComponent(cc.Layout);
     if (layout) {
       layout.updateLayout();
@@ -113,8 +120,6 @@ export default class BoosterPanelController extends cc.Component {
     EventBus.on(EventNames.BoostersSelected, this.onBoostersSelected, this);
     EventBus.on(EventNames.GameRestart, this.onGameRestart, this);
   }
-
-  // Метод setupBoosterSlot больше не нужен - бустеры настраиваются при инициализации
 
   private setBoosterIcon(slot: BoosterSlot, boosterId: string): void {
     if (!slot.icon) return;

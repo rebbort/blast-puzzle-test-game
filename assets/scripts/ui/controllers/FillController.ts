@@ -8,14 +8,14 @@ import type { Board } from "../../core/board/Board";
 import { runFallAnimation } from "../utils/FallAnimator";
 import { computeTilePosition } from "../utils/PositionUtils";
 
-@ccclass("FillController")
+@ccclass()
 export default class FillController extends cc.Component {
-  /** Базовый префаб TileNode для новых тайлов. */
+  /** Base TileNode prefab for new tiles. */
   @property(cc.Prefab)
-  tileNodePrefab!: cc.Prefab;
+  tileNodePrefab: cc.Prefab = null;
 
   @property(cc.Node)
-  tilesLayer!: cc.Node;
+  tilesLayer: cc.Node = null;
 
   private board!: Board;
   private tileViews!: TileView[][];
@@ -40,12 +40,6 @@ export default class FillController extends cc.Component {
     this.tileViews = this.getComponent(GameBoardController)!.tileViews;
     this.pending = slots;
 
-    // console.log("FillController: tilesLayer exists?", !!this.tilesLayer);
-    // console.log(
-    //   "FillController: tileNodePrefab exists?",
-    //   !!this.tileNodePrefab,
-    // );
-
     const byCol: { [key: number]: cc.Vec2[] } = {};
     for (let i = 0; i < slots.length; i++) {
       const p = slots[i];
@@ -64,20 +58,9 @@ export default class FillController extends cc.Component {
           .instantiate(this.tileNodePrefab)
           .getComponent(TileView) as TileView;
 
-        // console.log(
-        //   "FillController: Created view for position",
-        //   p,
-        //   "view:",
-        //   view,
-        // );
-
         view.node.parent = this.tilesLayer;
         view.node.active = true;
         view.node.opacity = 255;
-        // console.log(
-        //   "FillController: Set parent, node active:",
-        //   view.node.active,
-        // );
 
         const start = computeTilePosition(p.x, -1, this.board);
         view.node.setPosition(start);

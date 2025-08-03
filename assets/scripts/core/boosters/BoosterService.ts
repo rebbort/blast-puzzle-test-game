@@ -4,13 +4,13 @@ import { EventNames } from "../events/EventNames";
 import type { GameState } from "../game/GameStateMachine";
 
 /**
- * Хранит все доступные бустеры,
- * обрабатывает их активацию и публикацию событий.
+ * Stores all available boosters,
+ * handles their activation and publishes events.
  */
 export class BoosterService {
-  /** Коллекция зарегистрированных бустеров по их id. */
+  /** Collection of registered boosters by their id. */
   private boosters: Record<string, Booster> = {};
-  /** Идентификатор текущего активного бустера, если есть. */
+  /** Identifier of the currently active booster, if any. */
   private activeId: string | null = null;
 
   constructor(
@@ -20,45 +20,45 @@ export class BoosterService {
   ) {}
 
   /**
-   * Регистрирует новый бустер.
-   * @param boost Экземпляр бустера для добавления
+   * Registers a new booster.
+   * @param boost Instance of the booster to add
    */
   register(boost: Booster): void {
-    // Добавляем/перезаписываем бустер по ключу его id
+    // Add/overwrite booster by its id
     this.boosters[boost.id] = boost;
   }
 
   /**
-   * Пытается активировать бустер по идентификатору.
-   * Вызывает canActivate и, при успехе, start и публикацию события.
-   * @param id Идентификатор бустера
+   * Tries to activate a booster by its identifier.
+   * Calls canActivate and, if successful, start and publishes the event.
+   * @param id Identifier of the booster
    */
   activate(id: string): void {
     const boost = this.boosters[id];
     if (!boost) {
-      // Неизвестный бустер — ничего не делаем
+      // Unknown booster — do nothing
       return;
     }
 
-    // Если другой бустер уже активен, сначала отменяем его
+    // If another booster is active, cancel it first
     if (this.activeId && this.activeId !== id) {
       this.cancel();
     }
 
-    // Разрешаем активацию только в состоянии ожидания ввода
+    // Allow activation only in the WaitingInput state
     if (this.getState() !== "WaitingInput") {
       return;
     }
 
-    // Проверяем возможность активации в текущем состоянии
+    // Check if activation is possible in the current state
     if (!boost.canActivate()) {
       return;
     }
 
-    // Переводим игру в режим выбора клетки/клеток
+    // Switch the game to the mode of selecting cells (or cells)
     boost.start();
     this.activeId = id;
-    // Сообщаем подписчикам об активации конкретного бустера
+    // Notify subscribers about the activation of a specific booster
     this.bus.emit(EventNames.BoosterActivated, id);
     console.debug(
       "Listeners for BoosterActivated:",
@@ -67,43 +67,43 @@ export class BoosterService {
   }
 
   /**
-   * Снижает счётчик charges и публикует событие BoosterConsumed.
-   * @param id Идентификатор бустера
+   * Reduces the charges counter and publishes the BoosterConsumed event.
+   * @param id Identifier of the booster
    */
   consume(id: string): void {
     const boost = this.boosters[id];
     if (!boost) {
-      // Если бустер не найден, просто выходим
+      // If the booster is not found, simply exit
       return;
     }
     if (boost.charges <= 0) {
-      // Нечего списывать, бустер закончился
+      // Nothing to consume, the booster is depleted
       return;
     }
-    // Уменьшаем количество зарядов
+    // Decrease the number of charges
     boost.charges--;
     if (this.activeId === id) {
       this.activeId = null;
     }
-    // Оповещаем, что заряд израсходован
+    // Notify that the charge has been consumed
     this.bus.emit(EventNames.BoosterConsumed, id);
   }
 
   /**
-   * Отменяет режим активации и публикует событие BoosterCancelled.
+   * Cancels the activation mode and publishes the BoosterCancelled event.
    */
   cancel(): void {
     if (this.activeId !== null) {
       this.activeId = null;
     }
-    // Сообщаем слушателям, что активация прервана
+    // Notify listeners that the activation has been cancelled
     this.bus.emit(EventNames.BoosterCancelled);
   }
 
   /**
-   * Возвращает текущее количество зарядов для бустера.
-   * @param id Идентификатор бустера
-   * @returns Число оставшихся зарядов или 0, если бустер не найден
+   * Returns the current number of charges for the booster.
+   * @param id Identifier of the booster
+   * @returns Number of remaining charges or 0 if the booster is not found
    */
   getCharges(id: string): number {
     const boost = this.boosters[id];

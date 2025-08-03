@@ -9,7 +9,7 @@ import TileView from "../views/TileView";
 @ccclass()
 export default class TileInputController extends cc.Component {
   @property(cc.Node)
-  tilesLayer!: cc.Node;
+  tilesLayer: cc.Node = null;
 
   private boardCtrl!: GameBoardController;
 
@@ -48,9 +48,9 @@ export default class TileInputController extends cc.Component {
       console.debug(
         `Tile tap ignored: falling=${view?.["isFalling"]} feedbackActive=${view?.["isFeedbackActive"]} at {${col},${row}}`,
       );
-      // Тап по пустой области используется некоторыми бустерами (например, телепорт)
-      // как сигнал отмены. Публикуем InvalidTap, чтобы подписчики могли
-      // сбросить своё состояние.
+      // Tap on an empty area is used by some boosters (e.g. teleport)
+      // as a cancellation signal. We publish InvalidTap so that subscribers can
+      // reset their state.
       bus.emit(EventNames.InvalidTap, new cc.Vec2(col, row));
       return;
     }

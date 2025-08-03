@@ -1,9 +1,7 @@
-// Глобальная шина событий теперь основана на cc.EventTarget with diagnostics
+// Global event bus now based on cc.EventTarget with diagnostics
 import { InfrastructureEventBus } from "../infrastructure/InfrastructureEventBus";
 
 /**
- * Глобальный экземпляр EventBus используется во всех частях игры.
- * Мы отказались от сторонней библиотеки eventemitter2
- * в пользу обёртки на cc.EventTarget с отслеживанием подписчиков.
+ * Global EventBus instance used in all parts of the game.
  */
 export const EventBus = new InfrastructureEventBus();

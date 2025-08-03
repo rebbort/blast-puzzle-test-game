@@ -4,7 +4,7 @@ import { EventBus as bus } from "../../core/EventBus";
 import { EventNames } from "../../core/events/EventNames";
 import GameBoardController from "./GameBoardController";
 
-@ccclass("TilePressFeedback")
+@ccclass()
 export default class TilePressFeedback extends cc.Component {
   private boardCtrl!: GameBoardController;
 

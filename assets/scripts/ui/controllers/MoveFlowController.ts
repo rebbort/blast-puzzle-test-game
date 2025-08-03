@@ -12,7 +12,7 @@ import { computeTilePosition } from "../utils/PositionUtils";
 export default class MoveFlowController extends cc.Component {
   /** Parent node for new tile views */
   @property(cc.Node)
-  tilesLayer!: cc.Node;
+  tilesLayer: cc.Node = null;
 
   /** Cached matrix of tile view components. Filled on load. */
   private tileViews!: TileView[][];

@@ -13,12 +13,12 @@ import { FXController } from "../../core/fx/FXController";
 
 @ccclass()
 export default class GameBoardController extends cc.Component {
-  /** Базовый префаб узла тайла. */
+  /** Base TileNode prefab. */
   @property(cc.Prefab)
-  tileNodePrefab!: cc.Prefab;
+  tileNodePrefab: cc.Prefab = null;
   /** Parent node for all tile instances. */
   @property(cc.Node)
-  tilesLayer!: cc.Node;
+  tilesLayer: cc.Node = null;
 
   /** Board model generated on load. */
   private board!: Board;
@@ -40,11 +40,11 @@ export default class GameBoardController extends cc.Component {
    * 3. Spawns tile prefabs for every cell and stores their views.
    */
   onLoad(): void {
-    // 1) Загрузить конфиг
+    // 1) Load the board configuration
     const cfg = loadBoardConfig();
-    // 2) Сгенерировать Board
+    // 2) Generate the board
     this.board = new BoardGenerator().generate(cfg);
-    // 3) Спавнить по каждой клетке
+    // 3) Spawn tiles for each cell
     this.spawnAllTiles();
     FXController.setLayer(this.tilesLayer);
     // Attach animation controllers on the same node
@@ -61,7 +61,7 @@ export default class GameBoardController extends cc.Component {
     );
     bus.on(EventNames.BoosterCancelled, this.clearTeleportHighlight, this);
     bus.on(EventNames.SwapDone, this.onSwapDone, this);
-    // 4) Создаем дебаг сетку
+    // 4) Create a debug grid
     // this.createDebugGrid();
   }
 
@@ -75,13 +75,13 @@ export default class GameBoardController extends cc.Component {
         const tileData = this.board.tileAt(new cc.Vec2(c, r))!;
         const node = cc.instantiate(this.tileNodePrefab);
         node.parent = this.tilesLayer;
-        // устанавливаем anchorPoint на (0, 1) для origin (0, 1)
+        // set anchorPoint to (0, 1) for origin (0, 1)
         node.setAnchorPoint(cc.v2(0, 1));
-        // позиционируем точно как в Core
+        // position exactly as in Core
         node.setPosition(computeTilePosition(c, r, this.board));
-        // устанавливаем z-index: каждый следующий слой ниже
+        // set z-index: each next layer is below
         node.zIndex = this.board.rows - r - 1;
-        // сохраняем TileView для обновлений
+        // save TileView for updates
         const view = node.getComponent(TileView) as TileView;
         view.apply(tileData);
         view.boardPos = cc.v2(c, r);
@@ -219,7 +219,7 @@ export default class GameBoardController extends cc.Component {
       graphics.stroke();
     }
 
-    // Рисуем горизонтальные линии
+    // Draw horizontal lines
     for (let r = 0; r <= this.board.rows; r++) {
       const line = new cc.Node("HLine");
       line.parent = gridContainer;
@@ -237,7 +237,7 @@ export default class GameBoardController extends cc.Component {
       graphics.stroke();
     }
 
-    // Добавляем координаты клеток
+    // Add cell coordinates
     for (let r = 0; r < this.board.rows; r++) {
       for (let c = 0; c < this.board.cols; c++) {
         const label = new cc.Node("CellLabel");
