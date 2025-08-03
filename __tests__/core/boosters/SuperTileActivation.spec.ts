@@ -20,7 +20,7 @@ const cfg: BoardConfig = {
 
 async function activate(
   kind: TileKind,
-): Promise<{ events: string[]; removed: cc.Vec2[] }> {
+): Promise<{ events: string[]; removed: cc.Vec2[]; score: number }> {
   const tiles = Array.from({ length: 3 }, () =>
     Array.from({ length: 3 }, () => TileFactory.createNormal("red")),
   );
@@ -43,21 +43,23 @@ async function activate(
   );
   const events: string[] = [];
   let removed: cc.Vec2[] = [];
+  let score = 0;
   bus.on(EventNames.BoosterConfirmed, () =>
     events.push(EventNames.BoosterConfirmed),
   );
   bus.on(EventNames.RemoveStarted, (g: cc.Vec2[]) => (removed = g));
   bus.on(EventNames.TilesRemoved, () => events.push(EventNames.TilesRemoved));
   bus.on(EventNames.MoveCompleted, () => events.push(EventNames.MoveCompleted));
+  bus.on(EventNames.TurnEnded, ({ score: s }) => (score = s));
   fsm.start();
   bus.emit(EventNames.GroupSelected, new cc.Vec2(1, 1));
   await new Promise((r) => setImmediate(r));
-  return { events, removed };
+  return { events, removed, score };
 }
 
 describe("super tile activation", () => {
-  it("activates SuperRow clearing row", async () => {
-    const { events, removed } = await activate(TileKind.SuperRow);
+  it("activates SuperRow clearing row and awards score", async () => {
+    const { events, removed, score } = await activate(TileKind.SuperRow);
     expect(events).toEqual([
       EventNames.BoosterConfirmed,
       EventNames.TilesRemoved,
@@ -65,6 +67,7 @@ describe("super tile activation", () => {
     ]);
     const coords = removed.map((p) => `${p.x},${p.y}`).sort();
     expect(coords).toEqual(["0,1", "1,1", "2,1"]);
+    expect(score).toBe(4);
   });
 
   it("activates SuperCol clearing column", async () => {
