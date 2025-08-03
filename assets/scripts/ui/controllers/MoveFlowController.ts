@@ -135,4 +135,13 @@ export default class MoveFlowController extends cc.Component {
     view.apply(this.board.tileAt(pos)!);
     this.tileViews = this.boardCtrl.tileViews;
   }
+
+  /**
+   * Updates internal references after the board was reset.
+   */
+  public reset(board: Board, tileViews: TileView[][]): void {
+    this.board = board;
+    this.tileViews = tileViews;
+    this.boardCtrl = this.node.getComponent(GameBoardController)!;
+  }
 }

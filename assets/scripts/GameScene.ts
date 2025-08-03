@@ -16,52 +16,66 @@ const { ccclass } = cc._decorator;
 @ccclass()
 export default class GameScene extends cc.Component {
   private fsm: GameStateMachine | null = null;
+  private boardCtrl!: GameBoardController;
+  private solver!: BoardSolver;
+  private executor!: MoveExecutor;
+  private scoreStrategy!: ScoreStrategyQuadratic;
+  private turns!: TurnManager;
+  private currentState: GameState = "WaitingInput";
+
+  private onStateChange = (s: GameState): void => {
+    this.currentState = s;
+  };
+
+  private onBoostersSelected = (charges: Record<string, number>): void => {
+    const board = this.boardCtrl.getBoard();
+    initBoosterService(
+      board,
+      () => this.boardCtrl.tileViews,
+      () => this.currentState,
+      charges,
+    );
+    if (!this.fsm) {
+      this.fsm = new GameStateMachine(
+        EventBus,
+        board,
+        this.solver,
+        this.executor,
+        this.scoreStrategy,
+        this.turns,
+        800,
+        3,
+      );
+      this.fsm.start();
+    } else {
+      this.fsm.reset();
+    }
+  };
+
+  private onGameRestart = (): void => {
+    this.boardCtrl.resetBoard();
+    this.fsm?.reset();
+  };
 
   start(): void {
-    const boardCtrl = this.getComponentInChildren(GameBoardController);
-    if (!boardCtrl) {
+    this.boardCtrl = this.getComponentInChildren(GameBoardController);
+    if (!this.boardCtrl) {
       console.error("GameBoardController not found");
       return;
     }
 
-    const board = boardCtrl.getBoard();
-    const solver = new BoardSolver(board);
-    const executor = new MoveExecutor(board, EventBus);
-    const scoreStrategy = new ScoreStrategyQuadratic(1);
-    const turns = new TurnManager(20, EventBus);
+    const board = this.boardCtrl.getBoard();
+    this.solver = new BoardSolver(board);
+    this.executor = new MoveExecutor(board, EventBus);
+    this.scoreStrategy = new ScoreStrategyQuadratic(1);
+    this.turns = new TurnManager(20, EventBus);
 
     // Diagnostic helper that tracks event sequence for each move.
     new MoveSequenceLogger(EventBus, board);
 
-    // Track current FSM state for booster service
-    let currentState: GameState = "WaitingInput";
-    EventBus.on(EventNames.StateChanged, (s) => {
-      currentState = s as GameState;
-    });
-
-    // Wait for player to choose boosters before starting the game
-    EventBus.once(
-      EventNames.BoostersSelected,
-      (charges: Record<string, number>) => {
-        initBoosterService(
-          board,
-          () => boardCtrl.tileViews,
-          () => currentState,
-          charges,
-        );
-        this.fsm = new GameStateMachine(
-          EventBus,
-          board,
-          solver,
-          executor,
-          scoreStrategy,
-          turns,
-          800,
-          3,
-        );
-        this.fsm.start();
-      },
-    );
+    EventBus.on(EventNames.StateChanged, this.onStateChange);
+    EventBus.on(EventNames.BoostersSelected, this.onBoostersSelected);
+    EventBus.on(EventNames.GameRestart, this.onGameRestart);
 
     // Ensure booster selection popup is visible
     const selector = this.getComponentInChildren(BoosterSelectPopup);
@@ -72,5 +86,11 @@ export default class GameScene extends cc.Component {
       boosterSelectionService.reset();
       boosterSelectionService.confirm();
     }
+  }
+
+  onDestroy(): void {
+    EventBus.off(EventNames.StateChanged, this.onStateChange);
+    EventBus.off(EventNames.BoostersSelected, this.onBoostersSelected);
+    EventBus.off(EventNames.GameRestart, this.onGameRestart);
   }
 }

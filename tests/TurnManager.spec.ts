@@ -26,4 +26,13 @@ describe("TurnManager", () => {
     tm.useTurn();
     expect(count).toBe(1);
   });
+
+  test("reset restores initial turn count", () => {
+    const bus = new InfrastructureEventBus();
+    const tm = new TurnManager(3, bus);
+    tm.useTurn();
+    expect(tm.getRemaining()).toBe(2);
+    tm.reset();
+    expect(tm.getRemaining()).toBe(3);
+  });
 });

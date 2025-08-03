@@ -163,4 +163,24 @@ describe("GameStateMachine", () => {
     expect(turnSpy).not.toHaveBeenCalled();
     expect(execSpy).not.toHaveBeenCalled();
   });
+
+  test("reset returns machine to initial state", async () => {
+    const fsm = createFSM();
+    fsm.start();
+    EventBus.emit(EventNames.GroupSelected, new cc.Vec2(0, 0));
+    await new Promise((r) => setImmediate(r));
+    let turns: number | undefined;
+    let score: number | undefined;
+    let state: GameState | undefined;
+    EventBus.on(EventNames.TurnUsed, (t) => (turns = t as number));
+    EventBus.on(
+      EventNames.TurnEnded,
+      (s: { score: number }) => (score = s.score),
+    );
+    EventBus.on(EventNames.StateChanged, (s: GameState) => (state = s));
+    fsm.reset();
+    expect(turns).toBe(5);
+    expect(score).toBe(0);
+    expect(state).toBe("WaitingInput");
+  });
 });

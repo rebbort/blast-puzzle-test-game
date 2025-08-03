@@ -89,6 +89,35 @@ export default class GameBoardController extends cc.Component {
   }
 
   /**
+   * Regenerates the board model and recreates all tile views.
+   * Allows replaying without reloading the scene.
+   */
+  public resetBoard(): void {
+    // Generate fresh board data
+    const cfg = loadBoardConfig();
+    const newBoard = new BoardGenerator().generate(cfg);
+
+    for (let y = 0; y < cfg.rows; y++) {
+      for (let x = 0; x < cfg.cols; x++) {
+        const tile = newBoard.tileAt(new cc.Vec2(x, y));
+        this.board.setTile(new cc.Vec2(x, y), tile);
+      }
+    }
+
+    // Remove old visuals and spawn new ones
+    this.tilesLayer.removeAllChildren();
+    this.tileViews = [];
+    this.spawnAllTiles();
+
+    // Update dependent controllers with new references
+    const flow = this.getComponent(MoveFlowController);
+    flow?.reset(this.board, this.tileViews);
+    const fill = this.getComponent(FillController);
+    fill?.reset(this.board, this.tileViews);
+    this.teleportSelected = null;
+  }
+
+  /**
    * Spawns a single tile view at the given board position and stores it.
    */
   spawn(pos: cc.Vec2): TileView {

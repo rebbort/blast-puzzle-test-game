@@ -44,6 +44,7 @@ export default class GameStateController extends cc.Component {
   private setupEventListeners(): void {
     // Слушаем событие запуска игры
     EventBus.on(EventNames.BoostersSelected, this.onGameStart, this);
+    EventBus.on(EventNames.GameRestart, this.onGameRestart, this);
   }
 
   /**
@@ -87,5 +88,14 @@ export default class GameStateController extends cc.Component {
     if (this.gameBoard) {
       this.gameBoard.active = true;
     }
+  }
+
+  private onGameRestart(): void {
+    this.switchToBoosterSelection();
+  }
+
+  onDestroy(): void {
+    EventBus.off(EventNames.BoostersSelected, this.onGameStart, this);
+    EventBus.off(EventNames.GameRestart, this.onGameRestart, this);
   }
 }

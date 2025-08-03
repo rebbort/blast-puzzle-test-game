@@ -3,6 +3,8 @@ import { EventNames } from "../events/EventNames";
 export class TurnManager {
   /** Remaining turns in the current session. */
   private turnsLeft: number;
+  /** Starting amount of turns to allow resetting. */
+  private readonly initialTurns: number;
 
   /**
    * Creates a turn manager with the given initial amount of turns.
@@ -13,6 +15,7 @@ export class TurnManager {
     initialTurns: number,
     private bus: InfrastructureEventBus,
   ) {
+    this.initialTurns = initialTurns;
     this.turnsLeft = initialTurns;
   }
 
@@ -35,5 +38,12 @@ export class TurnManager {
    */
   getRemaining(): number {
     return this.turnsLeft;
+  }
+
+  /**
+   * Resets remaining turns back to their initial value.
+   */
+  reset(): void {
+    this.turnsLeft = this.initialTurns;
   }
 }

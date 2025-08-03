@@ -38,7 +38,7 @@ export class PopupController extends cc.Component {
     if (this.lblFinalScore) this.lblFinalScore.string = `Score: ${score}`;
     if (this.btnRestart)
       this.btnRestart.node.once("click", () =>
-        cc.director.loadScene("MenuScene"),
+        EventBus.emit(EventNames.GameRestart),
       );
 
     (this.node as unknown as { scale: cc.Vec3 }).scale = new cc.Vec3(0, 0, 0);
