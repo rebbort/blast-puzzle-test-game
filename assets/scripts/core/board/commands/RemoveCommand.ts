@@ -2,6 +2,7 @@ import { Board } from "../Board";
 import { InfrastructureEventBus } from "../../../infrastructure/InfrastructureEventBus";
 import { ICommand } from "./ICommand";
 import { EventNames } from "../../events/EventNames";
+import { TileKind } from "../Tile";
 
 /**
  * Removes tiles belonging to the provided group from the board.
@@ -27,7 +28,12 @@ export class RemoveCommand implements ICommand {
     for (const p of this.group) {
       // Ignore coordinates outside the board
       if (!this.board.inBounds(p)) continue;
-      if (this.board.tileAt(p)) {
+      const tile = this.board.tileAt(p);
+      if (tile) {
+        // Emit activation event for any super tile so FX can play before gravity.
+        if (tile.kind !== TileKind.Normal) {
+          this.bus.emit(EventNames.SuperTileActivated, tile.kind);
+        }
         this.board.setTile(p, null);
         cols.add(p.x);
       }

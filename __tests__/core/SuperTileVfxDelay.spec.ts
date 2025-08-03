@@ -71,7 +71,7 @@ describe("super-tile VFX delay", () => {
 
   it("waits for bomb explosion before falling", async () => {
     const nodes = mockVfx();
-    FXController.registerPrefab(TileKind.SuperBomb, {} as unknown as cc.Prefab);
+    FXController.setPrefab(TileKind.SuperBomb, {} as unknown as cc.Prefab);
 
     const board = new Board(cfg, [
       [TileFactory.createNormal("red")],
@@ -84,7 +84,6 @@ describe("super-tile VFX delay", () => {
     let fallTime = 0;
     bus.on(EventNames.RemoveStarted, () => {
       removeTime = Date.now();
-      bus.emit(EventNames.SuperTileActivated, TileKind.SuperBomb);
     });
     bus.on(EventNames.FallStarted, () => {
       fallTime = Date.now();
@@ -103,28 +102,27 @@ describe("super-tile VFX delay", () => {
 
   it("waits for the longest VFX when multiple supers trigger", async () => {
     const nodes = mockVfx();
-    FXController.registerPrefab(TileKind.SuperBomb, {} as unknown as cc.Prefab);
-    FXController.registerPrefab(TileKind.SuperRow, {} as unknown as cc.Prefab);
+    FXController.setPrefab(TileKind.SuperBomb, {} as unknown as cc.Prefab);
+    FXController.setPrefab(TileKind.SuperRow, {} as unknown as cc.Prefab);
 
     const board = new Board(cfg, [
       [TileFactory.createNormal("red")],
       [TileFactory.createNormal("red")],
     ]);
     board.tileAt(new cc.Vec2(0, 1))!.kind = TileKind.SuperBomb;
+    board.tileAt(new cc.Vec2(0, 0))!.kind = TileKind.SuperRow;
     const bus = new InfrastructureEventBus();
     const executor = new MoveExecutor(board, bus);
     let removeTime = 0;
     let fallTime = 0;
     bus.on(EventNames.RemoveStarted, () => {
       removeTime = Date.now();
-      bus.emit(EventNames.SuperTileActivated, TileKind.SuperBomb);
-      bus.emit(EventNames.SuperTileActivated, TileKind.SuperRow);
     });
     bus.on(EventNames.FallStarted, () => {
       fallTime = Date.now();
     });
 
-    const promise = executor.execute([new cc.Vec2(0, 1)]);
+    const promise = executor.execute([new cc.Vec2(0, 1), new cc.Vec2(0, 0)]);
 
     nodes[0].emit("finished");
     await Promise.resolve();

@@ -10,8 +10,11 @@ export class FXController {
   /** Registered prefabs for super-tile visual effects. */
   private static readonly prefabs: Partial<Record<TileKind, cc.Prefab>> = {};
 
-  /** Allows the game to provide prefabs for each super-tile kind. */
-  static registerPrefab(kind: TileKind, prefab: cc.Prefab): void {
+  /**
+   * Stores the prefab used for a particular super-tile. Typically invoked
+   * automatically from a component on the super-tile prefab.
+   */
+  static setPrefab(kind: TileKind, prefab: cc.Prefab): void {
     FXController.prefabs[kind] = prefab;
   }
 
