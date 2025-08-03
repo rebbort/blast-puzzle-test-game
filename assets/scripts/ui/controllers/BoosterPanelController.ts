@@ -42,6 +42,8 @@ export default class BoosterPanelController extends cc.Component {
 
     if (Object.keys(charges).length === 0) {
       this.boosterLabel.active = false;
+    } else {
+      this.boosterLabel.active = true;
     }
   }
 
@@ -213,6 +215,12 @@ export default class BoosterPanelController extends cc.Component {
 
   private onBoostersSelected(charges: Record<string, number>): void {
     this.createSlots(charges);
+
+    if (Object.keys(charges).length === 0) {
+      this.boosterLabel.active = false;
+    } else {
+      this.boosterLabel.active = true;
+    }
   }
 
   private onGameRestart(): void {
