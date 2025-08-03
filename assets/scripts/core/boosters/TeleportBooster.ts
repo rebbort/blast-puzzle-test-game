@@ -16,9 +16,10 @@ import { EventNames } from "../events/EventNames";
  * swap. UI listens for {@link EventNames.SwapDone} to play a scale
  * out/in animation that keeps the swap atomic.
  *
- * After swapping we verify the board still has moves. If none are found the
- * swap is reverted, {@link EventNames.SwapCancelled} is emitted and the charge
- * is not spent. The player must reactivate the booster to try again.
+ * By default the swap is always applied and a charge is consumed regardless of
+ * the board state after the swap. When constructed with `requireMove=true` the
+ * swap is reverted if no moves remain, {@link EventNames.SwapCancelled} is
+ * emitted and the charge is preserved.
  */
 export class TeleportBooster implements Booster {
   id = "teleport";
@@ -27,6 +28,12 @@ export class TeleportBooster implements Booster {
     private board: Board,
     private bus: InfrastructureEventBus,
     charges: number,
+    /**
+     * When true, a swap that doesn't produce any subsequent moves is reverted
+     * and the charge isn't spent. Defaults to false meaning the swap always
+     * applies and consumes a charge.
+     */
+    private requireMove = false,
   ) {
     this.charges = charges;
   }
@@ -36,6 +43,12 @@ export class TeleportBooster implements Booster {
   }
 
   start(): void {
+    if (this.charges <= 0) {
+      // Activation guard in case service skips canActivate check
+      this.bus.emit(EventNames.BoosterCancelled);
+      return;
+    }
+
     let first: cc.Vec2 | null = null;
 
     const cancel = (): void => {
@@ -62,17 +75,29 @@ export class TeleportBooster implements Booster {
         stage: "second",
         pos: b,
       });
+
+      // Cache tiles in case we need to revert
+      const tA = this.board.tileAt(first);
+      const tB = this.board.tileAt(b);
+
       // Perform swap with scale animation handled by UI on SwapDone
       await new SwapCommand(this.board, first, b, this.bus).execute();
-      const solver = new BoardSolver(this.board);
-      if (solver.hasMoves()) {
-        this.charges--;
-        this.bus.emit(EventNames.BoosterConsumed, this.id);
-      } else {
-        // Revert the swap when it doesn't yield any moves
-        await new SwapCommand(this.board, first, b, this.bus).execute();
-        this.bus.emit(EventNames.SwapCancelled);
+
+      if (this.requireMove) {
+        const solver = new BoardSolver(this.board);
+        if (!solver.hasMoves()) {
+          // revert silently without emitting SwapDone again
+          if (tA && tB) {
+            this.board.setTile(first, tA);
+            this.board.setTile(b, tB);
+          }
+          this.bus.emit(EventNames.SwapCancelled);
+          return;
+        }
       }
+
+      this.charges--;
+      this.bus.emit(EventNames.BoosterConsumed, this.id);
     };
 
     const onFirst = (posA: unknown) => {
