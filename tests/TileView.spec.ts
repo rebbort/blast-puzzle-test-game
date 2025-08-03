@@ -40,7 +40,7 @@ describe("TileView", () => {
     const superPrefab = new (cc.Prefab as any)("row", RowVisual);
 
     view.normalVariants = [normalPrefab];
-    view.superVariants = [];
+    view.superVariants = new Array(TileKind.SuperClear + 1).fill(null!);
     view.superVariants[TileKind.SuperRow] = superPrefab;
 
     const spy = jest.spyOn(cc, "instantiate");

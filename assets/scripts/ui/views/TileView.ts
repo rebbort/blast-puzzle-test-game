@@ -19,9 +19,14 @@ export default class TileView extends cc.Component {
   @property([cc.Prefab])
   normalVariants: cc.Prefab[] = [];
 
-  /** Префабы супер‑тайлов по индексу {@link TileKind}. */
+  /**
+   * Префабы супер‑тайлов по индексу {@link TileKind}.
+   * Индекс 1 → SuperRow, 2 → SuperCol, 3 → SuperBomb, 4 → SuperClear.
+   * Массив должен содержать заполнители для неиспользуемых видов, чтобы
+   * соответствовать значениям перечисления.
+   */
   @property([cc.Prefab])
-  superVariants: cc.Prefab[] | null = null;
+  superVariants: cc.Prefab[] = new Array(TileKind.SuperClear + 1).fill(null!);
 
   /** Текущий визуальный узел, размещённый в visualRoot. */
   private currentVisual: cc.Node | null = null;
@@ -69,8 +74,7 @@ export default class TileView extends cc.Component {
       const idx = this.colorIndex(tile.color);
       prefab = this.normalVariants[idx];
     } else {
-      const variants = this.superVariants || [];
-      prefab = variants[tile.kind];
+      prefab = this.superVariants[tile.kind];
     }
     if (!prefab) return;
 
