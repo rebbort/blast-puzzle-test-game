@@ -36,8 +36,13 @@ export class MoveExecutor {
     // Listener stays active only for this execution and is detached afterwards
     // to avoid capturing unrelated events when multiple moves chain.
     const vfxPromises: Promise<void>[] = [];
-    const onSuperActivated = (kind: TileKind) => {
-      vfxPromises.push(FXController.waitForVfx(kind));
+    const onSuperActivated = (kind: TileKind, pos: cc.Vec2) => {
+      const cfg = this.board.config;
+      const x =
+        (pos.x - this.board.cols / 2) * cfg.tileWidth + cfg.tileWidth / 2;
+      const y =
+        (this.board.rows / 2 - pos.y) * cfg.tileHeight - cfg.tileHeight / 2;
+      vfxPromises.push(FXController.waitForVfx(kind, cc.v2(x, y)));
     };
     this.bus.on(EventNames.SuperTileActivated, onSuperActivated);
 

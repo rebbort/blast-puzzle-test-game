@@ -30,7 +30,7 @@ export class FXController {
    * current scene and waits for its {@link VfxInstance} to finish playing.
    * The instantiated node is destroyed by the instance when playback ends.
    */
-  static async waitForVfx(kind: TileKind): Promise<void> {
+  static async waitForVfx(kind: TileKind, position?: cc.Vec2): Promise<void> {
     const prefab = FXController.prefabs[kind];
     const duration = FXController.durations[kind];
     if (!prefab) {
@@ -42,6 +42,10 @@ export class FXController {
     const node = cc.instantiate(prefab);
     const scene = cc.director.getScene?.();
     scene?.addChild(node);
+    if (position) {
+      node.setPosition(position);
+    }
+    node.zIndex = 9999;
     let instance = node.getComponent(VfxInstance);
     if (!instance) {
       instance = node.addComponent(VfxInstance);

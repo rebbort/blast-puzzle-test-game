@@ -31,8 +31,13 @@ export class RemoveCommand implements ICommand {
       const tile = this.board.tileAt(p);
       if (tile) {
         // Emit activation event for any super tile so FX can play before gravity.
+        // Provide the board position so the VFX can appear where the tile was.
         if (tile.kind !== TileKind.Normal) {
-          this.bus.emit(EventNames.SuperTileActivated, tile.kind);
+          this.bus.emit(
+            EventNames.SuperTileActivated,
+            tile.kind,
+            new cc.Vec2(p.x, p.y),
+          );
         }
         this.board.setTile(p, null);
         cols.add(p.x);

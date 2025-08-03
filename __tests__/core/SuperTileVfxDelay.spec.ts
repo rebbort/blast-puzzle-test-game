@@ -27,10 +27,18 @@ describe("super-tile VFX delay", () => {
     emit(event: string, ...args: unknown[]): void;
     destroy(): void;
     getComponent(_: unknown): { play: () => Promise<void> };
+    setPosition(_: cc.Vec2): void;
   }
 
   function mockVfx(): MockNode[] {
     const nodes: MockNode[] = [];
+    (cc as unknown as { director: { getScene: () => cc.Scene } }).director = {
+      getScene: () =>
+        ({
+          addChild: jest.fn(),
+          autoReleaseAssets: false,
+        }) as unknown as cc.Scene,
+    };
     jest.spyOn(cc, "instantiate").mockImplementation(() => {
       const listeners: Record<string, ((...args: unknown[]) => void)[]> = {};
       const node: MockNode = {
@@ -65,6 +73,7 @@ describe("super-tile VFX delay", () => {
               });
             }),
         })),
+        setPosition: jest.fn(),
       };
       nodes.push(node);
       return node as unknown as cc.Node;
