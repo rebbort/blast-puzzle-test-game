@@ -17,11 +17,10 @@ export class VfxInstance extends cc.Component {
    */
   play(): Promise<void> {
     return new Promise((resolve) => {
-      const ps = this.particleSystem as unknown as
-        | (cc.EventTarget & cc.ParticleSystem)
-        | null;
+      const ps = this.particleSystem;
+      const psNode = ps?.node || null;
       const finish = () => {
-        ps?.off("finished", finish);
+        psNode?.off("finished", finish);
         this.animation?.off("finished", finish);
         this.node.destroy();
         resolve();
@@ -29,8 +28,8 @@ export class VfxInstance extends cc.Component {
 
       let started = false;
 
-      if (ps) {
-        ps.once("finished", finish);
+      if (ps && psNode) {
+        psNode.once("finished", finish);
         ps.resetSystem();
         started = true;
       }

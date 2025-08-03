@@ -123,6 +123,8 @@ export default class TileView extends cc.Component {
 
       const instance = fx.getComponent(VfxInstance);
       instance?.play();
+      // Prevent repeated activation from triggering the effect again
+      this.activateFx = null;
     }
     // Дополнительная индикация может быть добавлена здесь
   }
