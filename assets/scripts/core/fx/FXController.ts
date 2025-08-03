@@ -19,20 +19,27 @@ export class FXController {
   }
 
   /**
-   * Instantiates the VFX prefab for the provided kind and waits for its
-   * VfxInstance to finish playing.
+   * Instantiates the VFX prefab for the provided kind, parents it to the
+   * current scene and waits for its {@link VfxInstance} to finish playing.
+   * The instantiated node is destroyed afterwards.
    */
-  static waitForVfx(kind: TileKind): Promise<void> {
+  static async waitForVfx(kind: TileKind): Promise<void> {
     const prefab = FXController.prefabs[kind];
     if (!prefab) {
-      return Promise.resolve();
+      return;
     }
     const node = cc.instantiate(prefab);
+    const scene = cc.director.getScene?.();
+    scene?.addChild(node);
     const instance = node.getComponent(VfxInstance);
     if (!instance) {
       node.destroy();
-      return Promise.resolve();
+      return;
     }
-    return instance.play();
+    try {
+      await instance.play();
+    } finally {
+      node.destroy();
+    }
   }
 }

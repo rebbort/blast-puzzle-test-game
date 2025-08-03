@@ -13,13 +13,12 @@ export class VfxInstance extends cc.Component {
 
   /**
    * Starts the particle system or animation and resolves once the `finished`
-   * event fires. The node is destroyed afterwards.
+   * event fires.
    */
   play(): Promise<void> {
     return new Promise((resolve) => {
       const finish = () => {
         this.node.off("finished", finish);
-        this.node.destroy();
         resolve();
       };
       this.node.once("finished", finish);

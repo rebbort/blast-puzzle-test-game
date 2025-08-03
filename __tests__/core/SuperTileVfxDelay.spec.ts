@@ -98,6 +98,7 @@ describe("super-tile VFX delay", () => {
 
     expect(fallTime).not.toBe(0);
     expect(fallTime).toBeGreaterThanOrEqual(removeTime);
+    expect(nodes[0].destroy).toHaveBeenCalled();
   });
 
   it("waits for the longest VFX when multiple supers trigger", async () => {
@@ -133,5 +134,7 @@ describe("super-tile VFX delay", () => {
 
     expect(fallTime).not.toBe(0);
     expect(fallTime).toBeGreaterThanOrEqual(removeTime);
+    expect(nodes[0].destroy).toHaveBeenCalled();
+    expect(nodes[1].destroy).toHaveBeenCalled();
   });
 });
