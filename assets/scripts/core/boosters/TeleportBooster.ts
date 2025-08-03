@@ -51,13 +51,22 @@ export class TeleportBooster implements Booster {
 
     let first: cc.Vec2 | null = null;
 
+    const externalCancel = (): void => {
+      this.bus.off(EventNames.GroupSelected, onFirst);
+      this.bus.off(EventNames.GroupSelected, onSecond);
+      this.bus.off(EventNames.InvalidTap, cancel);
+      this.bus.off(EventNames.BoosterCancelled, externalCancel);
+      first = null;
+    };
+
     const cancel = (): void => {
       this.bus.off(EventNames.GroupSelected, onSecond);
       this.bus.off(EventNames.InvalidTap, cancel);
+      this.bus.off(EventNames.BoosterCancelled, externalCancel);
       first = null;
       this.bus.emit(EventNames.BoosterCancelled);
       // Wait again for the first selection
-      this.bus.once(EventNames.GroupSelected, onFirst);
+      rearm();
     };
 
     const onSecond = async (posB: unknown) => {
@@ -70,6 +79,7 @@ export class TeleportBooster implements Booster {
       }
       this.bus.off(EventNames.GroupSelected, onSecond);
       this.bus.off(EventNames.InvalidTap, cancel);
+      this.bus.off(EventNames.BoosterCancelled, externalCancel);
       this.bus.emit(EventNames.BoosterTargetSelected, {
         id: this.id,
         stage: "second",
@@ -101,6 +111,7 @@ export class TeleportBooster implements Booster {
     };
 
     const onFirst = (posA: unknown) => {
+      this.bus.off(EventNames.GroupSelected, onFirst);
       first = posA as cc.Vec2;
       this.bus.emit(EventNames.BoosterTargetSelected, {
         id: this.id,
@@ -112,7 +123,12 @@ export class TeleportBooster implements Booster {
       this.bus.on(EventNames.InvalidTap, cancel);
     };
 
+    const rearm = (): void => {
+      this.bus.on(EventNames.GroupSelected, onFirst);
+      this.bus.on(EventNames.BoosterCancelled, externalCancel);
+    };
+
     // Wait for the first cell selection
-    this.bus.once(EventNames.GroupSelected, onFirst);
+    rearm();
   }
 }

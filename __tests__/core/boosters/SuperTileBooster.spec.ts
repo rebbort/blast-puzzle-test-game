@@ -57,4 +57,31 @@ describe("SuperTileBooster", () => {
     expect(board.tileAt(new cc.Vec2(0, 0))!.kind).toBe(TileKind.SuperBomb);
     expect(view.apply).toHaveBeenCalled();
   });
+
+  it("does nothing after cancellation", () => {
+    const bus = new InfrastructureEventBus();
+    const svc = new BoosterService(bus, () => "WaitingInput");
+    const board = new Board(cfg, [[TileFactory.createNormal("red")]]);
+    const view = { apply: jest.fn() } as unknown as TileView;
+    const views: TileView[][] = [[view]];
+    const getView = (p: cc.Vec2) => views[p.y]?.[p.x];
+    const booster = new SuperTileBooster(
+      "bomb",
+      board,
+      getView,
+      bus,
+      svc,
+      1,
+      TileKind.SuperBomb,
+    );
+    svc.register(booster);
+
+    svc.activate("bomb");
+    svc.cancel();
+    bus.emit(EventNames.GroupSelected, new cc.Vec2(0, 0));
+
+    expect(booster.charges).toBe(1);
+    expect(board.tileAt(new cc.Vec2(0, 0))!.kind).toBe(TileKind.Normal);
+    expect(view.apply).not.toHaveBeenCalled();
+  });
 });

@@ -34,7 +34,9 @@ export class SuperTileBooster implements Booster {
   }
 
   start(): void {
-    this.bus.once(EventNames.GroupSelected, (pos: unknown) => {
+    const onPlace = (pos: unknown): void => {
+      this.bus.off(EventNames.BoosterCancelled, onCancel);
+      this.bus.off(EventNames.GroupSelected, onPlace);
       if (this.charges <= 0) return;
       const p = pos as cc.Vec2;
       const tile = this.board.tileAt(p);
@@ -52,6 +54,14 @@ export class SuperTileBooster implements Booster {
         kind: this.kind,
         position: p,
       });
-    });
+    };
+
+    const onCancel = (): void => {
+      this.bus.off(EventNames.GroupSelected, onPlace);
+      this.bus.off(EventNames.BoosterCancelled, onCancel);
+    };
+
+    this.bus.on(EventNames.GroupSelected, onPlace);
+    this.bus.on(EventNames.BoosterCancelled, onCancel);
   }
 }

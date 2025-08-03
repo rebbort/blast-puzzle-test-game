@@ -106,6 +106,21 @@ describe("TeleportBooster", () => {
     expect(emitSpy).toHaveBeenCalledWith(EventNames.BoosterCancelled);
   });
 
+  it("does nothing after external cancellation", () => {
+    const board = new Board(cfg2x2, [
+      [TileFactory.createNormal("red"), TileFactory.createNormal("blue")],
+      [TileFactory.createNormal("blue"), TileFactory.createNormal("red")],
+    ]);
+    const booster = new TeleportBooster(board, bus, 1);
+
+    booster.start();
+    bus.emit(EventNames.BoosterCancelled);
+    bus.emit(EventNames.GroupSelected, new cc.Vec2(0, 0));
+
+    expect(booster.charges).toBe(1);
+    expect(bus.getListenerCount(EventNames.GroupSelected)).toBe(0);
+  });
+
   it("ignores activation with zero charges", () => {
     const board = new Board(cfg2x2, [
       [TileFactory.createNormal("red"), TileFactory.createNormal("blue")],
