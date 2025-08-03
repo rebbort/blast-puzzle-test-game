@@ -1,16 +1,12 @@
 const { ccclass, property } = cc._decorator;
 
+import { TileKind } from "./Tile";
+import { FXController } from "../fx/FXController";
+
 /**
  * Метаданные для визуального префаба тайла.
  * Указывает, к какому kind относится и какие визуальные эффекты проигрывать.
  */
-export enum SuperKind {
-  Normal,
-  SuperRow,
-  SuperCol,
-  SuperBomb,
-  SuperClear,
-}
 
 @ccclass("TileAppearanceConfig")
 export class TileAppearanceConfig extends cc.Component {
@@ -20,10 +16,10 @@ export class TileAppearanceConfig extends cc.Component {
   ).Enum;
   @property({
     type: TileAppearanceConfig.ccEnum
-      ? TileAppearanceConfig.ccEnum(SuperKind)
-      : SuperKind,
+      ? TileAppearanceConfig.ccEnum(TileKind)
+      : TileKind,
   })
-  kind: SuperKind = SuperKind.Normal;
+  kind: TileKind = TileKind.Normal;
 
   /**
    * Префаб визуального эффекта, который воспроизводится при появлении
@@ -41,4 +37,10 @@ export class TileAppearanceConfig extends cc.Component {
 
   // Дополнительные параметры могут быть добавлены здесь (цветовые вспышки,
   // множители и т. д.)
+
+  onLoad(): void {
+    if (this.activateFx) {
+      FXController.setPrefab(this.kind, this.activateFx);
+    }
+  }
 }

@@ -18,7 +18,7 @@ export default class TileView extends cc.Component {
   @property([cc.Prefab])
   normalVariants: cc.Prefab[] = [];
 
-  /** Префабы супер‑тайлов по индексу {@link SuperKind}. */
+  /** Префабы супер‑тайлов по индексу {@link TileKind}. */
   @property([cc.Prefab])
   superVariants: cc.Prefab[] | null = null;
 
