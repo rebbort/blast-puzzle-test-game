@@ -1,18 +1,3 @@
-import { EventTarget } from "../../../tests/cc";
-jest.mock("../../../assets/scripts/infrastructure/EventBus", () => {
-  return {
-    EventBus: class MockBus extends EventTarget {
-      once(event: string, cb: (...args: unknown[]) => void): void {
-        const wrapper = (...args: unknown[]) => {
-          this.off(event, wrapper);
-          cb(...args);
-        };
-        this.on(event, wrapper);
-      }
-    },
-  };
-});
-
 import { InfrastructureEventBus } from "../../../assets/scripts/infrastructure/InfrastructureEventBus";
 import { Board } from "../../../assets/scripts/core/board/Board";
 import { TileFactory } from "../../../assets/scripts/core/board/Tile";
