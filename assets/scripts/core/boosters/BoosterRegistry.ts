@@ -9,7 +9,7 @@ import { TileKind } from "../board/Tile";
 
 export interface BoosterFactoryParams {
   board: Board;
-  views: TileView[][];
+  getView: (p: cc.Vec2) => TileView | undefined;
   bus: InfrastructureEventBus;
   boosterService: BoosterService;
   charges: number;
@@ -32,11 +32,11 @@ export const BoosterRegistry: BoosterDefinition[] = [
   {
     id: "bomb",
     icon: "images/boosters/icon_booster_bomb",
-    factory: ({ board, views, bus, boosterService, charges }) =>
+    factory: ({ board, getView, bus, boosterService, charges }) =>
       new SuperTileBooster(
         "bomb",
         board,
-        views,
+        getView,
         bus,
         boosterService,
         charges,
@@ -46,11 +46,11 @@ export const BoosterRegistry: BoosterDefinition[] = [
   {
     id: "superRow",
     icon: "images/boosters/icon_booster_superRow",
-    factory: ({ board, views, bus, boosterService, charges }) =>
+    factory: ({ board, getView, bus, boosterService, charges }) =>
       new SuperTileBooster(
         "superRow",
         board,
-        views,
+        getView,
         bus,
         boosterService,
         charges,
@@ -60,11 +60,11 @@ export const BoosterRegistry: BoosterDefinition[] = [
   {
     id: "superCol",
     icon: "images/boosters/icon_booster_superCol",
-    factory: ({ board, views, bus, boosterService, charges }) =>
+    factory: ({ board, getView, bus, boosterService, charges }) =>
       new SuperTileBooster(
         "superCol",
         board,
-        views,
+        getView,
         bus,
         boosterService,
         charges,

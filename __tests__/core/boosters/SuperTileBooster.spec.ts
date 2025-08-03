@@ -23,10 +23,11 @@ describe("SuperTileBooster", () => {
     const board = new Board(cfg, [[TileFactory.createNormal("red")]]);
     const view = { apply: jest.fn() } as unknown as TileView;
     const views: TileView[][] = [[view]];
+    const getView = (p: cc.Vec2) => views[p.y]?.[p.x];
     const booster = new SuperTileBooster(
       "bomb",
       board,
-      views,
+      getView,
       bus,
       svc,
       1,

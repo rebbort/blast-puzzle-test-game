@@ -13,15 +13,19 @@ export let boosterService: BoosterService | undefined;
  */
 export function initBoosterService(
   board: Board,
-  views: TileView[][],
+  viewProvider: () => TileView[][],
   getState: () => GameState,
   charges: Record<string, number>,
 ): void {
   boosterService = new BoosterService(EventBus, getState);
+  const getView = (p: cc.Vec2): TileView | undefined => {
+    const views = viewProvider();
+    return views[p.y]?.[p.x];
+  };
   BoosterRegistry.forEach((def) => {
     const boost = def.factory({
       board,
-      views,
+      getView,
       bus: EventBus,
       boosterService,
       charges: charges[def.id] ?? 0,

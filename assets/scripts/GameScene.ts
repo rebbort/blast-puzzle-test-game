@@ -45,7 +45,7 @@ export default class GameScene extends cc.Component {
       (charges: Record<string, number>) => {
         initBoosterService(
           board,
-          boardCtrl.tileViews,
+          () => boardCtrl.tileViews,
           () => currentState,
           charges,
         );
