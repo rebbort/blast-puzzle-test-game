@@ -72,6 +72,27 @@ export class GameStateMachine {
   }
 
   /**
+   * Resets internal counters and emits initial events to start a new session.
+   * Keeps current board and event listeners intact.
+   */
+  reset(): void {
+    this.score = 0;
+    this.shuffles = 0;
+    this.turnManager.reset();
+
+    const turns = this.turnManager.getRemaining();
+    this.bus.emit(EventNames.TurnsInit, {
+      turns,
+      score: this.score,
+      targetScore: this.targetScore,
+    });
+    this.bus.emit(EventNames.TurnUsed, turns);
+    this.bus.emit(EventNames.TurnEnded, { score: this.score });
+
+    this.changeState("WaitingInput");
+  }
+
+  /**
    * Handles selection of a group by the player.
    * Ignored unless the machine awaits input.
    */

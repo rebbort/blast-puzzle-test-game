@@ -100,4 +100,13 @@ export default class FillController extends cc.Component {
     }
     this.pending = [];
   }
+
+  /**
+   * Updates references after board regeneration.
+   */
+  public reset(board: Board, tileViews: TileView[][]): void {
+    this.board = board;
+    this.tileViews = tileViews;
+    this.pending = [];
+  }
 }
