@@ -1,0 +1,32 @@
+# Deploy prebuilt web assets to GitHub Pages
+name: Deploy # Human-friendly name for the workflow
+
+on:
+  push:
+    branches:
+      - main # Trigger only when committing to main branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest # Use a Linux runner
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4 # Fetch repository contents
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4 # Provide Node for optional build steps
+        with:
+          node-version: 20 # Utilize Node 20 LTS
+
+      - name: Prepare deployment folder
+        run: |
+          mkdir -p deploy # Create directory for deployment artifacts
+          cp -r build/web/* deploy/ # Copy pre-built web files
+
+      - name: Publish to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4 # Push files to gh-pages branch
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }} # Authentication token
+          publish_branch: gh-pages # Pages branch
+          publish_dir: ./deploy # Directory to publish
+          force_orphan: true # Create orphan branch for clean history
