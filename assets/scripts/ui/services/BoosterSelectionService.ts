@@ -53,11 +53,15 @@ export class BoosterSelectionService {
 
   /**
    * Emits event with selected boosters and their charges.
-   * Currently each selected booster starts with one charge.
+   * Each selected booster starts with the maximum amount allowed by config
+   * (defaults to 10).
    */
   confirm(): void {
     const charges: Record<string, number> = {};
-    this.selected.forEach((id) => (charges[id] = 1));
+    this.selected.forEach((id) => {
+      const max = this.limits.maxPerType[id] ?? 10;
+      charges[id] = max;
+    });
     this.confirmedCharges = charges;
     EventBus.emit(EventNames.BoostersSelected, charges);
   }
