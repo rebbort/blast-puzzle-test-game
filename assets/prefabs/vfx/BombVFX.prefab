@@ -208,7 +208,7 @@
     "endSizeVar": 20,
     "startSpin": -30,
     "startSpinVar": -230,
-    "endSpin": 1000,
+    "endSpin": 10,
     "endSpinVar": -30,
     "sourcePos": {
       "__type__": "cc.Vec2",

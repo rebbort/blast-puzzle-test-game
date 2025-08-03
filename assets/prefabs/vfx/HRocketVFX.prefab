@@ -173,9 +173,9 @@
     "_stopped": true,
     "playOnLoad": false,
     "autoRemoveOnFinish": false,
-    "totalParticles": 100,
-    "duration": 1,
-    "emissionRate": 200,
+    "totalParticles": 200,
+    "duration": 0.5,
+    "emissionRate": 1000,
     "life": 0.8,
     "lifeVar": 0.2,
     "_startColor": {
@@ -206,9 +206,9 @@
       "b": 30,
       "a": 30
     },
-    "angle": 135,
+    "angle": 180,
     "angleVar": 30,
-    "startSize": 15,
+    "startSize": 150,
     "startSizeVar": 5,
     "endSize": 5,
     "endSizeVar": 2,
@@ -247,7 +247,7 @@
     "endRadiusVar": 0,
     "rotatePerS": 0,
     "rotatePerSVar": 0,
-    "_N$preview": false,
+    "_N$preview": true,
     "_id": ""
   },
   {
@@ -351,9 +351,9 @@
     "_stopped": true,
     "playOnLoad": false,
     "autoRemoveOnFinish": false,
-    "totalParticles": 100,
-    "duration": 1,
-    "emissionRate": 200,
+    "totalParticles": 200,
+    "duration": 0.5,
+    "emissionRate": 1000,
     "life": 0.8,
     "lifeVar": 0.2,
     "_startColor": {
@@ -384,9 +384,9 @@
       "b": 30,
       "a": 30
     },
-    "angle": 45,
+    "angle": 0,
     "angleVar": 30,
-    "startSize": 15,
+    "startSize": 150,
     "startSizeVar": 5,
     "endSize": 5,
     "endSizeVar": 2,
@@ -472,8 +472,9 @@
     },
     "speed": 1.5,
     "duration": 1,
-    "leftAngle": 135,
-    "rightAngle": 45,
+    "leftAngle": 180,
+    "rightAngle": 0,
+    "movementAngle": 0,
     "_id": ""
   },
   {

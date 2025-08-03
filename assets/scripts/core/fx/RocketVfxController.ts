@@ -24,6 +24,9 @@ export class RocketVfxController extends cc.Component {
   @property({ type: cc.Float, range: [0, 360, 5] })
   rightAngle: number = 45; // Вправо-вверх
 
+  @property({ type: cc.Float, range: [0, 360, 5] })
+  movementAngle: number = 90; // Угол движения ноды (по умолчанию вверх)
+
   private isPlaying = false;
 
   /**
@@ -51,6 +54,9 @@ export class RocketVfxController extends cc.Component {
         this.rightTail.resetSystem();
       }
 
+      // Анимируем движение ноды за пределы экрана
+      this.animateNodeMovement();
+
       // Ждем завершения эффекта
       const finish = () => {
         this.isPlaying = false;
@@ -76,6 +82,43 @@ export class RocketVfxController extends cc.Component {
   }
 
   /**
+   * Анимирует движение нод с партиклами в разные стороны.
+   */
+  private animateNodeMovement(): void {
+    // Получаем размеры экрана
+    const visibleSize = cc.view.getVisibleSize();
+    const screenWidth = visibleSize.width;
+    const screenHeight = visibleSize.height;
+    const distance = Math.max(screenWidth, screenHeight) * 1.5; // 1.5x размер экрана
+
+    // Анимируем левый хвост
+    if (this.leftTail?.node) {
+      const leftAngleRad = (this.leftAngle * Math.PI) / 180;
+      const leftDirectionX = Math.cos(leftAngleRad);
+      const leftDirectionY = Math.sin(leftAngleRad);
+
+      const leftEndX = this.leftTail.node.x + leftDirectionX * distance;
+      const leftEndY = this.leftTail.node.y + leftDirectionY * distance;
+
+      const leftMoveAction = cc.moveTo(this.duration, leftEndX, leftEndY);
+      this.leftTail.node.runAction(leftMoveAction);
+    }
+
+    // Анимируем правый хвост
+    if (this.rightTail?.node) {
+      const rightAngleRad = (this.rightAngle * Math.PI) / 180;
+      const rightDirectionX = Math.cos(rightAngleRad);
+      const rightDirectionY = Math.sin(rightAngleRad);
+
+      const rightEndX = this.rightTail.node.x + rightDirectionX * distance;
+      const rightEndY = this.rightTail.node.y + rightDirectionY * distance;
+
+      const rightMoveAction = cc.moveTo(this.duration, rightEndX, rightEndY);
+      this.rightTail.node.runAction(rightMoveAction);
+    }
+  }
+
+  /**
    * Настраивает хвост ракеты с заданным углом.
    */
   private setupTail(particleSystem: cc.ParticleSystem, angle: number): void {
@@ -87,12 +130,12 @@ export class RocketVfxController extends cc.Component {
     // Настраиваем параметры частиц
     particleSystem.duration = this.duration;
     particleSystem.life = this.duration * 0.8;
-    particleSystem.speed = this.speed * 100; // Увеличиваем скорость
+    particleSystem.speed = this.speed * 30; // Еще меньше скорость частиц, так как ноды движутся
     particleSystem.angle = angle;
-    particleSystem.angleVar = 30; // Небольшое отклонение
+    particleSystem.angleVar = 0; // Небольшое отклонение
 
     // Настраиваем размер и цвет
-    particleSystem.startSize = 15;
+    particleSystem.startSize = 250;
     particleSystem.endSize = 5;
     particleSystem.startSizeVar = 5;
     particleSystem.endSizeVar = 2;
@@ -107,8 +150,8 @@ export class RocketVfxController extends cc.Component {
     particleSystem.emissionRate = 200;
     particleSystem.totalParticles = 100;
 
-    // Настраиваем физику
-    particleSystem.gravity = cc.v2(0, -50); // Легкая гравитация
+    // Настраиваем физику - убираем гравитацию для лучшего эффекта хвоста
+    particleSystem.gravity = cc.v2(0, 0);
     particleSystem.tangentialAccel = 0;
     particleSystem.radialAccel = 0;
     particleSystem.speedVar = 20;
@@ -116,7 +159,7 @@ export class RocketVfxController extends cc.Component {
     // Настройки позиции
     particleSystem.sourcePos = cc.v2(0, 0);
     particleSystem.posVar = cc.v2(2, 2);
-    particleSystem.positionType = cc.ParticleSystem.PositionType.FREE;
+    particleSystem.positionType = cc.ParticleSystem.PositionType.RELATIVE; // Относительно ноды
 
     // Настройки вращения
     particleSystem.startSpin = 0;
