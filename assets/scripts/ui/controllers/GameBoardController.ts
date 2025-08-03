@@ -147,14 +147,14 @@ export default class GameBoardController extends cc.Component {
     const nodeA = viewA.node;
     const nodeB = viewB.node;
     cc.tween(nodeA)
-      .to(0.1, { scale: new cc.Vec3(0, 0, 1) })
+      .to(0.1, { scale: 0 })
       .call(() => viewA.apply(this.board.tileAt(a)!))
-      .to(0.1, { scale: new cc.Vec3(1, 1, 1) })
+      .to(0.1, { scale: 1 })
       .start();
     cc.tween(nodeB)
-      .to(0.1, { scale: new cc.Vec3(0, 0, 1) })
+      .to(0.1, { scale: 0 })
       .call(() => viewB.apply(this.board.tileAt(b)!))
-      .to(0.1, { scale: new cc.Vec3(1, 1, 1) })
+      .to(0.1, { scale: 1 })
       .start();
   }
 

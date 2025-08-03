@@ -195,6 +195,9 @@ export default class BoosterPanelController extends cc.Component {
         this.hideBoosterSlot(slot);
       }
     }
+
+    // Deactivate any active booster after it has been consumed
+    this.clearActiveSlot();
   }
 
   private onBoosterCancelled(): void {
