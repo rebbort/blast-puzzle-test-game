@@ -3,6 +3,7 @@ const { ccclass, property } = cc._decorator;
 import type { Tile, TileColor } from "../../core/board/Tile";
 import { TileKind } from "../../core/board/Tile";
 import { TileAppearanceConfig } from "../../core/board/TileAppearanceConfig";
+import { VfxInstance } from "../../core/fx/VfxInstance";
 
 /**
  * Представление игрового тайла. Содержит контейнер `visualRoot`, куда
@@ -18,9 +19,14 @@ export default class TileView extends cc.Component {
   @property([cc.Prefab])
   normalVariants: cc.Prefab[] = [];
 
-  /** Префабы супер‑тайлов по индексу {@link SuperKind}. */
+  /**
+   * Префабы супер‑тайлов по индексу {@link TileKind}.
+   * Индекс 1 → SuperRow, 2 → SuperCol, 3 → SuperBomb, 4 → SuperClear.
+   * Массив должен содержать заполнители для неиспользуемых видов, чтобы
+   * соответствовать значениям перечисления.
+   */
   @property([cc.Prefab])
-  superVariants: cc.Prefab[] | null = null;
+  superVariants: cc.Prefab[] = new Array(TileKind.SuperClear + 1).fill(null!);
 
   /** Текущий визуальный узел, размещённый в visualRoot. */
   private currentVisual: cc.Node | null = null;
@@ -68,8 +74,7 @@ export default class TileView extends cc.Component {
       const idx = this.colorIndex(tile.color);
       prefab = this.normalVariants[idx];
     } else {
-      const variants = this.superVariants || [];
-      prefab = variants[tile.kind];
+      prefab = this.superVariants[tile.kind];
     }
     if (!prefab) return;
 
@@ -109,9 +114,17 @@ export default class TileView extends cc.Component {
   activateSuper(): void {
     if (this.activateFx) {
       const fx = cc.instantiate(this.activateFx);
-      // Position effect relative to tiles layer so it persists after tile node is destroyed
-      fx.parent = this.node.parent || this.node;
+      // Position effect relative to a persistent layer so it survives tile removal
+      const parent =
+        (this.node.parent as cc.Node | null) ||
+        (cc.director.getScene?.() as cc.Node | null);
+      fx.parent = parent || this.node;
       fx.setPosition(this.node.position);
+
+      const instance = fx.getComponent(VfxInstance);
+      instance?.play();
+      // Prevent repeated activation from triggering the effect again
+      this.activateFx = null;
     }
     // Дополнительная индикация может быть добавлена здесь
   }

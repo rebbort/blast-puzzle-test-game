@@ -1,9 +1,6 @@
 import TileView from "../assets/scripts/ui/views/TileView";
 import { TileFactory, TileKind } from "../assets/scripts/core/board/Tile";
-import {
-  TileAppearanceConfig,
-  SuperKind,
-} from "../assets/scripts/core/board/TileAppearanceConfig";
+import { TileAppearanceConfig } from "../assets/scripts/core/board/TileAppearanceConfig";
 
 describe("TileView", () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -17,7 +14,7 @@ describe("TileView", () => {
   class NormalVisual extends TileAppearanceConfig {
     constructor() {
       super();
-      this.kind = SuperKind.Normal;
+      this.kind = TileKind.Normal;
       this.spawnFx = spawnPrefab;
     }
   }
@@ -25,7 +22,7 @@ describe("TileView", () => {
   class RowVisual extends TileAppearanceConfig {
     constructor() {
       super();
-      this.kind = SuperKind.SuperRow;
+      this.kind = TileKind.SuperRow;
       this.activateFx = activatePrefab;
     }
   }
@@ -43,7 +40,7 @@ describe("TileView", () => {
     const superPrefab = new (cc.Prefab as any)("row", RowVisual);
 
     view.normalVariants = [normalPrefab];
-    view.superVariants = [];
+    view.superVariants = new Array(TileKind.SuperClear + 1).fill(null!);
     view.superVariants[TileKind.SuperRow] = superPrefab;
 
     const spy = jest.spyOn(cc, "instantiate");
