@@ -17,9 +17,16 @@ local/
 temp/
 # Final build output
 build/               # ignore all build outputs
+!build/web-mobile/          # allow tracking of the web-mobile build directory itself
+build/web-mobile/**         # ignore generated files within the web-mobile build
+!build/web-mobile/.gitkeep  # keep placeholder so the directory exists in git
 !build/web/          # allow tracking of the web build directory itself
 build/web/**         # ignore generated files within the web build
 !build/web/.gitkeep  # keep placeholder so the directory exists in git
+!build/web-desktop/          # allow tracking of the web-desktop build directory itself
+build/web-desktop/**         # ignore generated files within the web-desktop build
+!build/web-desktop/.gitkeep  # keep placeholder so the directory exists in git
+
 # Editor log files
 logs/
 # Temporary meta files created by the editor
