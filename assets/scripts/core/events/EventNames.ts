@@ -28,7 +28,6 @@ export const EventNames = {
   StateChanged: "StateChanged",
   GamePaused: "GamePaused",
   GameResumed: "GameResumed",
-  GameRestart: "GameRestart",
   AnimationStarted: "AnimationStarted",
   AnimationEnded: "AnimationEnded",
   AutoShuffle: "AutoShuffle",
