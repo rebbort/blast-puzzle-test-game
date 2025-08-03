@@ -13,7 +13,7 @@
   },
   {
     "__type__": "cc.Node",
-    "_name": "TileBomb",
+    "_name": "BombVFX",
     "_objFlags": 0,
     "_parent": null,
     "_children": [
@@ -40,8 +40,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 100,
-      "height": 100
+      "width": 0,
+      "height": 0
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -79,7 +79,7 @@
   },
   {
     "__type__": "cc.Node",
-    "_name": "Sprite",
+    "_name": "FXBombExplosion",
     "_objFlags": 0,
     "_parent": {
       "__id__": 1
@@ -104,8 +104,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 86,
-      "height": 105
+      "width": 0,
+      "height": 0
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -116,8 +116,8 @@
       "__type__": "TypedArray",
       "ctor": "Float64Array",
       "array": [
-        0,
-        2.567,
+        -494.859,
+        841.937,
         0,
         0,
         0,
@@ -142,7 +142,7 @@
     "_id": ""
   },
   {
-    "__type__": "cc.Sprite",
+    "__type__": "cc.ParticleSystem",
     "_name": "",
     "_objFlags": 0,
     "node": {
@@ -155,48 +155,118 @@
       }
     ],
     "_srcBlendFactor": 770,
-    "_dstBlendFactor": 771,
-    "_spriteFrame": {
-      "__uuid__": "32ba05a1-9d1c-46bc-b67c-b0bdcb18ce14"
+    "_dstBlendFactor": 1,
+    "_custom": true,
+    "_file": {
+      "__uuid__": "b2687ac4-099e-403c-a192-ff477686f4f5"
     },
-    "_type": 0,
-    "_sizeMode": 1,
-    "_fillType": 0,
-    "_fillCenter": {
+    "_spriteFrame": {
+      "__uuid__": "472df5d3-35e7-4184-9e6c-7f41bee65ee3"
+    },
+    "_texture": null,
+    "_stopped": true,
+    "playOnLoad": false,
+    "autoRemoveOnFinish": false,
+    "totalParticles": 200,
+    "duration": 0.2,
+    "emissionRate": 1000,
+    "life": 0.20000000298023224,
+    "lifeVar": 0.4,
+    "_startColor": {
+      "__type__": "cc.Color",
+      "r": 202,
+      "g": 200,
+      "b": 86,
+      "a": 163
+    },
+    "_startColorVar": {
+      "__type__": "cc.Color",
+      "r": 229,
+      "g": 255,
+      "b": 173,
+      "a": 198
+    },
+    "_endColor": {
+      "__type__": "cc.Color",
+      "r": 173,
+      "g": 161,
+      "b": 19,
+      "a": 214
+    },
+    "_endColorVar": {
+      "__type__": "cc.Color",
+      "r": 107,
+      "g": 249,
+      "b": 249,
+      "a": 188
+    },
+    "angle": 360,
+    "angleVar": 360,
+    "startSize": 20,
+    "startSizeVar": 500,
+    "endSize": 10,
+    "endSizeVar": 20,
+    "startSpin": -30,
+    "startSpinVar": -30,
+    "endSpin": -30,
+    "endSpinVar": -30,
+    "sourcePos": {
       "__type__": "cc.Vec2",
       "x": 0,
       "y": 0
     },
-    "_fillStart": 0,
-    "_fillRange": 0,
-    "_isTrimmedMode": true,
-    "_atlas": null,
+    "posVar": {
+      "__type__": "cc.Vec2",
+      "x": 5,
+      "y": 5
+    },
+    "_positionType": 1,
+    "positionType": 1,
+    "emitterMode": 0,
+    "gravity": {
+      "__type__": "cc.Vec2",
+      "x": 5,
+      "y": 5
+    },
+    "speed": 3,
+    "speedVar": 5,
+    "tangentialAccel": 20,
+    "tangentialAccelVar": 10,
+    "radialAccel": 200,
+    "radialAccelVar": 200,
+    "rotationIsDir": true,
+    "startRadius": 0,
+    "startRadiusVar": 0,
+    "endRadius": 0,
+    "endRadiusVar": 0,
+    "rotatePerS": 0,
+    "rotatePerSVar": 0,
+    "_N$preview": false,
     "_id": ""
   },
   {
     "__type__": "cc.PrefabInfo",
     "root": {
-      "__id__": 1
+      "__id__": 2
     },
     "asset": {
-      "__id__": 0
+      "__uuid__": "c6f7c67a-bac7-4d67-848a-4578d9c31995"
     },
-    "fileId": "bchWJYTC9K1IdywwA1EFZM",
+    "fileId": "bdonDIZzRDcoWGk5EYC1DH",
     "sync": false
   },
   {
-    "__type__": "3245brUnJtELKkNyPIR2nTz",
+    "__type__": "62f57N9ZNRJvaWMUD1Dx3rM",
     "_name": "",
     "_objFlags": 0,
     "node": {
       "__id__": 1
     },
     "_enabled": true,
-    "kind": 3,
-    "spawnFx": null,
-    "activateFx": {
-      "__uuid__": "0c7b8200-d3b5-4145-8051-0386a6305822"
+    "particleSystem": {
+      "__id__": 3
     },
+    "animation": null,
     "_id": ""
   },
   {
