@@ -13,7 +13,6 @@ import { InfrastructureEventBus } from "../../infrastructure/InfrastructureEvent
 import { Board } from "../board/Board";
 import { BoardSolver } from "../board/BoardSolver";
 import { MoveExecutor } from "../board/MoveExecutor";
-import { BombCommand } from "../board/commands/BombCommand";
 import { ScoreStrategy } from "../rules/ScoreStrategy";
 import { TurnManager } from "../rules/TurnManager";
 import { BoardConfig } from "../../config/ConfigLoader";
@@ -102,25 +101,39 @@ export class GameStateMachine {
       this.changeState("ExecutingMove");
 
       switch (tile.kind) {
-        case TileKind.SuperBomb:
-          void new BombCommand(this.board, start, 1, this.bus).execute();
+        case TileKind.SuperBomb: {
+          const group: cc.Vec2[] = [];
+          for (let dx = -1; dx <= 1; dx++) {
+            for (let dy = -1; dy <= 1; dy++) {
+              if (Math.max(Math.abs(dx), Math.abs(dy)) <= 1) {
+                const p = new cc.Vec2(start.x + dx, start.y + dy);
+                if (this.board.inBounds(p)) group.push(p);
+              }
+            }
+          }
+          const expanded = this.solver.expandBySupers(group);
+          this.score += this.scoreStrategy.calculate(expanded.length);
+          void this.executor.execute(expanded);
           break;
+        }
         case TileKind.SuperRow: {
-          let group = Array.from(
+          const group = Array.from(
             { length: this.board.cols },
             (_, x) => new cc.Vec2(x, start.y),
           );
-          group = this.solver.expandBySupers(group);
-          void this.executor.execute(group);
+          const expanded = this.solver.expandBySupers(group);
+          this.score += this.scoreStrategy.calculate(expanded.length);
+          void this.executor.execute(expanded);
           break;
         }
         case TileKind.SuperCol: {
-          let group = Array.from(
+          const group = Array.from(
             { length: this.board.rows },
             (_, y) => new cc.Vec2(start.x, y),
           );
-          group = this.solver.expandBySupers(group);
-          void this.executor.execute(group);
+          const expanded = this.solver.expandBySupers(group);
+          this.score += this.scoreStrategy.calculate(expanded.length);
+          void this.executor.execute(expanded);
           break;
         }
         case TileKind.SuperClear: {
