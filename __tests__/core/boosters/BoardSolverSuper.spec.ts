@@ -34,7 +34,7 @@ it("expandGroupForSuper handles all kinds", () => {
   const bombTile = TileFactory.createNormal("red");
   bombTile.kind = TileKind.SuperBomb;
   const bombRes = solver.expandGroupForSuper(bombTile, new cc.Vec2(2, 2));
-  expect(bombRes).toHaveLength(5);
+  expect(bombRes).toHaveLength(9);
   expect(bombRes).toEqual(
     expect.arrayContaining([
       new cc.Vec2(2, 2),
@@ -42,6 +42,10 @@ it("expandGroupForSuper handles all kinds", () => {
       new cc.Vec2(3, 2),
       new cc.Vec2(2, 1),
       new cc.Vec2(2, 3),
+      new cc.Vec2(1, 1),
+      new cc.Vec2(1, 3),
+      new cc.Vec2(3, 1),
+      new cc.Vec2(3, 3),
     ]),
   );
 
