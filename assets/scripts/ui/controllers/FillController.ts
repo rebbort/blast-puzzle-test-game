@@ -53,7 +53,7 @@ export default class FillController extends cc.Component {
       byCol[p.x].push(p);
     }
 
-    const delayStep = 0.15;
+    const delayStep = 0.1;
 
     for (const colStr of Object.keys(byCol)) {
       const list = byCol[parseInt(colStr, 10)];
