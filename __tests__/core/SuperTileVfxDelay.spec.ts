@@ -59,7 +59,10 @@ describe("super-tile VFX delay", () => {
         getComponent: jest.fn(() => ({
           play: () =>
             new Promise<void>((resolve) => {
-              node.once("finished", resolve);
+              node.once("finished", () => {
+                node.destroy();
+                resolve();
+              });
             }),
         })),
       };
