@@ -3,6 +3,7 @@ const { ccclass, property } = cc._decorator;
 import type { Tile, TileColor } from "../../core/board/Tile";
 import { TileKind } from "../../core/board/Tile";
 import { TileAppearanceConfig } from "../../core/board/TileAppearanceConfig";
+import { VfxInstance } from "../../core/fx/VfxInstance";
 
 /**
  * Представление игрового тайла. Содержит контейнер `visualRoot`, куда
@@ -109,9 +110,15 @@ export default class TileView extends cc.Component {
   activateSuper(): void {
     if (this.activateFx) {
       const fx = cc.instantiate(this.activateFx);
-      // Position effect relative to tiles layer so it persists after tile node is destroyed
-      fx.parent = this.node.parent || this.node;
+      // Position effect relative to a persistent layer so it survives tile removal
+      const parent =
+        (this.node.parent as cc.Node | null) ||
+        (cc.director.getScene?.() as cc.Node | null);
+      fx.parent = parent || this.node;
       fx.setPosition(this.node.position);
+
+      const instance = fx.getComponent(VfxInstance);
+      instance?.play();
     }
     // Дополнительная индикация может быть добавлена здесь
   }
