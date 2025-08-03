@@ -10,8 +10,12 @@
     "test": "jest --runInBand",
     "lint": "eslint --config .eslintrc.cjs \"**/*.ts\"",
     "typecheck": "tsc --noEmit",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "build:web": "cocos-cli build --platform web-mobile --output build/web # build web version into build/web",
+    "postinstall": "npx cocos-cli --version # confirm cocos CLI is installed"
   },
+  "// build:web script": "Generates the web-mobile build into build/web for GitHub Pages",
+  "// postinstall script": "Verifies that cocos-cli is available after npm install",
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -23,6 +27,7 @@
     "@types/seedrandom": "^3.0.8",
     "@typescript-eslint/eslint-plugin": "^8.38.0",
     "@typescript-eslint/parser": "^8.38.0",
+    "cocos-cli": "^0.1.25",
     "eslint": "^8.57.1",
     "husky": "^9.1.7",
     "jest": "^30.0.5",
@@ -32,11 +37,10 @@
     "ts-jest": "^29.4.0",
     "typescript": "^5.8.3"
   },
+  "// cocos-cli dev dependency": "Provides the CLI used by build:web",
   "lint-staged": {
     "*.ts": [
       "prettier --write"
     ]
-  },
-  "dependencies": {
   }
 }
