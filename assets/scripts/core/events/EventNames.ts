@@ -5,6 +5,7 @@
  */
 export const EventNames = {
   GameStart: "GameStart",
+  GameRestart: "GameRestart",
   GroupSelected: "GroupSelected",
   TilesRemoved: "TilesRemoved",
   MoveCompleted: "MoveCompleted",
