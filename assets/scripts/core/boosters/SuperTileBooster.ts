@@ -19,7 +19,7 @@ export class SuperTileBooster implements Booster {
   constructor(
     id: string,
     private board: Board,
-    private views: TileView[][],
+    private getView: (p: cc.Vec2) => TileView | undefined,
     private bus: InfrastructureEventBus,
     private svc: BoosterService,
     charges: number,
@@ -46,7 +46,7 @@ export class SuperTileBooster implements Booster {
       this.svc.consume(this.id);
       const superTile: Tile = { ...tile, kind: this.kind };
       this.board.setTile(p, superTile);
-      const view = this.views[p.y]?.[p.x];
+      const view = this.getView(p);
       view?.apply(superTile);
       this.bus.emit(EventNames.SuperTilePlaced, {
         kind: this.kind,
