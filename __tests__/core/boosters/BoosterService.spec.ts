@@ -1,6 +1,10 @@
 import { InfrastructureEventBus } from "../../../assets/scripts/infrastructure/InfrastructureEventBus";
 import { BoosterService } from "../../../assets/scripts/core/boosters/BoosterService";
 import type { Booster } from "../../../assets/scripts/core/boosters/Booster";
+import { SuperTileBooster } from "../../../assets/scripts/core/boosters/SuperTileBooster";
+import { Board } from "../../../assets/scripts/core/board/Board";
+import { TileFactory, TileKind } from "../../../assets/scripts/core/board/Tile";
+import { BoardConfig } from "../../../assets/scripts/config/ConfigLoader";
 import { EventNames } from "../../../assets/scripts/core/events/EventNames";
 import type { GameState } from "../../../assets/scripts/core/game/GameStateMachine";
 
@@ -85,5 +89,46 @@ describe("BoosterService", () => {
     const svc = createSvc();
     svc.cancel();
     expect(emitSpy).toHaveBeenCalledWith(EventNames.BoosterCancelled);
+  });
+
+  it("only last activated booster reacts to input", () => {
+    const cfg: BoardConfig = {
+      cols: 1,
+      rows: 1,
+      tileWidth: 1,
+      tileHeight: 1,
+      colors: ["red"],
+      superThreshold: 3,
+    };
+    const board = new Board(cfg, [[TileFactory.createNormal("red")]]);
+    const getView = () =>
+      undefined as unknown as import("../../../assets/scripts/ui/views/TileView").default;
+    const svc = new BoosterService(bus, () => "WaitingInput");
+    const a = new SuperTileBooster(
+      "a",
+      board,
+      getView,
+      bus,
+      svc,
+      1,
+      TileKind.SuperRow,
+    );
+    const b = new SuperTileBooster(
+      "b",
+      board,
+      getView,
+      bus,
+      svc,
+      1,
+      TileKind.SuperCol,
+    );
+    svc.register(a);
+    svc.register(b);
+    svc.activate("a");
+    svc.activate("b");
+    bus.emit(EventNames.GroupSelected, new cc.Vec2(0, 0));
+    expect(a.charges).toBe(1);
+    expect(b.charges).toBe(0);
+    expect(board.tileAt(new cc.Vec2(0, 0))!.kind).toBe(TileKind.SuperCol);
   });
 });

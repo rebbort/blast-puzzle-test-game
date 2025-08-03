@@ -110,6 +110,8 @@ export default class BoosterPanelController extends cc.Component {
   private setupEventListeners(): void {
     EventBus.on(EventNames.BoosterConsumed, this.onBoosterConsumed, this);
     EventBus.on(EventNames.BoosterCancelled, this.onBoosterCancelled, this);
+    EventBus.on(EventNames.BoostersSelected, this.onBoostersSelected, this);
+    EventBus.on(EventNames.GameRestart, this.onGameRestart, this);
   }
 
   // Метод setupBoosterSlot больше не нужен - бустеры настраиваются при инициализации
@@ -152,10 +154,10 @@ export default class BoosterPanelController extends cc.Component {
 
   private setActiveSlot(slot: BoosterSlot): void {
     this.clearActiveSlot();
+    boosterService?.activate(slot.boosterId);
     slot.isActive = true;
     slot.highlight?.setHighlight();
     this.startPulse(slot.node);
-    boosterService?.activate(slot.boosterId);
   }
 
   private clearActiveSlot(): void {
@@ -204,6 +206,16 @@ export default class BoosterPanelController extends cc.Component {
     this.clearActiveSlot();
   }
 
+  private onBoostersSelected(charges: Record<string, number>): void {
+    this.createSlots(charges);
+  }
+
+  private onGameRestart(): void {
+    boosterService?.cancel();
+    this.clearActiveSlot();
+    this.createSlots({});
+  }
+
   private hideBoosterSlot(slot: BoosterSlot): void {
     slot.node.active = false;
     slot.isActive = false;
@@ -214,5 +226,7 @@ export default class BoosterPanelController extends cc.Component {
   onDestroy(): void {
     EventBus.off(EventNames.BoosterConsumed, this.onBoosterConsumed, this);
     EventBus.off(EventNames.BoosterCancelled, this.onBoosterCancelled, this);
+    EventBus.off(EventNames.BoostersSelected, this.onBoostersSelected, this);
+    EventBus.off(EventNames.GameRestart, this.onGameRestart, this);
   }
 }

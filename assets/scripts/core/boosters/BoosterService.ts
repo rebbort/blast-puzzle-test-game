@@ -10,6 +10,8 @@ import type { GameState } from "../game/GameStateMachine";
 export class BoosterService {
   /** Коллекция зарегистрированных бустеров по их id. */
   private boosters: Record<string, Booster> = {};
+  /** Идентификатор текущего активного бустера, если есть. */
+  private activeId: string | null = null;
 
   constructor(
     private bus: InfrastructureEventBus,
@@ -38,6 +40,11 @@ export class BoosterService {
       return;
     }
 
+    // Если другой бустер уже активен, сначала отменяем его
+    if (this.activeId && this.activeId !== id) {
+      this.cancel();
+    }
+
     // Разрешаем активацию только в состоянии ожидания ввода
     if (this.getState() !== "WaitingInput") {
       return;
@@ -50,6 +57,7 @@ export class BoosterService {
 
     // Переводим игру в режим выбора клетки/клеток
     boost.start();
+    this.activeId = id;
     // Сообщаем подписчикам об активации конкретного бустера
     this.bus.emit(EventNames.BoosterActivated, id);
     console.debug(
@@ -74,6 +82,9 @@ export class BoosterService {
     }
     // Уменьшаем количество зарядов
     boost.charges--;
+    if (this.activeId === id) {
+      this.activeId = null;
+    }
     // Оповещаем, что заряд израсходован
     this.bus.emit(EventNames.BoosterConsumed, id);
   }
@@ -82,6 +93,9 @@ export class BoosterService {
    * Отменяет режим активации и публикует событие BoosterCancelled.
    */
   cancel(): void {
+    if (this.activeId !== null) {
+      this.activeId = null;
+    }
     // Сообщаем слушателям, что активация прервана
     this.bus.emit(EventNames.BoosterCancelled);
   }
