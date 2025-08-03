@@ -116,8 +116,8 @@
       "__type__": "TypedArray",
       "ctor": "Float64Array",
       "array": [
-        -494.859,
-        841.937,
+        0,
+        0,
         0,
         0,
         0,
@@ -165,13 +165,13 @@
     },
     "_texture": null,
     "_stopped": true,
-    "playOnLoad": false,
+    "playOnLoad": true,
     "autoRemoveOnFinish": false,
     "totalParticles": 200,
-    "duration": 0.2,
+    "duration": 0.1,
     "emissionRate": 1000,
-    "life": 0.20000000298023224,
-    "lifeVar": 0.4,
+    "life": 0.3,
+    "lifeVar": 0.1,
     "_startColor": {
       "__type__": "cc.Color",
       "r": 202,
@@ -200,15 +200,15 @@
       "b": 249,
       "a": 188
     },
-    "angle": 360,
+    "angle": 0,
     "angleVar": 360,
     "startSize": 20,
-    "startSizeVar": 500,
+    "startSizeVar": 1000,
     "endSize": 10,
     "endSizeVar": 20,
     "startSpin": -30,
-    "startSpinVar": -30,
-    "endSpin": -30,
+    "startSpinVar": -230,
+    "endSpin": 1000,
     "endSpinVar": -30,
     "sourcePos": {
       "__type__": "cc.Vec2",
@@ -222,7 +222,7 @@
     },
     "_positionType": 1,
     "positionType": 1,
-    "emitterMode": 0,
+    "emitterMode": 1,
     "gravity": {
       "__type__": "cc.Vec2",
       "x": 5,
@@ -235,13 +235,13 @@
     "radialAccel": 200,
     "radialAccelVar": 200,
     "rotationIsDir": true,
-    "startRadius": 0,
-    "startRadiusVar": 0,
+    "startRadius": 90,
+    "startRadiusVar": 90,
     "endRadius": 0,
     "endRadiusVar": 0,
-    "rotatePerS": 0,
-    "rotatePerSVar": 0,
-    "_N$preview": false,
+    "rotatePerS": 50,
+    "rotatePerSVar": 60,
+    "_N$preview": true,
     "_id": ""
   },
   {
@@ -263,10 +263,13 @@
       "__id__": 1
     },
     "_enabled": true,
-    "particleSystem": {
-      "__id__": 3
-    },
-    "animation": null,
+    "particleSystems": [
+      {
+        "__id__": 3
+      }
+    ],
+    "animations": [],
+    "extras": [],
     "_id": ""
   },
   {
