@@ -53,7 +53,8 @@ async function activate(
   bus.on(EventNames.TurnEnded, ({ score: s }) => (score = s));
   fsm.start();
   bus.emit(EventNames.GroupSelected, new cc.Vec2(1, 1));
-  await new Promise((r) => setImmediate(r));
+  // Wait until the move fully completes so callers receive all events in order.
+  await new Promise((r) => bus.once(EventNames.MoveCompleted, r));
   return { events, removed, score };
 }
 
@@ -128,7 +129,7 @@ describe("super tile activation", () => {
     bus.on(EventNames.RemoveStarted, (g: cc.Vec2[]) => (removed = g));
     fsm.start();
     bus.emit(EventNames.GroupSelected, new cc.Vec2(1, 1));
-    await new Promise((r) => setImmediate(r));
+    await new Promise((r) => bus.once(EventNames.MoveCompleted, r));
     const coords = removed.map((p) => `${p.x},${p.y}`).sort();
     expect(coords).toEqual(["0,1", "1,1", "2,0", "2,1", "2,2"]);
   });
@@ -214,7 +215,7 @@ describe("super tile activation", () => {
     bus.on(EventNames.TurnEnded, ({ score }) => (finalScore = score));
     fsm.start();
     bus.emit(EventNames.GroupSelected, new cc.Vec2(1, 1));
-    await new Promise((r) => setImmediate(r));
+    await new Promise((r) => bus.once(EventNames.MoveCompleted, r));
     const coords = removed.map((p) => `${p.x},${p.y}`).sort();
     expect(events).toEqual([
       EventNames.BoosterConfirmed,
