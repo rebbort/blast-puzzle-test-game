@@ -45,7 +45,7 @@ export class BoardSolver {
         const cells: cc.Vec2[] = [];
         for (let dx = -radius; dx <= radius; dx++) {
           for (let dy = -radius; dy <= radius; dy++) {
-            if (dx * dx + dy * dy <= radius * radius) {
+            if (Math.max(Math.abs(dx), Math.abs(dy)) <= radius) {
               const p = new cc.Vec2(pos.x + dx, pos.y + dy);
               if (this.board.inBounds(p)) cells.push(p);
             }
