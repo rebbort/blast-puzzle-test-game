@@ -27,6 +27,7 @@ describe("super-tile VFX delay", () => {
     emit(event: string, ...args: unknown[]): void;
     destroy(): void;
     getComponent(_: unknown): { play: () => Promise<void> };
+    getComponentInChildren(_: unknown): unknown;
     setPosition(_: cc.Vec2): void;
   }
 
@@ -73,6 +74,7 @@ describe("super-tile VFX delay", () => {
               });
             }),
         })),
+        getComponentInChildren: jest.fn(() => null),
         setPosition: jest.fn(),
       };
       nodes.push(node);

@@ -10,6 +10,9 @@ export class FXController {
   /** Registered prefabs for super-tile visual effects. */
   private static readonly prefabs: Partial<Record<TileKind, cc.Prefab>> = {};
 
+  /** Layer that instantiated effects will be parented to. */
+  private static layer: cc.Node | null = null;
+
   /** Fallback durations (ms) for each super tile effect. */
   private static readonly durations: Partial<Record<TileKind, number>> = {
     [TileKind.SuperBomb]: 400,
@@ -23,6 +26,11 @@ export class FXController {
    */
   static setPrefab(kind: TileKind, prefab: cc.Prefab): void {
     FXController.prefabs[kind] = prefab;
+  }
+
+  /** Sets the parent node for instantiated VFX. */
+  static setLayer(node: cc.Node): void {
+    FXController.layer = node;
   }
 
   /**
@@ -40,18 +48,18 @@ export class FXController {
       return;
     }
     const node = cc.instantiate(prefab);
-    const scene = cc.director.getScene?.();
-    scene?.addChild(node);
+    const parent = FXController.layer || cc.director.getScene?.();
+    parent?.addChild(node);
     if (position) {
       node.setPosition(position);
     }
     node.zIndex = 9999;
-    let instance = node.getComponent(VfxInstance);
-    if (!instance) {
-      instance = node.addComponent(VfxInstance);
-      instance.particleSystem = node.getComponent(cc.ParticleSystem);
-      instance.animation = node.getComponent(cc.Animation);
-    }
+    const instance =
+      node.getComponent(VfxInstance) || node.addComponent(VfxInstance);
+    instance.particleSystem =
+      instance.particleSystem || node.getComponentInChildren(cc.ParticleSystem);
+    instance.animation =
+      instance.animation || node.getComponentInChildren(cc.Animation);
     let finished = false;
     const play = instance.play().then(() => {
       finished = true;

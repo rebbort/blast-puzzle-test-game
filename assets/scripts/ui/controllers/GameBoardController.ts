@@ -9,6 +9,7 @@ import FillController from "./FillController";
 import { computeTilePosition } from "../utils/PositionUtils";
 import { EventBus as bus } from "../../core/EventBus";
 import { EventNames } from "../../core/events/EventNames";
+import { FXController } from "../../core/fx/FXController";
 
 @ccclass()
 export default class GameBoardController extends cc.Component {
@@ -45,6 +46,7 @@ export default class GameBoardController extends cc.Component {
     this.board = new BoardGenerator().generate(cfg);
     // 3) Спавнить по каждой клетке
     this.spawnAllTiles();
+    FXController.setLayer(this.tilesLayer);
     // Attach animation controllers on the same node
     const flow = this.node.addComponent(MoveFlowController);
     flow.tilesLayer = this.tilesLayer;
