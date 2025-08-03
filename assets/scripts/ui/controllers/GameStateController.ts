@@ -52,16 +52,11 @@ export default class GameStateController extends cc.Component {
    */
   private onGameStart(charges: Record<string, number>): void {
     console.log("GameStateController: Starting game with charges:", charges);
+    this.switchToGameBoard();
+  }
 
-    // Активируем GameBoard
-    if (this.gameBoard) {
-      this.gameBoard.active = true;
-    }
-
-    // Скрываем BoosterSelectPopup
-    if (this.boosterSelectPopup) {
-      this.boosterSelectPopup.active = false;
-    }
+  private onGameRestart(): void {
+    this.switchToBoosterSelection();
   }
 
   /**
@@ -88,10 +83,6 @@ export default class GameStateController extends cc.Component {
     if (this.gameBoard) {
       this.gameBoard.active = true;
     }
-  }
-
-  private onGameRestart(): void {
-    this.switchToBoosterSelection();
   }
 
   onDestroy(): void {
