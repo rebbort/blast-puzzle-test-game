@@ -26,8 +26,13 @@ describe("super-tile VFX delay", () => {
     once(event: string, cb: (...args: unknown[]) => void): void;
     emit(event: string, ...args: unknown[]): void;
     destroy(): void;
-    getComponent(_: unknown): { play: () => Promise<void> };
-    getComponentInChildren(_: unknown): unknown;
+    getComponent(_: unknown): {
+      particleSystems: cc.ParticleSystem[];
+      animations: cc.Animation[];
+      extras: cc.Component[];
+      play: () => Promise<void>;
+    };
+    getComponentsInChildren(_: unknown): unknown[];
     setPosition(_: cc.Vec2): void;
   }
 
@@ -66,6 +71,9 @@ describe("super-tile VFX delay", () => {
         },
         destroy: jest.fn(),
         getComponent: jest.fn(() => ({
+          particleSystems: [],
+          animations: [],
+          extras: [],
           play: () =>
             new Promise<void>((resolve) => {
               node.once("finished", () => {
@@ -74,7 +82,7 @@ describe("super-tile VFX delay", () => {
               });
             }),
         })),
-        getComponentInChildren: jest.fn(() => null),
+        getComponentsInChildren: jest.fn(() => []),
         setPosition: jest.fn(),
       };
       nodes.push(node);
