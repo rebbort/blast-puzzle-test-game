@@ -1,4 +1,4 @@
-import { HudController } from "../assets/scripts/ui/HudController";
+import { HudController } from "../assets/scripts/ui/controllers/HudController";
 import { EventBus } from "../assets/scripts/core/EventBus";
 import { EventNames } from "../assets/scripts/core/events/EventNames";
 
