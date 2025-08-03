@@ -29,6 +29,14 @@ export class VfxInstance extends cc.Component {
       let started = false;
 
       if (ps && psNode) {
+        // Prevent the particle system from destroying its node automatically so
+        // we can wait for the completion event and clean up ourselves.
+        // Some prefabs have `autoRemoveOnFinish` enabled which would otherwise
+        // remove the node before the `finished` event fires, leaving the
+        // promise unresolved.
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        (ps as unknown as { autoRemoveOnFinish?: boolean }).autoRemoveOnFinish =
+          false;
         psNode.once("finished", finish);
         ps.resetSystem();
         started = true;

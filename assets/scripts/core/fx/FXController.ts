@@ -10,6 +10,13 @@ export class FXController {
   /** Registered prefabs for super-tile visual effects. */
   private static readonly prefabs: Partial<Record<TileKind, cc.Prefab>> = {};
 
+  /** Fallback durations (ms) for each super tile effect. */
+  private static readonly durations: Partial<Record<TileKind, number>> = {
+    [TileKind.SuperBomb]: 400,
+    [TileKind.SuperRow]: 450,
+    [TileKind.SuperCol]: 450,
+  };
+
   /**
    * Stores the prefab used for a particular super-tile. Typically invoked
    * automatically from a component on the super-tile prefab.
@@ -25,17 +32,36 @@ export class FXController {
    */
   static async waitForVfx(kind: TileKind): Promise<void> {
     const prefab = FXController.prefabs[kind];
+    const duration = FXController.durations[kind];
     if (!prefab) {
+      if (duration) {
+        await new Promise((r) => setTimeout(r, duration));
+      }
       return;
     }
     const node = cc.instantiate(prefab);
     const scene = cc.director.getScene?.();
     scene?.addChild(node);
-    const instance = node.getComponent(VfxInstance);
+    let instance = node.getComponent(VfxInstance);
     if (!instance) {
-      node.destroy();
-      return;
+      instance = node.addComponent(VfxInstance);
+      instance.particleSystem = node.getComponent(cc.ParticleSystem);
+      instance.animation = node.getComponent(cc.Animation);
     }
-    await instance.play();
+    let finished = false;
+    const play = instance.play().then(() => {
+      finished = true;
+    });
+    if (duration) {
+      await Promise.race([
+        play,
+        new Promise<void>((r) => setTimeout(r, duration)),
+      ]);
+      if (!finished && cc.isValid?.(node)) {
+        node.destroy();
+      }
+    } else {
+      await play;
+    }
   }
 }
