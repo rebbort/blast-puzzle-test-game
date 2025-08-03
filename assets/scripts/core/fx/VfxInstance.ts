@@ -28,9 +28,13 @@ export class VfxInstance extends cc.Component {
         false;
       promises.push(
         new Promise<void>((resolve) => {
-          (
-            ps as unknown as { once: (event: string, cb: () => void) => void }
-          ).once("finished", resolve);
+          const target =
+            typeof (ps as unknown as { once?: unknown }).once === "function"
+              ? (ps as unknown as {
+                  once: (event: string, cb: () => void) => void;
+                })
+              : ps.node;
+          target.once("finished", resolve);
           ps.resetSystem();
         }),
       );
