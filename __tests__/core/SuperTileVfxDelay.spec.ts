@@ -4,6 +4,7 @@ import { TileFactory, TileKind } from "../../assets/scripts/core/board/Tile";
 import { MoveExecutor } from "../../assets/scripts/core/board/MoveExecutor";
 import { BoardConfig } from "../../assets/scripts/config/ConfigLoader";
 import { EventNames } from "../../assets/scripts/core/events/EventNames";
+import { FXController } from "../../assets/scripts/core/fx/FXController";
 
 const cfg: BoardConfig = {
   cols: 1,
@@ -16,11 +17,62 @@ const cfg: BoardConfig = {
 
 describe("super-tile VFX delay", () => {
   afterEach(() => {
-    jest.useRealTimers();
+    jest.restoreAllMocks();
   });
 
+  interface MockNode {
+    on(event: string, cb: (...args: unknown[]) => void): void;
+    off(event: string, cb: (...args: unknown[]) => void): void;
+    once(event: string, cb: (...args: unknown[]) => void): void;
+    emit(event: string, ...args: unknown[]): void;
+    destroy(): void;
+    getComponent(_: unknown): { play: () => Promise<void> };
+  }
+
+  function mockVfx(): MockNode[] {
+    const nodes: MockNode[] = [];
+    jest.spyOn(cc, "instantiate").mockImplementation(() => {
+      const listeners: Record<string, ((...args: unknown[]) => void)[]> = {};
+      const node: MockNode = {
+        on(event: string, cb: (...args: unknown[]) => void): void {
+          (listeners[event] || (listeners[event] = [])).push(cb);
+        },
+        off(event: string, cb: (...args: unknown[]) => void): void {
+          const arr = listeners[event];
+          if (!arr) return;
+          const idx = arr.indexOf(cb);
+          if (idx >= 0) arr.splice(idx, 1);
+        },
+        once(event: string, cb: (...args: unknown[]) => void): void {
+          const wrapper = (...args: unknown[]) => {
+            cb(...args);
+            node.off(event, wrapper);
+          };
+          node.on(event, wrapper);
+        },
+        emit(event: string, ...args: unknown[]): void {
+          const arr = listeners[event];
+          if (!arr) return;
+          [...arr].forEach((fn) => fn(...args));
+        },
+        destroy: jest.fn(),
+        getComponent: jest.fn(() => ({
+          play: () =>
+            new Promise<void>((resolve) => {
+              node.once("finished", resolve);
+            }),
+        })),
+      };
+      nodes.push(node);
+      return node as unknown as cc.Node;
+    });
+    return nodes;
+  }
+
   it("waits for bomb explosion before falling", async () => {
-    jest.useFakeTimers();
+    const nodes = mockVfx();
+    FXController.registerPrefab(TileKind.SuperBomb, {} as unknown as cc.Prefab);
+
     const board = new Board(cfg, [
       [TileFactory.createNormal("red")],
       [TileFactory.createNormal("red")],
@@ -40,16 +92,20 @@ describe("super-tile VFX delay", () => {
 
     const promise = executor.execute([new cc.Vec2(0, 1)]);
 
-    jest.advanceTimersByTime(399);
     expect(fallTime).toBe(0);
-    jest.advanceTimersByTime(1);
+
+    nodes[0].emit("finished");
     await promise;
 
-    expect(fallTime - removeTime).toBeGreaterThanOrEqual(400);
+    expect(fallTime).not.toBe(0);
+    expect(fallTime).toBeGreaterThanOrEqual(removeTime);
   });
 
   it("waits for the longest VFX when multiple supers trigger", async () => {
-    jest.useFakeTimers();
+    const nodes = mockVfx();
+    FXController.registerPrefab(TileKind.SuperBomb, {} as unknown as cc.Prefab);
+    FXController.registerPrefab(TileKind.SuperRow, {} as unknown as cc.Prefab);
+
     const board = new Board(cfg, [
       [TileFactory.createNormal("red")],
       [TileFactory.createNormal("red")],
@@ -70,11 +126,14 @@ describe("super-tile VFX delay", () => {
 
     const promise = executor.execute([new cc.Vec2(0, 1)]);
 
-    jest.advanceTimersByTime(449);
+    nodes[0].emit("finished");
+    await Promise.resolve();
     expect(fallTime).toBe(0);
-    jest.advanceTimersByTime(1);
+
+    nodes[1].emit("finished");
     await promise;
 
-    expect(fallTime - removeTime).toBeGreaterThanOrEqual(450);
+    expect(fallTime).not.toBe(0);
+    expect(fallTime).toBeGreaterThanOrEqual(removeTime);
   });
 });
