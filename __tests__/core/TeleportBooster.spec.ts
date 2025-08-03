@@ -24,7 +24,7 @@ describe("TeleportBooster", () => {
     superThreshold: 3,
   };
 
-  it("consumes charge when swap creates moves", async () => {
+  it("swaps tiles and consumes charge", async () => {
     const board = new Board(cfg2x2, [
       [TileFactory.createNormal("red"), TileFactory.createNormal("blue")],
       [TileFactory.createNormal("blue"), TileFactory.createNormal("red")],
@@ -47,7 +47,7 @@ describe("TeleportBooster", () => {
     expect(board.colorAt(new cc.Vec2(1, 1))).toBe("blue");
   });
 
-  it("does not consume charge when no moves after swap", async () => {
+  it("still swaps even when no moves remain", async () => {
     const cfg: BoardConfig = {
       cols: 2,
       rows: 1,
@@ -61,8 +61,8 @@ describe("TeleportBooster", () => {
     ]);
     const booster = new TeleportBooster(board, bus, 1);
     const events: string[] = [];
-    bus.on(EventNames.SwapCancelled, () =>
-      events.push(EventNames.SwapCancelled),
+    bus.on(EventNames.BoosterConsumed, () =>
+      events.push(EventNames.BoosterConsumed),
     );
 
     booster.start();
@@ -70,10 +70,10 @@ describe("TeleportBooster", () => {
     bus.emit(EventNames.GroupSelected, new cc.Vec2(1, 0));
     await new Promise((r) => setImmediate(r));
 
-    expect(booster.charges).toBe(1);
-    expect(events).toEqual([EventNames.SwapCancelled]);
-    expect(board.colorAt(new cc.Vec2(0, 0))).toBe("red");
-    expect(board.colorAt(new cc.Vec2(1, 0))).toBe("blue");
+    expect(booster.charges).toBe(0);
+    expect(events).toEqual([EventNames.BoosterConsumed]);
+    expect(board.colorAt(new cc.Vec2(0, 0))).toBe("blue");
+    expect(board.colorAt(new cc.Vec2(1, 0))).toBe("red");
   });
 
   it("cancels when same tile tapped twice", () => {
@@ -104,5 +104,20 @@ describe("TeleportBooster", () => {
 
     expect(booster.charges).toBe(1);
     expect(emitSpy).toHaveBeenCalledWith(EventNames.BoosterCancelled);
+  });
+
+  it("ignores activation with zero charges", () => {
+    const board = new Board(cfg2x2, [
+      [TileFactory.createNormal("red"), TileFactory.createNormal("blue")],
+      [TileFactory.createNormal("blue"), TileFactory.createNormal("red")],
+    ]);
+    const booster = new TeleportBooster(board, bus, 0);
+
+    booster.start();
+    bus.emit(EventNames.GroupSelected, new cc.Vec2(0, 0));
+
+    expect(emitSpy).toHaveBeenCalledWith(EventNames.BoosterCancelled);
+    expect(board.colorAt(new cc.Vec2(0, 0))).toBe("red");
+    expect(booster.charges).toBe(0);
   });
 });
