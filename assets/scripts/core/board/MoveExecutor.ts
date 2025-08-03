@@ -6,6 +6,7 @@ import { FillCommand } from "./commands/FillCommand";
 import { TileFactory, TileKind } from "./Tile";
 import { SuperTileFactory } from "../boosters/SuperTileFactory";
 import { EventNames } from "../events/EventNames";
+import { FXController } from "../fx/FXController";
 
 /**
  * Executes a full player move by removing a group, letting tiles fall
@@ -31,10 +32,27 @@ export class MoveExecutor {
       return t !== null && t.kind !== TileKind.Normal;
     });
 
-    // 1. Remove tiles and wait for completion
+    // Collect promises for super-tile VFX that may be triggered during removal.
+    // Listener stays active only for this execution and is detached afterwards
+    // to avoid capturing unrelated events when multiple moves chain.
+    const vfxPromises: Promise<void>[] = [];
+    const onSuperActivated = (kind: TileKind) => {
+      vfxPromises.push(FXController.waitForVfx(kind));
+    };
+    this.bus.on(EventNames.SuperTileActivated, onSuperActivated);
+
+    // 1. Remove tiles and wait for completion. RemoveStarted is emitted inside
+    // RemoveCommand immediately, allowing UI to hide tiles before we await any
+    // visual effects.
     const removeDone = this.wait(EventNames.TilesRemoved);
     new RemoveCommand(this.board, this.bus, group).execute();
     const [dirtyCols] = (await removeDone) as [number[]];
+
+    // Detach listener and wait for all super-tile effects to finish before
+    // starting gravity. This delays FallStarted while keeping RemoveStarted
+    // synchronous so explosions aren't covered by new tiles.
+    this.bus.off(EventNames.SuperTileActivated, onSuperActivated);
+    await Promise.all(vfxPromises);
 
     // Если размер группы превышает порог, в исходной клетке
     // появляется супер-тайл выбранного вида.
