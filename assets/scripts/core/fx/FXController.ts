@@ -56,10 +56,14 @@ export class FXController {
     node.zIndex = 9999;
     const instance =
       node.getComponent(VfxInstance) || node.addComponent(VfxInstance);
-    instance.particleSystem =
-      instance.particleSystem || node.getComponentInChildren(cc.ParticleSystem);
-    instance.animation =
-      instance.animation || node.getComponentInChildren(cc.Animation);
+    if (instance.particleSystems.length === 0) {
+      instance.particleSystems = node.getComponentsInChildren(
+        cc.ParticleSystem,
+      );
+    }
+    if (instance.animations.length === 0) {
+      instance.animations = node.getComponentsInChildren(cc.Animation);
+    }
     let finished = false;
     const play = instance.play().then(() => {
       finished = true;

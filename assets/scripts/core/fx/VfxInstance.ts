@@ -5,53 +5,72 @@ const { ccclass, property } = cc._decorator;
  */
 @ccclass("VfxInstance")
 export class VfxInstance extends cc.Component {
-  @property(cc.ParticleSystem)
-  particleSystem: cc.ParticleSystem | null = null;
+  @property([cc.ParticleSystem])
+  particleSystems: cc.ParticleSystem[] = [];
 
-  @property(cc.Animation)
-  animation: cc.Animation | null = null;
+  @property([cc.Animation])
+  animations: cc.Animation[] = [];
+
+  @property([cc.Component])
+  extras: cc.Component[] = [];
 
   /**
-   * Starts the particle system or animation and resolves once the `finished`
-   * event fires.
+   * Starts configured effects and resolves once all of them finish.
    */
   play(): Promise<void> {
-    return new Promise((resolve) => {
-      const ps = this.particleSystem;
-      const psNode = ps?.node || null;
-      const finish = () => {
-        psNode?.off("finished", finish);
-        this.animation?.off("finished", finish);
-        this.node.destroy();
-        resolve();
+    const promises: Promise<void>[] = [];
+
+    for (const ps of this.particleSystems) {
+      if (!ps) continue;
+      // prevent auto removal so we can destroy node ourselves
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+      (ps as unknown as { autoRemoveOnFinish?: boolean }).autoRemoveOnFinish =
+        false;
+      promises.push(
+        new Promise<void>((resolve) => {
+          (
+            ps as unknown as { once: (event: string, cb: () => void) => void }
+          ).once("finished", resolve);
+          ps.resetSystem();
+        }),
+      );
+    }
+
+    for (const anim of this.animations) {
+      if (!anim) continue;
+      promises.push(
+        new Promise<void>((resolve) => {
+          anim.once("finished", resolve);
+          anim.play();
+        }),
+      );
+    }
+
+    for (const extra of this.extras) {
+      if (!extra) continue;
+      const anyExtra = extra as unknown as {
+        play?: () => Promise<void> | void;
+        once?: (event: string, cb: () => void) => void;
       };
-
-      let started = false;
-
-      if (ps && psNode) {
-        // Prevent the particle system from destroying its node automatically so
-        // we can wait for the completion event and clean up ourselves.
-        // Some prefabs have `autoRemoveOnFinish` enabled which would otherwise
-        // remove the node before the `finished` event fires, leaving the
-        // promise unresolved.
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-        (ps as unknown as { autoRemoveOnFinish?: boolean }).autoRemoveOnFinish =
-          false;
-        psNode.once("finished", finish);
-        ps.resetSystem();
-        started = true;
+      if (typeof anyExtra.play === "function") {
+        const result = anyExtra.play();
+        promises.push(Promise.resolve(result));
+      } else if (typeof anyExtra.once === "function") {
+        promises.push(
+          new Promise<void>((resolve) => {
+            anyExtra.once!("finished", resolve);
+          }),
+        );
       }
+    }
 
-      if (this.animation) {
-        this.animation.once("finished", finish);
-        this.animation.play();
-        started = true;
-      }
+    if (promises.length === 0) {
+      this.node.destroy();
+      return Promise.resolve();
+    }
 
-      if (!started) {
-        this.node.destroy();
-        resolve();
-      }
+    return Promise.all(promises).then(() => {
+      this.node.destroy();
     });
   }
 }
