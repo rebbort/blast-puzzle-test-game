@@ -10,6 +10,7 @@ import { Board } from "../../assets/scripts/core/board/Board";
 import { TileFactory, TileKind } from "../../assets/scripts/core/board/Tile";
 import { BoardSolver } from "../../assets/scripts/core/board/BoardSolver";
 import { BoardConfig } from "../../assets/scripts/config/ConfigLoader";
+import { RemoveCommand } from "../../assets/scripts/core/board/commands/RemoveCommand";
 
 // Common 3x3 config for tests
 const cfg: BoardConfig = {
@@ -143,4 +144,33 @@ it("expands group for SuperClear", () => {
   const solver = new BoardSolver(board);
   const res = solver.findGroup(new cc.Vec2(0, 0));
   expect(res).toHaveLength(cfg5.cols * cfg5.rows);
+});
+
+it("excludes untriggered super tile from adjacent group", () => {
+  const cfg2: BoardConfig = { ...cfg, cols: 2, rows: 2 };
+  const tiles = [
+    [TileFactory.createNormal("red"), TileFactory.createNormal("red")],
+    [TileFactory.createNormal("red"), TileFactory.createNormal("red")],
+  ];
+  tiles[1][1].kind = TileKind.SuperRow;
+  const board = new Board(cfg2, tiles);
+  const solver = new BoardSolver(board);
+  const group = solver.findGroup(new cc.Vec2(0, 0));
+  const coords = group.map((p) => `${p.x},${p.y}`).sort();
+  expect(coords).toEqual(["0,0", "0,1", "1,0"]);
+});
+
+it("removing adjacent group keeps super tile", async () => {
+  const cfg2: BoardConfig = { ...cfg, cols: 2, rows: 2 };
+  const tiles = [
+    [TileFactory.createNormal("red"), TileFactory.createNormal("red")],
+    [TileFactory.createNormal("red"), TileFactory.createNormal("red")],
+  ];
+  tiles[1][1].kind = TileKind.SuperRow;
+  const board = new Board(cfg2, tiles);
+  const solver = new BoardSolver(board);
+  const bus = new InfrastructureEventBus();
+  const group = solver.findGroup(new cc.Vec2(0, 0));
+  await new RemoveCommand(board, bus, group).execute();
+  expect(board.tileAt(new cc.Vec2(1, 1))!.kind).toBe(TileKind.SuperRow);
 });

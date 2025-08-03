@@ -154,10 +154,10 @@ export default class BoosterPanelController extends cc.Component {
 
   private setActiveSlot(slot: BoosterSlot): void {
     this.clearActiveSlot();
+    boosterService?.activate(slot.boosterId);
     slot.isActive = true;
     slot.highlight?.setHighlight();
     this.startPulse(slot.node);
-    boosterService?.activate(slot.boosterId);
   }
 
   private clearActiveSlot(): void {

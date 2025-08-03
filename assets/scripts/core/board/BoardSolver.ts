@@ -134,6 +134,13 @@ export class BoardSolver {
     if (!startTile) {
       return [];
     }
+    // If the player taps a super tile directly, it should activate
+    // immediately without collecting adjacent tiles of the same color.
+    if (startTile.kind !== TileKind.Normal) {
+      const result = this.expandBySupers([start]);
+      EventBus.emit(EventNames.GroupFound, result);
+      return result;
+    }
 
     const startColor = startTile.color;
 
@@ -148,7 +155,9 @@ export class BoardSolver {
       if (colorVisited.has(key)) continue;
       colorVisited.add(key);
 
-      if (this.board.colorAt(p) !== startColor) continue;
+      const tile = this.board.tileAt(p);
+      if (!tile || tile.color !== startColor || tile.kind !== TileKind.Normal)
+        continue;
 
       baseGroup.push(p);
       // Diagonal tiles are ignored to match game rules.
