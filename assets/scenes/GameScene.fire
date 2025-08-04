@@ -75,11 +75,14 @@
         "__id__": 5
       },
       {
-        "__id__": 88
+        "__id__": 87
       }
     ],
     "_active": true,
     "_components": [
+      {
+        "__id__": 93
+      },
       {
         "__id__": 94
       },
@@ -88,9 +91,6 @@
       },
       {
         "__id__": 96
-      },
-      {
-        "__id__": 97
       }
     ],
     "_prefab": null,
@@ -276,9 +276,6 @@
       },
       {
         "__id__": 86
-      },
-      {
-        "__id__": 87
       }
     ],
     "_prefab": null,
@@ -3572,16 +3569,6 @@
     "_id": "6f7AXFrmJN/puS7/9C8jUz"
   },
   {
-    "__type__": "48caefpdrVP7bgY851j0iTh",
-    "_name": "",
-    "_objFlags": 0,
-    "node": {
-      "__id__": 5
-    },
-    "_enabled": true,
-    "_id": "ecI0+/+3tBC4OAxyhoLO5y"
-  },
-  {
     "__type__": "01fa9k3VdlCfbh0rx8vvxB5",
     "_name": "",
     "_objFlags": 0,
@@ -3662,17 +3649,17 @@
     },
     "_children": [
       {
-        "__id__": 89
+        "__id__": 88
       }
     ],
     "_active": true,
     "_components": [
       {
-        "__id__": 92
+        "__id__": 91
       }
     ],
     "_prefab": {
-      "__id__": 93
+      "__id__": 92
     },
     "_opacity": 255,
     "_color": {
@@ -3726,17 +3713,17 @@
     "_name": "FXBombExplosion",
     "_objFlags": 0,
     "_parent": {
-      "__id__": 88
+      "__id__": 87
     },
     "_children": [],
     "_active": true,
     "_components": [
       {
-        "__id__": 90
+        "__id__": 89
       }
     ],
     "_prefab": {
-      "__id__": 91
+      "__id__": 90
     },
     "_opacity": 255,
     "_color": {
@@ -3790,7 +3777,7 @@
     "_name": "",
     "_objFlags": 0,
     "node": {
-      "__id__": 89
+      "__id__": 88
     },
     "_enabled": true,
     "_materials": [
@@ -3891,7 +3878,7 @@
   {
     "__type__": "cc.PrefabInfo",
     "root": {
-      "__id__": 89
+      "__id__": 88
     },
     "asset": null,
     "fileId": "bdonDIZzRDcoWGk5EYC1DH",
@@ -3902,7 +3889,7 @@
     "_name": "",
     "_objFlags": 0,
     "node": {
-      "__id__": 88
+      "__id__": 87
     },
     "_enabled": true,
     "particleSystems": [],
@@ -3913,7 +3900,7 @@
   {
     "__type__": "cc.PrefabInfo",
     "root": {
-      "__id__": 88
+      "__id__": 87
     },
     "asset": null,
     "fileId": "",
