@@ -11,12 +11,8 @@
     "lint": "eslint --config .eslintrc.cjs \"**/*.ts\"",
     "typecheck": "tsc --noEmit",
     "prepare": "husky install",
-    "build:web": "npx cocoscli build --platform web-mobile --output build/web-mobile",
-    "postinstall": "npx cocoscli --version # confirm cocos CLI is installed",
     "release:archive": "tar -C build -czf release.tar.gz web-mobile"
   },
-  "// build:web script": "Generates the web-mobile build into build/web-mobile for GitHub Pages",
-  "// postinstall script": "Verifies that cocoscli is available after npm install",
   "// release:archive script": "Packages build/web-mobile into release.tar.gz for pushing to the release branch",
   "keywords": [],
   "author": "",
@@ -38,7 +34,6 @@
     "ts-jest": "^29.4.0",
     "typescript": "^5.8.3"
   },
-  "// cocos-cli dev dependency": "Provides the CLI used by build:web",
   "lint-staged": {
     "*.ts": [
       "prettier --write"
