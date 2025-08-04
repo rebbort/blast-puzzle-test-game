@@ -46,8 +46,8 @@ export class PopupController extends cc.Component {
   }
 
   onEnable(): void {
-    EventBus.on(EventNames.GameWon, this.onWin);
-    EventBus.on(EventNames.GameLost, this.onLose);
+    EventBus.on(EventNames.GameWon, this.onWin, this);
+    EventBus.on(EventNames.GameLost, this.onLose, this);
   }
 
   onDisable(): void {
