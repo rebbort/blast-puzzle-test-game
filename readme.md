@@ -11,6 +11,10 @@ Installing dependencies with `npm install` also fetches the `cocos-cli` used by 
 
 This project contains a prototype for a Blast puzzle game. The badge above shows the status of the CI workflow which runs linting and type checking on every push to `main`.
 
+## How to Play
+
+For a rundown of rules, controls, boosters and scoring see the [Player Guide](docs/player-guide.md).
+
 ## Running tests
 
 Install dependencies once with `npm install` if needed, then run:
