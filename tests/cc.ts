@@ -137,6 +137,7 @@ export function tween<T extends { position?: unknown; scale?: unknown }>(
 ): {
   delay: (d: number) => unknown;
   to: (d: number, props: Partial<T>) => unknown;
+  by: (d: number, props: Partial<T>) => unknown;
   call: (fn: () => void) => unknown;
   start: () => unknown;
 } {
@@ -145,6 +146,10 @@ export function tween<T extends { position?: unknown; scale?: unknown }>(
       return chain;
     },
     to(_d: number, props: Partial<T>) {
+      Object.assign(target as object, props);
+      return chain;
+    },
+    by(_d: number, props: Partial<T>) {
       Object.assign(target as object, props);
       return chain;
     },
