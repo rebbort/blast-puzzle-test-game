@@ -25,11 +25,34 @@ export class Node {
   position = new Vec3();
   scale = new Vec3();
   active = false;
+  private anchor = new Vec2();
   private components: Component[] = [];
   // Anchor point is ignored in tests but must exist for code calling it
-  // Called by production code; does nothing in tests
-  setAnchorPoint(): void {
-    // no-op for test environment
+  // Called by production code; store value for later retrieval
+  setAnchorPoint(pos: Vec2 | number, y?: number): void {
+    if (pos instanceof Vec2) {
+      this.anchor.x = pos.x;
+      this.anchor.y = pos.y;
+    } else {
+      this.anchor.x = pos;
+      this.anchor.y = y ?? 0;
+    }
+  }
+  getAnchorPoint(): Vec2 {
+    return new Vec2(this.anchor.x, this.anchor.y);
+  }
+
+  get x(): number {
+    return this.position.x;
+  }
+  set x(v: number) {
+    this.position.x = v;
+  }
+  get y(): number {
+    return this.position.y;
+  }
+  set y(v: number) {
+    this.position.y = v;
   }
 
   setPosition(pos: Vec2 | number, y?: number): void {
@@ -137,6 +160,7 @@ export function tween<T extends { position?: unknown; scale?: unknown }>(
 ): {
   delay: (d: number) => unknown;
   to: (d: number, props: Partial<T>) => unknown;
+  by: (d: number, props: Partial<T>) => unknown;
   call: (fn: () => void) => unknown;
   start: () => unknown;
 } {
@@ -145,6 +169,10 @@ export function tween<T extends { position?: unknown; scale?: unknown }>(
       return chain;
     },
     to(_d: number, props: Partial<T>) {
+      Object.assign(target as object, props);
+      return chain;
+    },
+    by(_d: number, props: Partial<T>) {
       Object.assign(target as object, props);
       return chain;
     },

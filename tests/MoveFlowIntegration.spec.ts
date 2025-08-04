@@ -55,6 +55,17 @@ beforeEach(() => {
         }
         return this;
       },
+      by(_d: number, props: any) {
+        if (props.position) {
+          target.position.x += props.position.x;
+          target.position.y += props.position.y;
+        }
+        if (props.scale) {
+          target.scale.x += props.scale.x;
+          target.scale.y += props.scale.y;
+        }
+        return this;
+      },
       call(fn: () => void) {
         fn();
         return this;
