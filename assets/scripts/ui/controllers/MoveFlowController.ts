@@ -156,9 +156,7 @@ export default class MoveFlowController extends cc.Component {
 
   /** Pushes surrounding tiles outwards when a SuperBomb explodes. */
   private applyBombShockwave(center: cc.Vec2): void {
-    const centerView = this.tileViews[center.y]?.[center.x];
-    const centerNode = centerView?.node;
-    if (!centerNode) return;
+    const centerPos = computeTilePosition(center.x, center.y, this.board);
 
     for (let y = center.y - 2; y <= center.y + 2; y++) {
       for (let x = center.x - 2; x <= center.x + 2; x++) {
@@ -171,17 +169,20 @@ export default class MoveFlowController extends cc.Component {
         if (!view || !view.isInteractive()) continue;
 
         const node = view.node;
-        const dir = cc
-          .v2(node.x - centerNode.x, node.y - centerNode.y)
-          .normalize();
-        const offset = dir.mul(shock.bombOffset); // 12px is enough to notice without overlap
+        const dx = node.x - centerPos.x;
+        const dy = node.y - centerPos.y;
+        const len = Math.sqrt(dx * dx + dy * dy) || 1;
+        const offset = cc.v2(
+          (dx / len) * shock.bombOffset,
+          (dy / len) * shock.bombOffset,
+        ); // 12px is enough to notice without overlap
         // Use relative movement so we don't rely on absolute coordinates.
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (cc.tween(node) as any)
           .by(shock.bombDurationOut, { position: offset })
           .by(
             shock.bombDurationBack,
-            { position: offset.neg() },
+            { position: cc.v2(-offset.x, -offset.y) },
             { easing: "quadOut" },
           )
           .call(() => node.setPosition(Math.round(node.x), Math.round(node.y)))
@@ -195,10 +196,6 @@ export default class MoveFlowController extends cc.Component {
    * @param isRow true for horizontal rockets, false for vertical
    */
   private applyLineShockwave(center: cc.Vec2, isRow: boolean): void {
-    const centerView = this.tileViews[center.y]?.[center.x];
-    const centerNode = centerView?.node;
-    if (!centerNode) return;
-
     const max = isRow ? this.board.cols : this.board.rows;
     for (let i = 0; i < max; i++) {
       const dx = isRow ? Math.abs(i - center.x) : 0;
@@ -219,9 +216,12 @@ export default class MoveFlowController extends cc.Component {
         if (!view || !view.isInteractive()) continue;
 
         const node = view.node;
+        const sign = isRow
+          ? Math.sign(center.y - t.y)
+          : Math.sign(center.x - t.x);
         const dir = isRow
-          ? cc.v2(0, Math.sign(node.y - centerNode.y) * shock.lineOffset) // 8px sideways nudge
-          : cc.v2(Math.sign(node.x - centerNode.x) * shock.lineOffset, 0);
+          ? cc.v2(0, sign * shock.lineOffset) // 8px sideways nudge
+          : cc.v2(sign * shock.lineOffset, 0);
         // Relative tween keeps original coordinate intact after return.
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (cc.tween(node) as any)
@@ -229,7 +229,7 @@ export default class MoveFlowController extends cc.Component {
           .by(shock.lineDuration, { position: dir })
           .by(
             shock.lineDuration,
-            { position: dir.neg() },
+            { position: cc.v2(-dir.x, -dir.y) },
             { easing: "quadOut" },
           )
           .call(() => node.setPosition(Math.round(node.x), Math.round(node.y)))
