@@ -12,7 +12,7 @@
     "typecheck": "tsc --noEmit",
     "prepare": "husky install",
     "build:web": "cocoscli build --platform web-mobile # build web-mobile version into build/web-mobile",
-    "postinstall": "npx cocoscli --version # confirm cocos CLI is installed"
+    "postinstall": "patch-package && npx cocoscli --version # confirm cocos CLI is installed"
   },
   "// build:web script": "Generates the web-mobile build into build/web-mobile for GitHub Pages",
   "// postinstall script": "Verifies that cocoscli is available after npm install",
@@ -32,6 +32,7 @@
     "husky": "^9.1.7",
     "jest": "^30.0.5",
     "lint-staged": "^16.1.2",
+    "patch-package": "^8.0.0",
     "prettier": "^3.6.2",
     "seedrandom": "^3.0.5",
     "ts-jest": "^29.4.0",

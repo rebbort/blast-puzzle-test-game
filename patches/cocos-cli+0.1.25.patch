@@ -1,0 +1,15 @@
+diff --git a/node_modules/cocos-cli/bin/cocoscli.js b/node_modules/cocos-cli/bin/cocoscli.js
+index ea91011..6be5982 100755
+--- a/node_modules/cocos-cli/bin/cocoscli.js
++++ b/node_modules/cocos-cli/bin/cocoscli.js
+@@ -13,7 +13,9 @@ var glob = require('glob');
+ //var image = require('../src/image');
+ var basecmd = require('../src/basecmd');
+ //var tp = require('../src/texturepacker');
+-var argv = require('yargs')
++const yargs = require('yargs/yargs');
++const { hideBin } = require('yargs/helpers');
++var argv = yargs(hideBin(process.argv))
+     .usage('Usage: cocoscli command')
+     .example('cocoscli command', 'cocoscli command')
+     .help('h')
