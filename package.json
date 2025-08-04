@@ -11,11 +11,11 @@
     "lint": "eslint --config .eslintrc.cjs \"**/*.ts\"",
     "typecheck": "tsc --noEmit",
     "prepare": "husky install",
-    "build:web": "cocos-cli build --platform web-mobile --output build/web # build web version into build/web",
-    "postinstall": "npx cocos-cli --version # confirm cocos CLI is installed"
+    "build:web": "cocoscli build --platform web-mobile # build web-mobile version into build/web-mobile",
+    "postinstall": "npx cocoscli --version # confirm cocos CLI is installed"
   },
-  "// build:web script": "Generates the web-mobile build into build/web for GitHub Pages",
-  "// postinstall script": "Verifies that cocos-cli is available after npm install",
+  "// build:web script": "Generates the web-mobile build into build/web-mobile for GitHub Pages",
+  "// postinstall script": "Verifies that cocoscli is available after npm install",
   "keywords": [],
   "author": "",
   "license": "ISC",
