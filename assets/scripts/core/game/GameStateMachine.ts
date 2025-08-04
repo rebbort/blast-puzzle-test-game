@@ -42,17 +42,21 @@ export class GameStateMachine {
     private maxShuffles: number = 3,
   ) {}
 
+  private groupSelectedHandler = (p: cc.Vec2): void => this.onGroupSelected(p);
+  private boosterActivatedHandler = (): void => this.onBoosterActivated();
+  private boosterConsumedHandler = (): void => this.onBoosterConsumed();
+  private boosterCancelledHandler = (): void => this.onBoosterCancelled();
+  private moveCompletedHandler = (): void => this.onMoveCompleted();
+
   /**
    * Subscribe to relevant events and enter the initial WaitingInput state.
    */
   start(): void {
-    this.bus.on(EventNames.GroupSelected, (p: cc.Vec2) =>
-      this.onGroupSelected(p),
-    );
-    this.bus.on(EventNames.BoosterActivated, () => this.onBoosterActivated());
-    this.bus.on(EventNames.BoosterConsumed, () => this.onBoosterConsumed());
-    this.bus.on(EventNames.BoosterCancelled, () => this.onBoosterCancelled());
-    this.bus.on(EventNames.MoveCompleted, () => this.onMoveCompleted());
+    this.bus.on(EventNames.GroupSelected, this.groupSelectedHandler);
+    this.bus.on(EventNames.BoosterActivated, this.boosterActivatedHandler);
+    this.bus.on(EventNames.BoosterConsumed, this.boosterConsumedHandler);
+    this.bus.on(EventNames.BoosterCancelled, this.boosterCancelledHandler);
+    this.bus.on(EventNames.MoveCompleted, this.moveCompletedHandler);
     console.debug(
       "Listeners for GroupSelected:",
       this.bus.getListenerCount(EventNames.GroupSelected),
@@ -90,6 +94,14 @@ export class GameStateMachine {
     this.bus.emit(EventNames.TurnEnded, { score: this.score });
 
     this.changeState("WaitingInput");
+  }
+
+  destroy(): void {
+    this.bus.off(EventNames.GroupSelected, this.groupSelectedHandler);
+    this.bus.off(EventNames.BoosterActivated, this.boosterActivatedHandler);
+    this.bus.off(EventNames.BoosterConsumed, this.boosterConsumedHandler);
+    this.bus.off(EventNames.BoosterCancelled, this.boosterCancelledHandler);
+    this.bus.off(EventNames.MoveCompleted, this.moveCompletedHandler);
   }
 
   /**

@@ -31,6 +31,11 @@ export default class FillController extends cc.Component {
     bus.on(EventNames.FillDone, this.onFillDone, this);
   }
 
+  onDestroy(): void {
+    bus.off(EventNames.FillStarted, this.onFillStarted, this);
+    bus.off(EventNames.FillDone, this.onFillDone, this);
+  }
+
   /**
    * Spawns visual tiles for new board pieces created by FillCommand.
    * Core.FillCommand updates the model before emitting FillStarted so the

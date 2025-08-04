@@ -13,6 +13,10 @@ export default class TilePressFeedback extends cc.Component {
     bus.on(EventNames.TilePressed, this.onTilePressed, this);
   }
 
+  onDestroy(): void {
+    bus.off(EventNames.TilePressed, this.onTilePressed, this);
+  }
+
   private onTilePressed(pos: cc.Vec2): void {
     const view = this.boardCtrl.tileViews[pos.y]?.[pos.x];
     view?.pressFeedback();

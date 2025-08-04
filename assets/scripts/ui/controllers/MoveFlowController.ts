@@ -39,6 +39,14 @@ export default class MoveFlowController extends cc.Component {
     bus.on(EventNames.SuperTileActivated, this.onSuperTileActivated, this);
   }
 
+  onDestroy(): void {
+    bus.off(EventNames.RemoveStarted, this.onRemove, this);
+    bus.off(EventNames.FallDone, this.onFall, this);
+    bus.off(EventNames.FillDone, this.onFill, this);
+    bus.off(EventNames.SuperTileCreated, this.onSuperTileCreated, this);
+    bus.off(EventNames.SuperTileActivated, this.onSuperTileActivated, this);
+  }
+
   /**
    * Plays scale + fade animation on removed tile views.
    * @param positions coordinates of tiles removed by the core

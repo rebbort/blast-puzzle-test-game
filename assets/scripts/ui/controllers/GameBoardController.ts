@@ -256,4 +256,15 @@ export default class GameBoardController extends cc.Component {
       }
     }
   }
+
+  onDestroy(): void {
+    bus.off(EventNames.BoosterConfirmed, this.onBoosterConfirmed, this);
+    bus.off(
+      EventNames.BoosterTargetSelected,
+      this.onBoosterTargetSelected,
+      this,
+    );
+    bus.off(EventNames.BoosterCancelled, this.clearTeleportHighlight, this);
+    bus.off(EventNames.SwapDone, this.onSwapDone, this);
+  }
 }

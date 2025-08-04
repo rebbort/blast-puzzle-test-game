@@ -12,6 +12,19 @@ export default class TileInputController extends cc.Component {
   tilesLayer: cc.Node = null;
 
   private boardCtrl!: GameBoardController;
+  private onTouchEnd = (e: cc.Event.EventTouch): void => {
+    const worldPos = e.getLocation();
+    const local = this.tilesLayer.convertToNodeSpaceAR(worldPos);
+    // convert node-space coordinates to column/row using tile size
+    const col = Math.floor(
+      (local.x + this.tilesLayer.width / 2) / loadBoardConfig().tileWidth,
+    );
+    const row = Math.floor(
+      (this.tilesLayer.height / 2 - (local.y - 12)) /
+        loadBoardConfig().tileHeight,
+    );
+    this.handleTap(col, row);
+  };
 
   onLoad(): void {
     this.boardCtrl = this.getComponent(GameBoardController)!;
@@ -23,23 +36,11 @@ export default class TileInputController extends cc.Component {
     }
 
     // Attach a single click listener on the tilesLayer node
-    this.tilesLayer.on(
-      cc.Node.EventType.TOUCH_END,
-      (e: cc.Event.EventTouch) => {
-        const worldPos = e.getLocation();
-        const local = this.tilesLayer.convertToNodeSpaceAR(worldPos);
-        // convert node-space coordinates to column/row using tile size
-        const col = Math.floor(
-          (local.x + this.tilesLayer.width / 2) / loadBoardConfig().tileWidth,
-        );
-        const row = Math.floor(
-          (this.tilesLayer.height / 2 - (local.y - 12)) /
-            loadBoardConfig().tileHeight,
-        );
-        this.handleTap(col, row);
-      },
-      this,
-    );
+    this.tilesLayer.on(cc.Node.EventType.TOUCH_END, this.onTouchEnd, this);
+  }
+
+  onDestroy(): void {
+    this.tilesLayer.off(cc.Node.EventType.TOUCH_END, this.onTouchEnd, this);
   }
 
   handleTap(col: number, row: number): void {

@@ -31,6 +31,7 @@ export class HudController extends cc.Component {
   private turns: number = 0;
   private score: number = 0;
   private targetScore: number = 0;
+  private pauseHandler = (): void => this.onPauseClick();
 
   onLoad(): void {
     // Update moves counter when a turn is consumed
@@ -67,7 +68,7 @@ export class HudController extends cc.Component {
       .getChildByName("btnPause")
       ?.getComponent("Button") as NodeUtils | null;
 
-    this.btnPause?.node?.on("click", this.onPauseClick.bind(this));
+    this.btnPause?.node?.on("click", this.pauseHandler);
 
     // Display current FSM state in the HUD
     EventBus.on(EventNames.StateChanged, this.onStateChanged, this);
@@ -142,5 +143,13 @@ export class HudController extends cc.Component {
    */
   private onStateChanged(state: string): void {
     if (this.lblState) this.lblState.string = state;
+  }
+
+  onDestroy(): void {
+    EventBus.off(EventNames.TurnUsed, this.onTurnUsed, this);
+    EventBus.off(EventNames.TurnEnded, this.onTurnEnded, this);
+    EventBus.off(EventNames.TurnsInit, this.onTurnsInit, this);
+    EventBus.off(EventNames.StateChanged, this.onStateChanged, this);
+    this.btnPause?.node?.off("click", this.pauseHandler);
   }
 }

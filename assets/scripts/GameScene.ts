@@ -21,6 +21,7 @@ export default class GameScene extends cc.Component {
   private executor!: MoveExecutor;
   private scoreStrategy!: ScoreStrategyQuadratic;
   private turns!: TurnManager;
+  private logger: MoveSequenceLogger | null = null;
   private currentState: GameState = "WaitingInput";
 
   private onStateChange = (s: GameState): void => {
@@ -71,7 +72,7 @@ export default class GameScene extends cc.Component {
     this.turns = new TurnManager(20, EventBus);
 
     // Diagnostic helper that tracks event sequence for each move.
-    new MoveSequenceLogger(EventBus, board);
+    this.logger = new MoveSequenceLogger(EventBus, board);
 
     EventBus.on(EventNames.StateChanged, this.onStateChange);
     EventBus.on(EventNames.BoostersSelected, this.onBoostersSelected);
@@ -89,6 +90,8 @@ export default class GameScene extends cc.Component {
   }
 
   onDestroy(): void {
+    this.fsm?.destroy();
+    this.logger?.destroy();
     EventBus.off(EventNames.StateChanged, this.onStateChange);
     EventBus.off(EventNames.BoostersSelected, this.onBoostersSelected);
     EventBus.off(EventNames.GameRestart, this.onGameRestart);

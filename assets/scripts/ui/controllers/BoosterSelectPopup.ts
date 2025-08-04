@@ -26,6 +26,7 @@ export default class BoosterSelectPopup extends cc.Component {
 
   private slots: BoosterSlot[] = [];
   private animationController: BoosterSelectAnimationController = null;
+  private onPlayButton = (): void => this.startGame();
 
   onLoad(): void {
     this.animationController = this.getComponent(
@@ -43,7 +44,7 @@ export default class BoosterSelectPopup extends cc.Component {
 
   start(): void {
     const playButton = this.node.getChildByName("PlayButton");
-    playButton?.on(cc.Node.EventType.TOUCH_END, () => this.startGame());
+    playButton?.on(cc.Node.EventType.TOUCH_END, this.onPlayButton, this);
   }
 
   private createSlots(): void {
@@ -135,5 +136,11 @@ export default class BoosterSelectPopup extends cc.Component {
     if (this.animationController) {
       this.animationController.showAllImmediately();
     }
+  }
+
+  onDestroy(): void {
+    const playButton = this.node.getChildByName("PlayButton");
+    playButton?.off(cc.Node.EventType.TOUCH_END, this.onPlayButton, this);
+    this.slots.forEach((s) => s.node.off(cc.Node.EventType.TOUCH_END));
   }
 }

@@ -18,6 +18,7 @@ export class MoveSequenceLogger {
   private fillTimer: ReturnType<typeof setTimeout> | null = null;
   private status: MoveSequenceStatus = { step: "init", unsynced: false };
   private listeners: StatusListener[] = [];
+  private fallDoneHandler = (): void => this.update("fall done");
 
   constructor(
     private bus: InfrastructureEventBus,
@@ -26,7 +27,7 @@ export class MoveSequenceLogger {
     MoveSequenceLogger.current = this;
     bus.on(EventNames.GroupSelected, this.onGroupSelected, this);
     bus.on(EventNames.TilesRemoved, this.onTilesRemoved, this);
-    bus.on(EventNames.FallDone, () => this.update("fall done"), this);
+    bus.on(EventNames.FallDone, this.fallDoneHandler, this);
     bus.on(EventNames.FillStarted, this.onFillStarted, this);
     bus.on(EventNames.FillDone, this.onFillDone, this);
     bus.on(EventNames.MoveCompleted, this.onMoveCompleted, this);
@@ -99,5 +100,18 @@ export class MoveSequenceLogger {
       rows.push(cols.join(""));
     }
     return rows.join("|");
+  }
+
+  destroy(): void {
+    this.bus.off(EventNames.GroupSelected, this.onGroupSelected, this);
+    this.bus.off(EventNames.TilesRemoved, this.onTilesRemoved, this);
+    this.bus.off(EventNames.FallDone, this.fallDoneHandler, this);
+    this.bus.off(EventNames.FillStarted, this.onFillStarted, this);
+    this.bus.off(EventNames.FillDone, this.onFillDone, this);
+    this.bus.off(EventNames.MoveCompleted, this.onMoveCompleted, this);
+    if (this.fillTimer) {
+      clearTimeout(this.fillTimer);
+      this.fillTimer = null;
+    }
   }
 }
