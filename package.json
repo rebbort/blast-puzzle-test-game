@@ -11,7 +11,7 @@
     "lint": "eslint --config .eslintrc.cjs \"**/*.ts\"",
     "typecheck": "tsc --noEmit",
     "prepare": "husky install",
-    "build:web": "cocoscli build --platform web-mobile # build web-mobile version into build/web-mobile",
+    "build:web": "npx cocoscli build --platform web-mobile --output build/web-mobile",
     "postinstall": "npx cocoscli --version # confirm cocos CLI is installed"
   },
   "// build:web script": "Generates the web-mobile build into build/web-mobile for GitHub Pages",

@@ -31,23 +31,20 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # 4) Глобально ставим cocos-CLI, если отсутствует
+      # 4) Проверяем доступность cocoscli через npx
       - name: Ensure cocos CLI is available
         run: |
-          if ! command -v cocos >/dev/null 2>&1; then
-            npm install -g cocos-cli
-          fi
-          cocos --version      # логируем версию
+          npx cocoscli --version      # логируем версию
 
-      # 5) Собираем Web-Mobile (скрипт должен быть в package.json)
+      # 5) Собираем Web-Mobile через npx cocoscli
       - name: Build web assets
-        run: npm run build:web # → build/web/
+        run: npm run build:web # → build/web-mobile/
 
       # 6) Готовим папку для деплоя
       - name: Prepare deployment folder
         run: |
           mkdir -p deploy
-          cp -r build/web/* deploy/
+          cp -r build/web-mobile/* deploy/
 
       # 7) Публикуем в ветку gh-pages
       - name: Publish to GitHub Pages
