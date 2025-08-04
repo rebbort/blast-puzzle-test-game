@@ -1,57 +1,35 @@
 # .github/workflows/gh-pages.yml
 # ---------------------------------------------------------------
-# Deploy Web-Mobile build (Cocos Creator 2.4.x) to GitHub Pages.
-# — Trigger: manual “Run workflow” in the Actions tab (workflow_dispatch)
-# — Output: pushes contents of build/web/ → branch gh-pages
+# Deploy prebuilt Web-Mobile archive to GitHub Pages.
+# — Trigger: push to release branch
+# — Input: release.tar.gz archived build
+# — Output: contents published to gh-pages branch
 # ---------------------------------------------------------------
 
 name: Deploy
 
 on:
-  workflow_dispatch: # ← запускается вручную
+  push:
+    branches: [release]
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest # Linux-runner
-
+    runs-on: ubuntu-latest
     steps:
-      # 1) Получаем репозиторий с LFS-ассетами
       - name: Checkout source
         uses: actions/checkout@v4
         with:
-          lfs: true # ⚠️ тянем большие PNG/Prefab из Git LFS
+          lfs: true
 
-      # 2) Node.js для npm-скриптов / cocos-CLI
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20 # LTS 20
-
-      # 3) Устанавливаем зависимости (package-lock.json обязателен)
-      - name: Install dependencies
-        run: npm ci
-
-      # 4) Проверяем доступность cocoscli через npx
-      - name: Ensure cocos CLI is available
-        run: |
-          npx cocoscli --version      # логируем версию
-
-      # 5) Собираем Web-Mobile через npx cocoscli
-      - name: Build web assets
-        run: npm run build:web # → build/web-mobile/
-
-      # 6) Готовим папку для деплоя
-      - name: Prepare deployment folder
+      - name: Extract release archive
         run: |
           mkdir -p deploy
-          cp -r build/web-mobile/* deploy/
+          tar -xzf release.tar.gz -C deploy
 
-      # 7) Публикуем в ветку gh-pages
       - name: Publish to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }} # токен по умолчанию
-          publish_branch: gh-pages # ветка для Pages
-          publish_dir: ./deploy # что именно пушим
-          force_orphan: true # чистая история
-
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: ./deploy
+          force_orphan: true
