@@ -10,6 +10,7 @@ import { initBoosterService } from "./core/boosters/BoosterSetup";
 import { EventNames } from "./core/events/EventNames";
 import BoosterSelectPopup from "./ui/controllers/BoosterSelectPopup";
 import { boosterSelectionService } from "./ui/services/BoosterSelectionService";
+import { SoundController } from "./core/fx/SoundController";
 
 const { ccclass } = cc._decorator;
 
@@ -22,6 +23,7 @@ export default class GameScene extends cc.Component {
   private scoreStrategy!: ScoreStrategyQuadratic;
   private turns!: TurnManager;
   private currentState: GameState = "WaitingInput";
+  private sounds!: SoundController;
 
   private onStateChange = (s: GameState): void => {
     this.currentState = s;
@@ -70,6 +72,9 @@ export default class GameScene extends cc.Component {
     this.scoreStrategy = new ScoreStrategyQuadratic(1);
     this.turns = new TurnManager(20, EventBus);
 
+    // Initialize sound effects controller
+    this.sounds = new SoundController(EventBus);
+
     // Diagnostic helper that tracks event sequence for each move.
     new MoveSequenceLogger(EventBus, board);
 
@@ -92,5 +97,6 @@ export default class GameScene extends cc.Component {
     EventBus.off(EventNames.StateChanged, this.onStateChange);
     EventBus.off(EventNames.BoostersSelected, this.onBoostersSelected);
     EventBus.off(EventNames.GameRestart, this.onGameRestart);
+    this.sounds.destroy();
   }
 }
