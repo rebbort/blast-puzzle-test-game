@@ -19,6 +19,13 @@ jobs:
       - name: Install dependencies
         run: npm ci # Install exact versions from package-lock.json
 
+      - name: Ensure cocos CLI is available
+        run: |
+          if ! command -v cocoscli >/dev/null 2>&1; then
+            npm install -g cocos-cli
+          fi
+          cocoscli --version # Output installed version for logging
+
       - name: Build web assets
         run: npm run build:web # Generate build/web-mobile
 
