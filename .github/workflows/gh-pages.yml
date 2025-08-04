@@ -1,43 +1,60 @@
-# Build and deploy web assets to GitHub Pages
-name: Deploy # Human-friendly name for the workflow
+# .github/workflows/gh-pages.yml
+# ---------------------------------------------------------------
+# Deploy Web-Mobile build (Cocos Creator 2.4.x) to GitHub Pages.
+# — Trigger: manual “Run workflow” in the Actions tab (workflow_dispatch)
+# — Output: pushes contents of build/web/ → branch gh-pages
+# ---------------------------------------------------------------
+
+name: Deploy
 
 on:
-  workflow_dispatch: # Allow manual runs only
+  workflow_dispatch: # ← запускается вручную
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest # Use a Linux runner
+    runs-on: ubuntu-latest # Linux-runner
+
     steps:
+      # 1) Получаем репозиторий с LFS-ассетами
       - name: Checkout source
-        uses: actions/checkout@v4 # Fetch repository contents
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4 # Provide Node for build step
+        uses: actions/checkout@v4
         with:
-          node-version: 20 # Utilize Node 20 LTS
+          lfs: true # ⚠️ тянем большие PNG/Prefab из Git LFS
 
+      # 2) Node.js для npm-скриптов / cocos-CLI
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20 # LTS 20
+
+      # 3) Устанавливаем зависимости (package-lock.json обязателен)
       - name: Install dependencies
-        run: npm ci # Install exact versions from package-lock.json
+        run: npm ci
 
+      # 4) Глобально ставим cocos-CLI, если отсутствует
       - name: Ensure cocos CLI is available
         run: |
-          if ! command -v cocoscli >/dev/null 2>&1; then
+          if ! command -v cocos >/dev/null 2>&1; then
             npm install -g cocos-cli
           fi
-          cocoscli --version # Output installed version for logging
+          cocos --version      # логируем версию
 
+      # 5) Собираем Web-Mobile (скрипт должен быть в package.json)
       - name: Build web assets
-        run: npm run build:web # Generate build/web-mobile
+        run: npm run build:web # → build/web/
 
+      # 6) Готовим папку для деплоя
       - name: Prepare deployment folder
         run: |
-          mkdir -p deploy # Create directory for deployment artifacts
-          cp -r build/web-mobile/* deploy/ # Copy built web files
+          mkdir -p deploy
+          cp -r build/web/* deploy/
 
+      # 7) Публикуем в ветку gh-pages
       - name: Publish to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4 # Push files to gh-pages branch
+        uses: peaceiris/actions-gh-pages@v4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }} # Authentication token
-          publish_branch: gh-pages # Pages branch
-          publish_dir: ./deploy # Directory to publish
-          force_orphan: true # Create orphan branch for clean history
+          github_token: ${{ secrets.GITHUB_TOKEN }} # токен по умолчанию
+          publish_branch: gh-pages # ветка для Pages
+          publish_dir: ./deploy # что именно пушим
+          force_orphan: true # чистая история
+
