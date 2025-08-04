@@ -2,9 +2,7 @@
 name: Deploy # Human-friendly name for the workflow
 
 on:
-  push:
-    branches:
-      - main # Trigger only when committing to main branch
+  workflow_dispatch: # Allow manual runs only
 
 jobs:
   deploy:
