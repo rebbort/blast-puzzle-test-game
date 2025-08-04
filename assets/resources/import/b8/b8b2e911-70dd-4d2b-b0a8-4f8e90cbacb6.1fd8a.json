@@ -1,0 +1,51 @@
+[
+  1,
+  [
+    "30sE/4aXVFrr3DCEKaTntK"
+  ],
+  [
+    "_textureSetter"
+  ],
+  [
+    "cc.SpriteFrame"
+  ],
+  0,
+  [
+    {
+      "name": "icon_booster_bomb",
+      "rect": [
+        2,
+        2,
+        93,
+        108
+      ],
+      "offset": [
+        1,
+        2.5
+      ],
+      "originalSize": [
+        95,
+        117
+      ],
+      "capInsets": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  [
+    0
+  ],
+  0,
+  [
+    0
+  ],
+  [
+    0
+  ],
+  [
+    0
+  ]
+]

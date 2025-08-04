@@ -1,0 +1,51 @@
+[
+  1,
+  [
+    "52DCEZUH1JdI36b4XApw32"
+  ],
+  [
+    "_textureSetter"
+  ],
+  [
+    "cc.SpriteFrame"
+  ],
+  0,
+  [
+    {
+      "name": "icon_booster_superCol",
+      "rect": [
+        6,
+        0,
+        89,
+        111
+      ],
+      "offset": [
+        0.5,
+        0.5
+      ],
+      "originalSize": [
+        100,
+        112
+      ],
+      "capInsets": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  [
+    0
+  ],
+  0,
+  [
+    0
+  ],
+  [
+    0
+  ],
+  [
+    0
+  ]
+]
