@@ -216,11 +216,15 @@ export default class MoveFlowController extends cc.Component {
         if (!view || !view.isInteractive()) continue;
 
         const node = view.node;
+        // Direction points away from the rocket path. For a horizontal rocket
+        // tiles above should move further up and tiles below further down.
+        // Same idea for vertical rockets: tiles left of the path move further
+        // left, tiles on the right move further right.
         const sign = isRow
-          ? Math.sign(center.y - t.y)
-          : Math.sign(center.x - t.x);
+          ? Math.sign(t.y - center.y)
+          : Math.sign(t.x - center.x);
         const dir = isRow
-          ? cc.v2(0, sign * shock.lineOffset) // 8px sideways nudge
+          ? cc.v2(0, -sign * shock.lineOffset) // 8px sideways nudge
           : cc.v2(sign * shock.lineOffset, 0);
         // Relative tween keeps original coordinate intact after return.
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
