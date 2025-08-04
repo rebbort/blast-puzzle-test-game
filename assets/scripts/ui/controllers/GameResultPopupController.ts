@@ -28,6 +28,10 @@ export class PopupController extends cc.Component {
   /** Original position of ResultLine for animation */
   private originalResultLinePosition: cc.Vec3 = cc.Vec3.ZERO;
 
+  /** Cached handlers so we can unsubscribe without removing others' listeners. */
+  private onWin = (score: number): void => this.show(true, score);
+  private onLose = (score: number): void => this.show(false, score);
+
   onLoad(): void {
     // Save the original position of ResultLine
     if (this.resultLine) {
@@ -42,15 +46,13 @@ export class PopupController extends cc.Component {
   }
 
   onEnable(): void {
-    EventBus.on(EventNames.GameWon, (score: number) => this.show(true, score));
-    EventBus.on(EventNames.GameLost, (score: number) =>
-      this.show(false, score),
-    );
+    EventBus.on(EventNames.GameWon, this.onWin);
+    EventBus.on(EventNames.GameLost, this.onLose);
   }
 
   onDisable(): void {
-    EventBus.off(EventNames.GameWon);
-    EventBus.off(EventNames.GameLost);
+    EventBus.off(EventNames.GameWon, this.onWin);
+    EventBus.off(EventNames.GameLost, this.onLose);
   }
 
   /**
