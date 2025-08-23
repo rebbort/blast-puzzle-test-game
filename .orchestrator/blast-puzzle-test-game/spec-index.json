@@ -1,0 +1,44 @@
+[
+  {
+    "id": "5",
+    "title": "Intro",
+    "startLine": 1,
+    "endLine": 3,
+    "sha256": "7bd75e38a344f93bf2cd6518d002d82a3b98a5d6656c4ec9b71e59b843c7e77e"
+  },
+  {
+    "id": "6.2",
+    "title": "Gameplay",
+    "startLine": 4,
+    "endLine": 10,
+    "sha256": "5a30735108cef5342b0f1a5061ad81dbcb882fc67a59917c6544537d2dd008f4"
+  },
+  {
+    "id": "6.2.A",
+    "title": "Deep Dive",
+    "startLine": 11,
+    "endLine": 13,
+    "sha256": "aa29472842c2914a356781a4741940160465329598ba1c3b1ae09a1697401b1e"
+  },
+  {
+    "id": "9.2",
+    "title": "Scoring",
+    "startLine": 14,
+    "endLine": 16,
+    "sha256": "bd559578a27d36e54ab0575a6a85ea435cbaec7445365687ffaca8c6b41d1d51"
+  },
+  {
+    "id": "18",
+    "title": "Final",
+    "startLine": 17,
+    "endLine": 19,
+    "sha256": "ccefe2104cdad0e45fdd78c7a71ee7be9fe1f4e11783914188b1f6eb9f241eab"
+  },
+  {
+    "id": "18.F",
+    "title": "Appendix",
+    "startLine": 20,
+    "endLine": 22,
+    "sha256": "71c7ec3fcdcc5a8af224f2522ccc64691815a8cf24a5b073a73d2d5207428b22"
+  }
+]
